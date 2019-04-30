@@ -1,27 +1,27 @@
 # 日常笔记
 操作系统-<br/>
-  |-ArchLinux<br/>
-  |-CentOS<br/>
-  |-Ubunto<br/>
+&nbsp;&nbsp;|-ArchLinux<br/>
+&nbsp;&nbsp;|-CentOS<br/>
+&nbsp;&nbsp;|-Ubunto<br/>
 数据库-<br/>
-  |-MySQL<br/>
+&nbsp;&nbsp;|-MySQL<br/>
 服务器-<br/>
-  |-Nginx<br/>
-  |-workerman<br/>
-  |-websocketed<br/>
-  |-vsftpd<br/>
+&nbsp;&nbsp;|-Nginx<br/>
+&nbsp;&nbsp;|-workerman<br/>
+&nbsp;&nbsp;|-websocketed<br/>
+&nbsp;&nbsp;|-vsftpd<br/>
 框架-<br/>
-  |-Zend<br/>
-  |-thinkPHP<br/>
-  |-Django<br/>
-  |-Tornado<br/>
-  |-Vue.js<br/>
+&nbsp;&nbsp;|-Zend<br/>
+&nbsp;&nbsp;|-thinkPHP<br/>
+&nbsp;&nbsp;|-Django<br/>
+&nbsp;&nbsp;|-Tornado<br/>
+&nbsp;&nbsp;|-Vue.js<br/>
 语言-<br/>
-  |-C/C++<br/>
-  |-HTML5<br/>
-  |-Javascript、Jquery<br/>
-  |-PHP<br/>
-  |-Python<br/>
-  |-Shell<br/>
-  |-XML<br/>
-  |-微信小程序<br/>
+&nbsp;&nbsp;|-C/C++<br/>
+&nbsp;&nbsp;|-HTML5<br/>
+&nbsp;&nbsp;|-Javascript、Jquery<br/>
+&nbsp;&nbsp;|-PHP<br/>
+&nbsp;&nbsp;|-Python<br/>
+&nbsp;&nbsp;|-Shell<br/>
+&nbsp;&nbsp;|-XML<br/>
+&nbsp;&nbsp;|-微信小程序<br/>
