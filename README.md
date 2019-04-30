@@ -1,3 +1,27 @@
-# 笔记目录说明
-1\
-2\
+# 日常笔记
+操作系统-
+  |-ArchLinux
+  |-CentOS
+  |-Ubunto
+数据库-
+  |-MySQL
+服务器-
+  |-Nginx
+  |-workerman
+  |-websocketed
+  |-vsftpd
+框架-
+  |-Zend
+  |-thinkPHP
+  |-Django
+  |-Tornado
+  |-Vue.js
+语言-
+  |-C/C++
+  |-HTML5
+  |-Javascript、Jquery
+  |-PHP
+  |-Python
+  |-Shell
+  |-XML
+  |-微信小程序
