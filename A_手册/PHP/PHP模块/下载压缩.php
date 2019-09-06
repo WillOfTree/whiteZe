@@ -1,35 +1,51 @@
 <?php
+class ZipF
+{
+    /**
+     * 下载文件夹位置
+     * @var [type]
+     */
+    private $DOWNPATH = "./Down/";
 
     /**
      * 下载压缩
-     *
-     * @param string $downDir 下载目录
-     * @param string $packDir 打包目录
      */
-    public function zip($downDir, $packDir) {
+    function zip() {
         
         $time = time();
         $time = date('Y-m-d*H-i-s', $time); //最终生成的文件名（含路径）
+        
+        //下载文件目录及文件名
+        // $filename = $this->DOWNPATH . $name . "/" . $time . '.zip';
+        $filename = $time . '.zip';
+        //压缩的目录
+        $resultPath = $this->DOWNPATH . $name;
 
+        /**
+         * 压缩方法
+         */
         $zip = new ZipArchive();
-        if ($zip->open($downDir, ZipArchive::CREATE) === TRUE) {
+        if ($zip->open($filename, ZipArchive::CREATE) === TRUE) {
             //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
-            $this->addFileToZip($packDir, $zip);
+            $this->addFileToZip($resultPath, $zip);
             $zip->close();
         }
 
+        /**
+         * 下载方法
+         */
         header("Cache-Control: public");
         header("Content-Description: File Transfer");
         //文件名
-        header('Content-disposition: attachment; filename=' . basename($downDir));
+        header('Content-disposition: attachment; filename=' . basename($filename));
         //zip格式的
         header("Content-Type: application/zip");
         //告诉浏览器，这是二进制文件
         header("Content-Transfer-Encoding: binary");
         //告诉浏览器，文件大小
-        header('Content-Length: ' . filesize($downDir));
-        @readfile($downDir);
-        unlink($downDir);
+        header('Content-Length: ' . filesize($filename));
+        @readfile($filename);
+        unlink("$filename");
         exit();
     }
 
@@ -92,3 +108,4 @@
         @closedir($path);
         return $folder;
     }
+}
