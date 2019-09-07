@@ -1,6 +1,6 @@
 # code配置
 
-{
+    {
     "files.associations": {
         ".cjson": "jsonc", 
         ".wxss": "css", 
@@ -46,6 +46,5 @@
     "editor.renderWhitespace": "none",
     "window.menuBarVisibility": "default",
     "editor.fontSize": 16,
-    
     }
     
