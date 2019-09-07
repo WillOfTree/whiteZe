@@ -1,6 +1,7 @@
+# code配置
+
 {
     "files.associations": {
-        
         ".cjson": "jsonc", 
         ".wxss": "css", 
         ".wxs": "javascript", 
