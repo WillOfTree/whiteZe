@@ -1,18 +1,15 @@
-{
-    "workbench.colorTheme": "Visual Studio Light",
-    "files.associations": {
-        "*.cjson": "jsonc",
-        "*.wxss": "css",
-        "*.wxs": "javascript",
-        "*.py": "python", // 配置这里可以显示运行按钮
-        // "*.cpp": "C++"
-    },
-    "emmet.includeLanguages": {
-        "wxml": "html"
-    },
-    // "minapp-vscode.disableAutoConfig": true,
-    "files.autoSave": "onFocusChange",
+# code配置
 
+    {
+    "files.associations": {
+        ".cjson": "jsonc", 
+        ".wxss": "css", 
+        ".wxs": "javascript", 
+        ".py": "python", 
+        // 配置这里可以显示运行按钮 // ".cpp": "C++" 
+    }, 
+    "emmet.includeLanguages": { "wxml": "html" }, 
+    // "minapp-vscode.disableAutoConfig": true, "files.autoSave": "onFocusChange",
     "editor.fontFamily": "'Fira Code', Consolas, 'Courier New', monospace",
     "editor.fontLigatures": true,
     "editor.fontWeight": "400" ,
@@ -25,7 +22,6 @@
     "editor.acceptSuggestionOnEnter": "on",
     "editor.codeLens": false,
     "editor.minimap.enabled": true,
-
     "window.zoomLevel": 1,
     "[javascript]": {
         "editor.defaultFormatter": "HookyQR.beautify"
@@ -33,17 +29,12 @@
     "[json]": {
         "editor.defaultFormatter": "HookyQR.beautify"
     },
-    // "code-runner.defaultLanguage": "zh-cn",
-    // "code-runner.executorMap": {}
-    // "code-runner.runInTerminal": true,
-    // "code-runner.saveAllFilesBeforeRun": true,
-    // "python.pythonPath": "c:\\users\\administrator\\envs\\one\\lib\\site-packages",
-    "python.venvPath": "c:\\users\\administrator\\envs",
-    "python.venvFolders": [
-        "envs",
-        ".pyenv",
-        ".direnv"
-    ],
+    // "python.venvPath": "c:\\users\\administrator\\envs",
+    // "python.venvFolders": [
+    //     "envs",
+    //     ".pyenv",
+    //     ".direnv"
+    // ],
     "workbench.statusBar.visible": true,
     "workbench.activityBar.visible": true,
     "workbench.editor.showTabs":false,
@@ -54,4 +45,6 @@
     "breadcrumbs.enabled": false,
     "editor.renderWhitespace": "none",
     "window.menuBarVisibility": "default",
-}
+    "editor.fontSize": 16,
+    }
+    
