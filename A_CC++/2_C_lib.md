@@ -1,6 +1,8 @@
-# IO函数
+# 函数集合
 
-## printf 格式化打印
+## IO函数
+
+### printf 格式化打印
 
 ```c
 /* 头文件 */
@@ -41,11 +43,11 @@ int main()
 scanf_s 是vs编译器提供的
 ```
 
-## getchar
+### getchar
 
-# 字符串函数
+## 字符串函数
 
-## strlen-求字符串长度
+### strlen-求字符串长度
 
 ```c
 /* 头文件 */
@@ -64,7 +66,7 @@ printf("%d", strlen(a)); //不确定的个数，a中没有 \0
 strlen("abc") - strlen("abcde") > 0
 ```
 
-## strcpy-字符串赋值
+### strcpy-字符串赋值
 
 ```c
 /* 头文件 */
@@ -88,7 +90,7 @@ char *a = "xxxxx";
 strcpy(a, "ab");//a是常量不可修改
 ```
 
-## strcat-字符串追加
+### strcat-字符串追加
 
 ```c
 /* 头文件 */
@@ -109,7 +111,7 @@ strcat("hallo", "world"); // a为 halloworld
 strcat(a, a); //不能自己追加自己，因为 \0 被去掉了
 ```
 
-## strcmp-字符串比较
+### strcmp-字符串比较
 
 ```c
 /* 头文件 */
@@ -128,7 +130,7 @@ char *str1 = "abc";
 char *str2 = "abcd";
 ```
 
-## strncpy
+### strncpy
 
 ```c
 /* 头文件 */
@@ -142,7 +144,7 @@ int *strncpy(char *destination, const char *source, size_t num)
 strcpy(a, b, 5);
 ```
 
-## strncat
+### strncat
 
 ```c
 /* 头文件 */
@@ -157,7 +159,7 @@ char *strcat(char *destination, const char *source, size_t num)
 strncat(arr, "hallo", 2);
 ```
 
-## strncmp
+### strncmp
 
 ```c
 /* 头文件 */
@@ -172,7 +174,7 @@ strncat(arr, "hallo", 2);
 int *strcmp(const char *str1, const char *str2, size_t num)
 ```
 
-## strstr-在字符串中找其他字符串
+### strstr-在字符串中找其他字符串
 
 ```c
 /* 头文件 */
@@ -190,7 +192,7 @@ char *ret = strstr(str1, str2);
 if(ret == NULL) printf("没找到")
 ```
 
-## strtok-切割字符串
+### strtok-切割字符串
 
 ```c
 /* 头文件 */
@@ -221,7 +223,7 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 }
 ```
 
-# 字符分类函数
+## 字符分类函数
 
 #include <ctype.h>
 
@@ -239,11 +241,11 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 | isgraph  |               |
 | isprint  |               |
 
-# 内存函数
+## 内存函数
 
 为什么要有内存函数，因为字符串库等其他，有缺陷如strcpy不能复制数组
 
-## malloc-堆空间申请动态空间
+### malloc-堆空间申请动态空间
 
 ```c
 /*
@@ -282,9 +284,7 @@ int (*arr)[2] = (int(*)[])malloc(sizeof(int)*3*2)；
 arr[1][2];
 ```
 
-
-
-## free-释放空间
+### free-释放空间
 
 必须由malloc,calloc,realloc申请的空间的指针
 
@@ -292,7 +292,7 @@ arr[1][2];
 free(a); //a是一个指针，必须是malloc申请的空间
 ```
 
-## calloc-自动申请N个空间
+### calloc-自动申请N个空间
 
 动态申请N个长度为size的空间,并自动初始化为0
 
@@ -303,7 +303,7 @@ void *calloc(size_t N, size_t size)
 int *p = (int *)calloc(8, sizeof(int));
 ```
 
-## realloc-重新分配空间
+### realloc-重新分配空间
 
 重新分配的空间大，原数据不会丢失
 
@@ -317,7 +317,7 @@ void *realloc(void *ptr, size_t size)
 int *pt = (int *)realloc(p, 8*sizeof(int));
 ```
 
-## memset-内存设置
+### memset-内存设置
 
 ```c
 #include <stdlib.h>
@@ -332,7 +332,7 @@ int *p = NULL;
 memset(p, 0, sizeof(int)*10);
 ```
 
-## memcpy-内存拷贝(不支持重叠)
+### memcpy-内存拷贝(不支持重叠)
 
 ```c
 #include<stdlib.h>
@@ -353,7 +353,7 @@ memcpy(arr2, arr1, 20)；
 memcpy(arr+2, arr, 20)
 ```
 
-## memmove-内存拷贝(重叠)
+### memmove-内存拷贝(重叠)
 
 ```c
 #include<stdlib.h>
@@ -378,7 +378,7 @@ memmove(arr+2, arr, 20);
 memcpy(arr+2, arr, 20)
 ```
 
-## memcmp-内存比较
+### memcmp-内存比较
 
 ```c
 #include<stdlib.h>
@@ -397,11 +397,11 @@ float arr2[] = {1.0, 3.0}
 int ret = memcmp(arr1, arr2, 4);
 ```
 
-# 中断与错误信息
+## 中断与错误信息
 
-## assert-断言中断程序
+### assert-断言中断程序
 
-## strerror-返回错误码
+### strerror-返回错误码
 
 ```c
 /* 头文件 */
@@ -419,7 +419,7 @@ strerror(errno);
 printf("%s\n", strerror(0) )
 ```
 
-## perror-打印错误信息
+### perror-打印错误信息
 
 ```c
 #include <stdio.h>
@@ -428,9 +428,9 @@ printf("%s\n", strerror(0) )
 perror("自定义字符")
 ```
 
-# 文件操作
+## 文件操作
 
-## 操作符
+### 操作符
 
 1. r：只读模式，文件必须存在，从头写入
 2. w：写模式，文件不存在创建，从头写入
@@ -440,7 +440,7 @@ perror("自定义字符")
 6. a+：读和追加模式，文件不存在创建，在末尾添加
 7. b：二进制文件读写，不会对\r\n进行转换，其他会自动进行转换
 
-## 打开文件
+### 打开文件
 
 ```c
 // 头文件
@@ -459,7 +459,7 @@ FILE *f = fopen("xxx.txt"， "r");
 if( f == NULL) printf("打开失败");
 ```
 
-## 写方法
+### 写方法
 
 ```c
 // 头文件
@@ -505,7 +505,7 @@ fwrite
 int fseek(FILE *stream, long int offset, int origin)
 ```
 
-## 关闭文件
+### 关闭文件
 
 ```c
 #include <stdio.h>
@@ -516,7 +516,7 @@ fclose(f);
 f=NULL
 ```
 
-## 例子
+### 例子
 
 ```c
 #include <stdio.h>
@@ -539,9 +539,9 @@ int main()
 }
 ```
 
-## 位置指针
+### 位置指针
 
-## 文件流
+### 文件流
 
 1. 标准输入流(stdin)-键盘
 2. 标准输出流(stdout)-屏幕
@@ -561,13 +561,78 @@ int main()
 }
 ```
 
-# stddef.h
+## stddef.h
 
-## offsetof-偏移量计算
+### offsetof-偏移量计算
 
 ```c
 #include <stddef.h>
 
 //计算c1相对于s的偏移量
 offsetof(struct s, c1)
+```
+
+## 算法函数
+
+### qsort-快排
+
+``` c
+/** 
+Function Name: qsort() 
+Describe: 快速排序
+Parameter:
+    base    指向要排序的数组的第一个元素的指针。
+    nitems  base数组中元素的个数。
+    size    base数组中每个元素的大小，以字节为单位,sizeof即可。
+    compar  用来比较两个元素的函数。
+*/ 
+#include <stdlib.h>
+void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
+
+/** 
+Function Name:  compar()
+Describe: 快速排序中自定义的比较函数
+Parameter:
+    const void *a 快排的标准数,i指针
+    const void *b 快排的比较数，j指针
+return: 正序a-b, 逆序b-a
+**/
+int cmp(const void *a, const void *b) 
+
+//使用方法
+int a[] = {1,3,5,6,34,0};
+qsort(a, 6, sizeof(int), cmp);
+
+int cmp(const void *a, const void *b)
+{
+    int a1 = *(int *)a; //必须得强制转换为int，void无法进行计算
+    int b1 = *(int *)b;
+
+    return a-b;
+}
+
+```
+
+### bsearch-二叉树查找
+
+``` c
+/** 
+Function Name: bsearch() 
+Describe: 二叉排序查找方法
+Parameter:
+    key -- 要查找的元素的指针，类型转换为 void*。
+    base -- 进行查找的数组的第一个对象的指针，类型转换为 void*。
+    nitems -- base 所指向的数组中元素的个数。
+    size -- 数组中每个元素的大小，以字节为单位。
+    compar -- 用来比较两个元素的函数。
+**/
+#include <stdlib.h>
+void *bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *))
+
+//例
+int *item;
+int key = 32;
+
+/* 使用 bsearch() 在数组中查找值 32 */
+item = (int*) bsearch (&key, values, 5, sizeof (int), cmpfunc);
 ```
