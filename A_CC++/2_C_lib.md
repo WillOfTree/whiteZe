@@ -272,7 +272,8 @@ malloc创建二维数组
 //2、sizeof(int*)是创建的箱子里存放什么类型，*10是10个
 int **arr = (int**)malloc(sizeof(int*)*10);
 for(i=0; i<10; ++i){
-    arr[i] = (int*)malloc(sizeof(int)*10);
+    // malloc创建的空间，不能使用[]进行赋值,但可以使用[]取值
+    //arr[i] = (int*)malloc(sizeof(int)*10);
     *(arr+i) = (int*)malloc(sizeof(int)*10);
 }
 
@@ -576,7 +577,7 @@ offsetof(struct s, c1)
 
 ### qsort-快排
 
-``` c
+```c
 /** 
 Function Name: qsort() 
 Describe: 快速排序
@@ -610,12 +611,11 @@ int cmp(const void *a, const void *b)
 
     return a-b;
 }
-
 ```
 
 ### bsearch-二叉树查找
 
-``` c
+```c
 /** 
 Function Name: bsearch() 
 Describe: 二叉排序查找方法
