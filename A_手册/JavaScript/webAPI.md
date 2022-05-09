@@ -290,8 +290,6 @@ e.removeChild(a) //删除a的孩子节点button
 
 ```
 
-## BOM 游览器对象模型
-
 ## 时间对象
 
 ``` javascript
@@ -379,7 +377,11 @@ l.addEventListener("click", function(event){
     e.target // 当前点击的对象
     e.target.style.color = "red"; //样例
 })
+```
 
+## 位置定位-scroll
+
+``` javascript
 /**
  * 滚动事件
  * */
@@ -428,7 +430,12 @@ d.clientLeft //
 window.addEventListener("resize", function() {})
 ```
 
-## window对象
+## BOM 游览器对象模型
+
+BOM游览器对象包含window
+window内包含navigator,location,document,history,screen属性
+
+### window对象
 
 ``` javascript
 /**
@@ -436,4 +443,82 @@ window.addEventListener("resize", function() {})
  * */
 window.addEventListener("load", function(){A}) //加载完成执行A
 document.addEventListener("DOMContentLoaded", function(){}) //当所有元素加载完成后促发，不等待样式表，图像
+
+/**
+ * 延迟函数, 只能执行1次
+ * */
+let timer = setTimeout(function(){}，T)
+
+let timer = setTimeout(function(){
+    console.log()
+}, 5000)
+clearTimeout(timer)
+```
+
+### location对象
+
+``` javascript
+// href属性
+location.href = "http://www.baidu.com" //跳转到指定页面
+console.log(location.href) // 当前页面的url地址
+// search属性
+location.search //获取 url地址中？后面的部分
+// hash
+location.hash //获取地址中的hash值，url中#后面的字符
+//reload
+location.reload() //刷新页面
+location.reload(true) //强制刷新
+```
+
+### navigator对象
+
+主要记录了游览器自身的相关信息
+
+``` javascript
+navigator.userAgent //游览器的版本及平台
+```
+
+### histroy对象
+
+``` javascript
+// 后退1个页面
+history.back()
+// 前进1个页面
+history.forward() 
+// 前进/后退 n个页面
+history.go(1)  // 前进1个页面
+history.go(-1) // 后退1个页面
+```
+
+### swiper插件 
+
+swiper 常用于移动端网站的特效插件
+min的是进行压缩后的
+
+### 本地存储
+
+``` javascript
+/**
+ * localStorage
+ * 生命周期永久
+ * */
+localStorage.setItem(key, value)
+localStorage.setItem("key", "AAA") //保存
+localStorage.getItem("key") //获取
+localStorage.removeItem("key") //删除
+
+//存多个数据
+let o = {
+    key: "xxx", key2:"xxx"
+}
+// json属性和值都是双引号保存
+// 保存
+localStorage.setItem("obj", JSON.stringify(o))
+// 取出
+JSON.parse(localStorage.getItem("obj"))
+
+/**
+ * sessionStorage
+ * 生命周期为游览器窗口关闭，用法与localStorage相同
+ * /
 ```
