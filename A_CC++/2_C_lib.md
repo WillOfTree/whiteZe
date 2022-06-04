@@ -227,19 +227,19 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 
 #include <ctype.h>
 
-| 函数       | 如果参数符合下列添加返回真 |
-| -------- | ------------- |
-| iscntrl  | 任何控制字符        |
-| isspace  | 空白字符\n \f \r等 |
-| isdigit  | 0-9           |
-| isxdigit | 十六近制0-9       |
-| islower  | a-z           |
-| isupper  | A-Z           |
-| isalpha  | a-z，A-Z       |
-| isalnum  |               |
-| ispunct  |               |
-| isgraph  |               |
-| isprint  |               |
+| 函数     | 如果参数符合下列添加返回真 |
+| -------- | -------------------------- |
+| iscntrl  | 任何控制字符               |
+| isspace  | 空白字符\n \f \r等         |
+| isdigit  | 0-9                        |
+| isxdigit | 十六近制0-9                |
+| islower  | a-z                        |
+| isupper  | A-Z                        |
+| isalpha  | a-z，A-Z                   |
+| isalnum  |                            |
+| ispunct  |                            |
+| isgraph  |                            |
+| isprint  |                            |
 
 ## 内存函数
 
@@ -635,4 +635,21 @@ int key = 32;
 
 /* 使用 bsearch() 在数组中查找值 32 */
 item = (int*) bsearch (&key, values, 5, sizeof (int), cmpfunc);
+```
+
+## 科学计算-math
+
+### fmin
+
+``` c
+/**
+Function Name: fmin() 
+Describe: 返回2者较小的数
+Parameter:
+    A -- 元素A
+    B -- 元素B
+*/
+fmin(A,b)  // 返回A，b中小的数,int类型
+fminl(A,B) // 返回A，B中，小的数，double类型
+fminf(A,B) // 返回A，B中，小的数，float类型
 ```

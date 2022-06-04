@@ -1,5 +1,10 @@
 # leetcode做题记录
 
+1.暴力算法对于一些无序，无法排序，排序没有意义的特别好用。
+2.对于无序序列，一般方法为，将无序序列变成有序序列后在进行操作。
+3.对于2个数组，可用双指针，进行依次比较数据。
+4.对于查找位置的相关题目，都可用二分查找法。
+
 ## 217.存在重复元素
 
 给你一个整数数组 `nums` 。如果任一值在数组中出现 **至少两次** ，返回 `true` ；如果数组中每个元素互不相同，返回 `false` 。
@@ -164,5 +169,134 @@ void merge(int* nums1, int nums1Size, int m, int* nums2, int nums2Size, int n){
     }
 
     return 0;
+}
+```
+
+## 350 两个数组的交集
+
+给你两个整数数组 nums1 和 nums2 ，请你以数组形式返回两数组的交集。返回结果中每个元素出现的次数，应与元素在两个数组中都出现的次数一致（如果出现次数不一致，则考虑取较小值）。可以不考虑输出结果的顺序。
+
+**示例:**
+
+>输入：nums1 = [1,2,2,1], nums2 = [2,2]\
+>输出：[2,2]
+
+**解题方法:**
+
+// 先将数组变成有序，然后利用双指针,依次对比每一个数
+
+``` c
+int cmp(const void* _a, const void* _b) 
+{
+    int *a = _a, *b = (int*)_b;
+    return *a == *b ? 0 : *a > *b ? 1 : -1;
+}
+
+int *intersect(int* nums1, int nums1Size, int* nums2, int nums2Size,int* returnSize) 
+{
+    // 排序算法，将数组变成有序
+    qsort(nums1, nums1Size, sizeof(int), cmp);
+    qsort(nums2, nums2Size, sizeof(int), cmp);
+    *returnSize = 0;
+    // fmin(a,b)是返回a,b的较小整数
+    int* intersection = (int*)malloc(sizeof(int) * fmin(nums1Size, nums2Size));
+    int index1 = 0, index2 = 0;
+    // 循环对比数组，将数小的数组下标+1
+    // 相等的话，都要加1，
+    while (index1 < nums1Size && index2 < nums2Size) {
+        if (nums1[index1] < nums2[index2]) {
+            index1++;
+        } else if (nums1[index1] > nums2[index2]) {
+            index2++;
+        } else {
+            intersection[(*returnSize)++] = nums1[index1];
+            index1++;
+            index2++;
+        }
+    }
+    return intersection;
+}
+```
+
+## 买股票的最佳时机
+
+给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
+你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。
+设计一个算法来计算你所能获取的最大利润。返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
+
+**示例:**
+
+> 输入：[7,1,5,3,6,4]\
+> 输出：5\
+> 解释：在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+> 注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+
+**解题方法:**
+
+// 暴力重复判断，
+// 先拿出第1个数k，循环找出之后比k大的数，如果没有比k大的数，则这个就没有收益，将K+1
+// 对找出的数进行收益计算，必定是多个，再从中找到最大的收益
+
+## 第一个错误的版本
+
+假设你有 n 个版本 [1, 2, ..., n]，你想找出导致之后所有版本出错的第一个错误的版本。
+
+**示例:**
+
+> 输入：n = 5, bad = 4
+> 输出：4
+> 解释：
+> 调用 isBadVersion(3) -> false
+> 调用 isBadVersion(5) -> true
+> 调用 isBadVersion(4) -> true
+> 所以，4 是第一个错误的版本。
+
+**解题方法:**
+
+// 可以先用查找，找到合适位置，再进行判断
+
+``` c
+int firstBadVersion(int n) {
+    int left = 1, right = n;
+    while (left < right) {  // 循环直至区间左右端点相同
+        int mid = left + (right - left) / 2;  // 防止计算时溢出
+        if (isBadVersion(mid)) {
+            right = mid;  // 答案在区间 [left, mid] 中
+        } else {
+            left = mid + 1;  // 答案在区间 [mid+1, right] 中
+        }
+    }
+    // 此时有 left == right，区间缩为一个点，即为答案
+    return left;
+}
+```
+
+## 收索插入位置
+
+给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
+
+**示例：**
+
+> 输入: nums = [1,3,5,6], target = 5
+> 输出: 2
+
+**解题方法:**
+
+// 可以先用二差查找法，查找位置，然后再进行插入（非官方）
+// 
+
+``` c
+int searchInsert(int* nums, int numsSize, int target) {
+    int left = 0, right = numsSize - 1, ans = numsSize;
+    while (left <= right) {
+        int mid = ((right - left) >> 1) + left;
+        if (target <= nums[mid]) {
+            ans = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return ans;
 }
 ```
