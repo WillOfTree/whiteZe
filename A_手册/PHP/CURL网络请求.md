@@ -21,9 +21,14 @@ $output = curl_exec($ch);
 curl_close($ch);
 ```
 
-## 获取最后一次传输的相关信息。
+## 调试错误信息。
 
 ``` php
+/**
+ * 返回错误信息
+ **/
+curl_error($ch);
+
 /**
  * $ch 由curl_init()方法创建的句柄
  * $opt 可选参数
@@ -32,19 +37,30 @@ curl_close($ch);
 curl_getinfo(resource $ch, int $opt = 0)
 ```
 
-## **Curl_setopt参数**
+## Curl_setopt参数
 
-CURLOPT_URL 
+``` php
 
-指定请求的URL；
+// 指定请求的URL；
+curl_setopt($ch, CURLOPT_URL );
+// 设置为0表示不返回HTTP头部信息
+curl_setopt($ch, CURLLOPT_HEADER );
+// 设置0直接输出，1是存入内存(curl_exec的返回值是文本流)
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+// 设置不检查ssl
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+curl_setopt($ch, CURLOPT_URL );
+```
 
-CURLLOPT_HEADER
 
-设置为0表示不返回HTTP头部信息
 
-CURLOPT_RETURNTRANSFER
 
-设置0直接输出，1是存入内存(curl_exec的返回值是文本流)
 
 ## GET请求
 
@@ -82,7 +98,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
 curl_setopt($ch, CURLOPT_POSTFIELDS, “data=”.$post_data);
 
-# **匹配文本**
+## **匹配文本**
 
 //开启
 
@@ -160,9 +176,26 @@ Curl_setopt($ch1, CURLOPT_URL, “http://www.aa.com”);
 
 Curl_setopt($ch2, CURLOPT_URL, “http://www.bb.com”);
 
- 
+ ## 常见错误信息
 
- 
+1、**SSL certificate problem: unable to get local issuer certificate**
+
+ 解决方法：
+
+（1）curl 取消 ssl 检查
+
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+（2）添加cacert.pem证书
+
+下载证书：[curl - Extract CA Certs from Mozilla](https://curl.se/docs/caextract.html)
+
+修改php.ini添加对cacert.pem支持
+
+[curl]
+; A default value for the CURLOPT_CAINFO option. This is required to be an
+; absolute path.
+curl.cainfo = D:\WAMP\tmp\cacert.pem
 
  
 

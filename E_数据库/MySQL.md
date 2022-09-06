@@ -1,29 +1,62 @@
 # MySQL
 
-## **一、命令**
+## 常用命令
 
-mysql -uroot -p 进入数据库
+``` mysql
+# 进入数据库
+mysql -uroot -p 
+# 创建数据库
+create database 数据库名 
+# 选择数据
+use 数据库名称
+# 显示表
+show tables 表名
+# 显示数据库
+show databases 数据库
+# 索引从0开始
+truncate table 表名 #
+# 修改密码
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '新密码';
+# 设置为空密码
+mysql> set password for root@localhost=password('');
+```
 
-create database ---name---创建数据库
+## 忘记密码
 
-use ---datebaeseName--使用数据库
+``` shell
+# 方法一，跳过密码检验
+# 打开mysql的配置文件，添加skip-grant-tables
+[mysqld]
+skip-grant-tables
 
-show tables 显示表
+# 方法二，修改密码
+# 前提要先跳过密码，后进入mysql控制台
+mysql > use mysql;
+mysql > update user set authentication_string=password('123456') where user='root';
+mysql > flush privileges;
 
-show databases 显示数据库
+# 出现的错误
+# ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.
+alter user 'root'@'localhost' identified by 'youpassword';
 
-truncate table 你的表名 #索引从0开始
+# 出现的错误
+# ERROR 1819 (HY000): Your password does not satisfy the current policy requirements
+set global validate_password_policy=0;
+```
 
-## 二、运行sql文件**
 
-1/创建数据
 
-2/进入库
+### 运行sql文件
 
-3/source /opt/mysql.sql
+``` mysql
+# 创建数据
+# 进入库
+source /opt/mysql.sql
+```
 
-# **三、导出** 
+### 导出 
 
+``` mysql
 mysqldump -u用戶名 -p密码 -d 数据库名 表名 > 脚本名;
 
 导出整个数据库结构和数据
@@ -37,70 +70,42 @@ mysqldump -h localhost -uroot -p123456 -d database > dump.sql
 
 导出单个数据表结构（不包含数据）
 mysqldump -h localhost -uroot -p123456 -d database table > dump.sql
+```
 
-# **四、MySQL-python**
+## window使用
 
- 
+### 常用
 
-import MySQLdb
+必须是系统管理员权限
 
- 
+``` shell
+# 启动mysql
+net start mysql
+# 关闭mysql
+net stop mysql
 
-\# 打开数据库连接
 
-db = MySQLdb.connect(
+```
 
-host="localhost",
+### 错误-无法启动
 
-user="root",
+检查mysql.ini文件中路径是否正确
 
-port="3306",
+## 错误-缺少data
 
-password="humingfei212697~",
+``` shell
+# 缺少data文件
+mysql --initialize --user=mysql --console
+# 
+```
 
-db="codelion",
 
-charset='utf8'
 
-)
 
-\# 使用cursor()方法获取操作游标
 
-cursor = db.cursor()
 
-\#执行
 
-cursor.execute("")
-
-\# 使用 fetchone() 方法获取一条数据
-
-\# data = cursor.fetchone()
-
-print "Database version : %s " % data
-
-\# 关闭数据库连接
-
-db.close()
-
- 
-
-execute(sql)
-
-　　可接受一条语句从而执行
-
-executemany(templet,args)
-
-　　能同时执行多条语句，执行同样多的语句可比execute()快很多，强烈建议执行多条语句时使用executemany
-
-　　templet : sql模板字符串,
-
-​         例如   'insert into table(id,name) values(%s,%s)'
-
-　　args: 模板字符串的参数，是一个列表，列表中的每一个元素必须是元组！！！ 
-
-​        例如： [(1,'小明'),(2,'zeke'),(3,'琦琦'),(4,'韩梅梅')] 
-
-# **远程访问MySQL**
+## 远程访问MySQL
 
 use mysql;
 
@@ -110,7 +115,7 @@ select host,user,password from user;
 
   (1)有时想用本地IP登录，那么可以将以上的Host值改为自己的Ip即可。
 
-## **实现远程连接(授权法)**
+### 实现远程连接(授权法)
 
   将host字段的值改为%就表示在任何客户端机器上能以root用户登录到mysql服务器，建议在开发时设为%。  
   update user set host = ’%’ where user = ’root’;
@@ -137,23 +142,13 @@ mysql> select host,user,password from user;
 
 这样机器就可以以用户名root密码root远程访问该机器上的MySql.
 
-## **实现远程连接（改表法）**
+### 实现远程连接（改表法）
 
 use mysql;
 
 update user set host = '%' where user = 'root';
 
 这样在远端就可以通过root用户访问Mysql.
-
-# **sql语法**
-
-## **add**
-
-## **delect**
-
-## **update**
-
-## **select**
 
  
 

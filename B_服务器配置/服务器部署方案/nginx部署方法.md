@@ -210,10 +210,12 @@ location ~/image {
 
 ``` nginx
 # 目录：/usr/local/nginx
-# 创建证书文件夹 cert
-# 上传证书到目录
+# 1.创建证书文件夹 nginx/conf/cert; nginx默认访问位置是nginx/conf/
+# 2.上传证书到目录
 
 server{
+    # 3.加上 ssl 就是要使用https协议访问
+    #   并不一定非得是443端口，同时还可以设置多个监听端口
     listen 443 ssl;
     # 绑定证书的域名
     server_name miaomu.willoftree.cn;
@@ -222,15 +224,16 @@ server{
     # 如果一站点既要80 http访问，又要443https访问。
     # 不能在配置文件中使用ssl on，配置listen 443 ssl;
     
-    #证书信息
+    # 4.证书信息
     ssl_certificate ssl/miao/....crt;
     ssl_certificate_key ssl/....key;
         
-    #私钥名称
+    # 私钥名称-并不是必须
     ssl_session_timeout 5m;
     ssl_ciphers ECDHE_RSA_AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
     ssl_prefer_server_ciphers on;
     
+    # 正常的请求页面
     location / {
         proxy_pass http://xxxx.com:port;
     }

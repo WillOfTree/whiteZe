@@ -33,6 +33,16 @@ php think run -p 8080
 composer require topthink/think-view
 ```
 
+### 安装视图
+
+错误信息 Driver [Think] not supported.
+
+``` shell
+composer require topthink/think-view
+```
+
+
+
 ## url访问
 
 单应用访问模式：
