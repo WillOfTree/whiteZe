@@ -1,51 +1,108 @@
 # C语言函数库
 
-## IO函数
+## 一、IO函数
 
-### printf 格式化打印
+### printf-格式化打印
+
+- 头文件：#include<stdio.h>
+
+- 字符串输出到\0
+
+- | 格式符 | 说明                                         |
+  | :----: | -------------------------------------------- |
+  |   %d   | 十进制整数输出                               |
+  |   %u   | 无符号十进制输出                             |
+  |   %o   | 无符号八进制输出，不输出前导符：0            |
+  |   %x   | 无符号十六进制（大写）输出，不输出前导符：0x |
+  |   %X   | 无符号十六进制（小写）输出，不输出前导符：0x |
+  |   %c   | 输出1个字符                                  |
+  |   %s   | 输出字符串                                   |
+  |   %f   | 十进制浮点型输出                             |
 
 ```c
-/* 头文件 */
-#include <stdio.h>
-/* 参数 */
+/** 
+原型：
+	printf("字符串")
+	printf(格式控制字符，参数列表)
+*/
 printf("XXXXXX");
-printf("%d"); // int 
-printf("%lf"); // double
-printf("%f");  // float
-printf("%s");  // string 字符数组，特殊，放指针结束到\0
-printf("%c");  // string 一个字符
+printf("%s", ch);  // string 字符数组，特殊，放指针结束到\0
+
 /* 字符数组 */
 char a[] = "ABC";
-printf("%s", a); //输出ABC，字符串与普通变量不同，可以不用&,他有自己的结束符号
-printf("%s", a[0]);  //输出A
-printf("%s", &a[0]); //&数组名，取出的是数组地址，输出ABC
+printf("%s", a); // 输出ABC，数组与普通变量不同，变量名就是首地址
+printf("%s", a[0]);  // 输出A
+printf("%s", &a[0]); // &数组名，取出的是数组地址，输出ABC
 ```
 
-### 输入函数
+### scanf-格式输入
+
+- 头文件：#include<stdio.h>
+
+- 返回值：
+
+  成功：指定的数据项
+
+  失败：EOF，在stdio中定义为-1
+
+- | 格式符 | 说明                                                  |
+  | :----: | ----------------------------------------------------- |
+  |   %d   | 十进制整数                                            |
+  |   %o   | 八进制                                                |
+  |   %x   | 十六进制                                              |
+  |   %c   | 输入1个字符，空白字符、回车、空格、制表符也是有效输入 |
+  |   %s   | 输入字符串，空格回车制表符代表输入结束                |
 
 ```c
-scanf("%d", &a);
+/**
+原型：
+	scanf("字符控制列表", 地址)
+vs2019取消scanf函数错误提示：
+	方法1：#define _CRT_SECURE_NO_WARNINGS 1
+	方法2：使用scanf_s替换scanf
+*/
+scanf("%d", &a); 
 
-int main()
-{
-    int a;
-    int b[10];
-    char c[128];
-
-    scanf("%d", &a); // a是一个变量，需要取地址
-    scanf("%d", b); // b本身就是字符串数组，变量名就是数组地址
-    scanf("%d", c); // 字符串就是特殊数组，没有用&，
-}
-
-//对于vs2019,
-#define _CRT_SECURE_NO_WARNINGS 1 //取消scanf函数错误提示
-//方法2，使用scanf_s替换
-scanf_s 是vs编译器提供的
+int a;
+scanf("%d", &a); // a是一个变量，需要取地址
+int b[10];
+scanf("%d", b); // b本身就是字符串数组，变量名就是数组地址
 ```
 
-### getchar
+### getchar-字符输入
 
-## 字符串函数
+- 头文件：#include<stdio.h>
+- Describe：C语言函数库中专门用于字符输入的函数，每次读取1个字符，回车为为止（回车也会被读取）
+
+``` c
+#include<stdio.h>
+// 读取1个字符
+char ch;
+ch = getchar();
+
+// 读取多个字符,需要开辟一个连续空间
+char ch[10];
+for(int i=0;i<8;i++)
+{
+    ch[i] = getchar();
+}
+```
+
+### putchar-字符输出
+
+- 头文件：#include<stdio.h>
+- 描述：输出指定字符
+
+``` c
+#include<stdio.h>
+//ch是字符变量
+putchar(ch);
+putchar('\n');
+```
+
+
+
+## 二、字符串函数
 
 ### strlen-求字符串长度
 
@@ -225,7 +282,7 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 
 ## 字符分类函数
 
-#include <ctype.h>
+- 头文件：#include <ctype.h>
 
 | 函数     | 如果参数符合下列添加返回真 |
 | -------- | -------------------------- |
@@ -247,20 +304,26 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 
 ### malloc-堆空间申请动态空间
 
+- 头文件：#include<stdlib.h>
+
+- 说明：
+
+  1、malloc申请的空间内并不是空白的，而是随机内容
+
+  2、malloc创建二维数组，是使用一维数组指向另外的一维数组构成的二维数组
+
 ```c
 /*
-void *malloc(size_t size)
-申请size类型指针，返回一个void类型的指针，申请的空间数据是随机的
-注意：malloc创建二维数组，是使用一维数组指向另外的一维数组构成的二维数组
+原型：
+	void *malloc(size_t size)
 */
-#include<stdlib.h>
-
-//空间存放指针
+// 一般使用方法，不同类型对应不同的指针
 int *a = (int *)malloc(10 * sizeof(int));
+char *a = (char *)malloc(10 * sizeof(char));
 //Player结构体动态分配空间
-Player * None=（Player *）malloc(sizeof(Player));
+Player *a=(Player *)malloc(sizeof(Player));
 
-//初始化内存空间
+//使用memset初始化内存空间
 #include<string.h>
 memset(a, 0, 10*sizeof(int)); //用0填充a空间，填充大小为10*sizeof(int)
 
@@ -287,7 +350,8 @@ arr[1][2];
 
 ### free-释放空间
 
-必须由malloc,calloc,realloc申请的空间的指针
+- 头文件：#include<stdlib.h>
+- 必须由malloc，calloc，realloc申请的空间的指针
 
 ```c
 free(a); //a是一个指针，必须是malloc申请的空间
@@ -397,6 +461,33 @@ float arr2[] = {1.0, 3.0}
 // 只比较前4个字节
 int ret = memcmp(arr1, arr2, 4);
 ```
+
+### rand-随机数
+
+- 头文件：#include<stdlib.h>
+- 描述：随机产生一个0~RAND_MAX之间的数，RAND_MAX由stdlib中定义；c语言默认产生最大数是32767
+- 注意：rand产生的数是伪随机，产生的随机数序列是相同的
+
+``` c
+int a = rand();
+rand() % 100;//产生0-99之间的数
+rand() % 100 + 1; //产生1-100之间的数
+```
+
+### srand-随机数种子
+
+- 头文件：#include<stdlib.h>
+- 描述：可以更改rand函数产生不同的随机数序列
+
+``` c
+srand(1); //设置随机数种子，不同的种子，随机数不同
+int a = rand();
+
+#include<time.h>
+srand(time(NULL)) //根据时间设置随机种子
+```
+
+
 
 ## 中断与错误信息
 
