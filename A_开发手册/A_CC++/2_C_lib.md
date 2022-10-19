@@ -63,8 +63,10 @@ vs2019取消scanf函数错误提示：
 */
 scanf("%d", &a); 
 
+/* 样例 */
 int a;
 scanf("%d", &a); // a是一个变量，需要取地址
+/* 数组样例 */
 int b[10];
 scanf("%d", b); // b本身就是字符串数组，变量名就是数组地址
 ```
@@ -135,8 +137,9 @@ strlen("abc") - strlen("abcde") > 0
 //将source指向的字符复制到destination指向的变量
 char *strcpy(char *destination, const char *source)
 
-/* 使用 */
+/* 使用，将b赋值给a */
 strcpy(a, b);
+/* 将xxxxx赋值给a */
 strcpy(a, "xxxxxx");
 
 /*错误1*/
@@ -280,7 +283,7 @@ for(ret = trtok(temp, p); ret!=NULL; ret=ssstrtok(NULL, p))
 }
 ```
 
-## 字符分类函数
+## 字符处理函数
 
 - 头文件：#include <ctype.h>
 
@@ -359,7 +362,7 @@ free(a); //a是一个指针，必须是malloc申请的空间
 
 ### calloc-自动申请N个空间
 
-动态申请N个长度为size的空间,并自动初始化为0
+- 动态申请N个长度为size的空间,并自动初始化为0
 
 ```c
 /*
@@ -368,18 +371,19 @@ void *calloc(size_t N, size_t size)
 int *p = (int *)calloc(8, sizeof(int));
 ```
 
-### realloc-重新分配空间
+### realloc-重新分配已分配的空间
 
-重新分配的空间大，原数据不会丢失
-
-从新分配的空间小，原数据会丢失
+- 重新分配的空间大，原数据不会丢失
+- 重新分配的空间小，原数据会丢失
 
 ```c
 /*
-ptr 堆空间指针
-void *realloc(void *ptr, size_t size) 
+void *realloc(void *ptr, size_t size)
+
+ptr  ：已分配空间的指针
+size ：空间大小
 */
-int *pt = (int *)realloc(p, 8*sizeof(int));
+int *pt = (int *)realloc(ptr, 8*sizeof(int));
 ```
 
 ### memset-内存设置
@@ -520,89 +524,138 @@ printf("%s\n", strerror(0) )
 perror("自定义字符")
 ```
 
-## 文件操作
+## 六、文件操作
 
-### 操作符
+### 1、操作符
 
-1. r：只读模式，文件必须存在，从头写入
-2. w：写模式，文件不存在创建，从头写入
-3. a：追加模式，文件不存在创建
+1. r：只读模式，文件必须存在
+2. w：写模式，文件不存在创建，从头写入（会覆盖文件）
+3. a：追加模式，文件不存在创建，从文章末尾开始
 4. r+：读写模式，文件必须存在，从头写入，不是完全覆盖，有几个字符覆盖几个
 5. w+：读写模式，文件不存在创建，从头写入，覆盖所有内容
 6. a+：读和追加模式，文件不存在创建，在末尾添加
 7. b：二进制文件读写，不会对\r\n进行转换，其他会自动进行转换
 
-### 打开文件
+### fopen-打开文件
 
 ```c
 // 头文件
 #include <stdio.h>
-
-// 定义
-// FILE *fp ：必须使用 FILE 文件类型声明指针
-// filename 路径文件名
-// mode     打开模式
-// return   NULL打开失败
-FILE *fopen(const char *filename, const char *mode)
-
-// 使用
+/*
+原型：
+	FILE *fopen(const char *filename, const char *mode)
+参数：
+	filename 路径文件名
+	mode     打开模式
+返回值：
+	失败，NULL
+	成功，FILE 类型的指针
+*/
 // 没有路径指与本文件在同一目录
 FILE *f = fopen("xxx.txt"， "r"); 
 if( f == NULL) printf("打开失败");
 ```
 
-### 写方法
+### fgetc-读取1个字符
 
 ```c
 // 头文件
 #include <stdio.h>
+/*
+描述：从文件中读取1个字符，读到末尾返回EOF（在stdio.h文件中定义，值为-1）
+原型：int fgetc(FILE *stream)
+参数：
+	stream：fopen返回的文件指针
+返回：
+	成功，读取的字符
+	失败 / 文章末尾，EOF
+*/
+char c = fgetc(f);
+```
 
-//输入读取：将文件读取到内存
-//字符输出
-int fputc(int c, FILE *stream)
-fgetc("b", f)
-//每次读一个字符到内存
-//读取失败或结束，会读一个EOF
-int fgetc(FILE *stream)
-fputc(f)
+### fputs-写入1个字符
 
-//按行读取
+``` c
+#include<stdio.h>
+/*
+描述：每次写入1个字符
+原型：int fputc(int c, FILE *stream)
+参数：
+	c：写入的字符
+	stream：fopen返回的文件指针
+*/
+fputc("b", fp);
+```
+
+### feof-判断是否到了结尾
+
+``` c
+#include<stdio.h>
+/*
+原型：int feof(FILE *fp)
+返回值：
+	非0，文件位置指向文件结束符（EOF)
+	0, 未到结尾
+*/
+while(!feof(fp)){...}
+```
+
+### fgets-读取多个字符
+
+``` c
+#include<stdio.h>
+/*
+描述：fgets从文件中读取字符串，并在字符串末尾添加\0,放到string变量中，最多读取n-1个字符
+原型：char *fgets(char *string, int n, FILE *stream)
+参数：
+	string:
+	n:
+	stream：fopen返回的文件指针
+返回值：
+	成功，字符串指针
+	失败，NULL，需要使用feof或者ferror函数确定错误原因
+*/
 // 将stream读取的数据放到string中，n表示读取的最大个数
-char *fgets(char *string, int n, FILE *stream)
-fgets,返回NULL
-//文本输出
-fputs
+fgets(str, 8, fp);
+```
 
+### fscanf-按格式读取
+
+### fprintf-按格式输入
+
+``` c
 //格式化输出
 // format 格式
 int fprint(FILE *stream, const char *format[,argument]...)
 fprintf(f,"%d %s %f",a,b,c)
 //格式化输入
 fscanf(f,"%d %s %f", &a, &b, &c)
+```
 
-// 格式化输出到变量
-char a[100] = {0}
-sprintf(a, "%d %d", a, b)
-sscanf
+### fread-按块读取
 
-// 自能输出到文件
-//二进制输入
-fread
-//二进制输出
-size_t fwrite(const void *buffer, size_t size, size_t count, FILE *stream)
-fwrite
+### fwrite-按块写入
 
+### fseek-随机读取
+
+``` c
 // 文件随机读写
 // 根据文件指针的位置和偏移量定位文件指针
 int fseek(FILE *stream, long int offset, int origin)
 ```
 
-### 关闭文件
+### fflush-刷新缓冲区
+
+### fclose-关闭文件
 
 ```c
 #include <stdio.h>
-
-int fclose( FILE *stream)
+/*
+原型：
+	int fclose(FILE *stream)
+参数：
+	steam：由fopen返回的文件指针
+*/
 // 结束后才能清空缓冲区
 fclose(f);
 f=NULL
@@ -633,7 +686,7 @@ int main()
 
 ### 位置指针
 
-### 文件流
+### 标准输入输出
 
 1. 标准输入流(stdin)-键盘
 2. 标准输出流(stdout)-屏幕
@@ -746,3 +799,12 @@ fminf(A,B) // 返回A，B中，小的数，float类型
 ```
 
 ### sqrt-开方函数
+
+## 系统函数
+
+### system-DOS清屏
+
+``` c
+system("cls"); //清屏命令
+```
+
