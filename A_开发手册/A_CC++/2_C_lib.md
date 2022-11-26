@@ -579,7 +579,7 @@ perror("自定义字符")
 
 ## 六、文件操作
 
-### 1、操作符
+### 操作符
 
 1. r：只读模式，文件必须存在
 2. w：写模式，文件不存在创建，从头写入（会覆盖文件）
@@ -626,33 +626,6 @@ if( f == NULL) printf("打开失败");
 char c = fgetc(f);
 ```
 
-### fputs-写入1个字符
-
-``` c
-#include<stdio.h>
-/*
-描述：每次写入1个字符
-原型：int fputc(int c, FILE *stream)
-参数：
-	c：写入的字符
-	stream：fopen返回的文件指针
-*/
-fputc("b", fp);
-```
-
-### feof-判断是否到了结尾
-
-``` c
-#include<stdio.h>
-/*
-原型：int feof(FILE *fp)
-返回值：
-	非0，文件位置指向文件结束符（EOF)
-	0, 未到结尾
-*/
-while(!feof(fp)){...}
-```
-
 ### fgets-读取多个字符
 
 ``` c
@@ -670,6 +643,37 @@ while(!feof(fp)){...}
 */
 // 将stream读取的数据放到string中，n表示读取的最大个数
 fgets(str, 8, fp);
+```
+
+### fputc-写入1个字符
+
+``` c
+#include<stdio.h>
+/*
+描述：每次写入1个字符
+原型：int fputc(int c, FILE *stream)
+参数：
+	c：写入的字符
+	stream：fopen返回的文件指针
+*/
+fputc("b", fp);
+```
+
+### fputs-写入多个字符
+
+
+
+### feof-判断是否到了结尾
+
+``` c
+#include<stdio.h>
+/*
+原型：int feof(FILE *fp)
+返回值：
+	非0，文件位置指向文件结束符（EOF)
+	0, 未到结尾
+*/
+while(!feof(fp)){...}
 ```
 
 ### fscanf-按格式读取
