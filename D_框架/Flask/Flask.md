@@ -4,7 +4,15 @@
 
 ### 一、原理
 
-flask框架引用
+``` python
+from werkzeug.serving import run_simple
+
+def func(environ, start_response):
+    print("请求来了")
+    
+if __name__ == "__main__":
+    run_simple('127.0.0.1', 5000, func)
+```
 
 ### 二、Hallo word
 
@@ -144,117 +152,6 @@ def index(name):
     return redirect('/index')
 ```
 
-## 装饰器
-
-1、自定义装饰器
-
-- 装饰器可以简单的理解为添加额外功能，运行流程为：@auth、def index()、@app.route
-- flask中装饰器一定要在路由装饰器下面
-- 由于装饰器的替换效果，多个函数使用同一个装饰器会有函数名重复的错误
-
-``` python
-# 装饰器
-def auth(func):
-    def inner(*arg, **kwargs):
-        # 装饰器要运行的代码
-        if not user:
-            pass
-        # end
-        return func(*args, **kwargs)
-    return inner
-
-# index函数将会替换装饰器中的inner函数
-@app.route("/index")
-@auth
-def index():
-    pass
-```
-
-2、装饰器名称修改
-
-``` python
-import functools
-
-# 装饰器
-# @functools.wraps(func)会将当前运行的函数名换成func变量的名称
-def auth(func):
-    @functools.wraps(func)
-    def inner(*arg, **kwargs):
-        # 这里添加装饰器要运行的函数
-        # end
-        return func(*args, **kwargs)
-    return inner
-
-# index函数将会替换装饰器中的inner函数
-# auth的函数名为index
-@app.route("/index")
-@auth
-def index():
-    pass
-
-# index函数将会替换装饰器中的inner函数
-# auth的函数名为edit
-@app.route("/edit")
-@auth
-def edit():
-    pass
-
-```
-
-## 请求上下文
-
-原理
-current_app 使用了设计模式中的代理模式
-request 
-session
-g   本地代理
-应用上下文-current_app, g, session
-请求上下文-request
-离线应用-单元测试
-app=Flask(__name__)
-ctx=app.app_context()//请求上下文
-ctx.push()
-a=current_app.config[‘debug’]
-ctx.pop()
-使用with语句改写
-with需要
-#
-#上下文管理器
-# 实现__enter__(); __exit__()两个方法
-# 上下文表达式必要返回一个上下文管理器
-# with A() as AA:  AA是class A()中__enter__的返回值
-with app.app_context():
-current_app[‘debug’]
-
-## 线程隔离
-
-flask多线程
-app = Flask(__name__)
-app.run(threaded=true,)
-
-from werkzeug.local import localStack //栈元素
-from werkzeug.local import local
-oo = local() //线程隔离
-oo.a = 1
-oo.b = b //再不同的线程中修改值
-
-生命周期
-@flask_app.before_reqeust
-def before_request():
-print（所有请求之前调用）
-
-配置文件
-setting.py
-DEBUG = True  //配置文件写法
-
-app Flask核心对象
-app.config.from_object(“app.setting”) //读取/app/setting.py
-读取配置文件
-app.config[‘DEBUG’]
-
-from flask import current_app //当前flask核心对象
-current_app.config[‘DEBUG’]
-
 ## 模板
 
 ### 一、配置
@@ -392,27 +289,78 @@ html中设置
 
 ## 蓝图
 
-### 一、基础使用方法
+### 一、目录结构
 
-``` python
-# 1、创建蓝图
-api = Blueprint(“api”, __name__)
-# 2、注册蓝图
-# 需要导入api模块
-flask_app.register_blueprint(api)
-# 3、view使用蓝图
-# 需要导入api
-@api.route(“/”)
-def index():
-    print(“index.py”)
+``` ejs
+project
+	|-- manage.py
+	|-- pro_excel
+		|-- __init__.py
+		|-- views
+			|-- index.py
+		|-- templates
+			|-- index.html 
+		|-- statics
 ```
 
-### 二、配置统一蓝图
+### 二、基础使用方法
+
+#### 1、manage.py
+
+- 整个项目的启动文件
 
 ``` python
-flask_app.register_blueprint(api, url_prefix=’/admin’)
-# 访问的路径变成 https://127.0.0.1/admin/index
-# /admin 是路由添加
+from pro_excel import create_app
+
+app = create_app()
+if __name__ == "__main__":
+    app.run()
+```
+
+#### 2、\__init__.py
+
+``` python
+from flask import Flask
+# 导入视图蓝图
+from pro_excel.view.index from api
+
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = "dfdfaeddfgijii"
+    
+    # 注册蓝图到flask
+    app.register_blueprint(api)
+    
+    return app
+```
+
+#### 3、views/index.py
+
+``` python
+from flask import Blueprint
+
+# 创建一个蓝图
+# xm是蓝图的自定义名称
+api = Blueprint("api", __name__)
+
+@api.route("/index")
+def func():
+    return "f1"
+```
+
+### 二、蓝图前缀/路由分发
+
+``` python
+from flask import Flask
+# 导入视图中的蓝图模块
+from .view.index import api
+app = Flask(__name__)
+
+# 访问的路径由
+# https://127.0.0.1/index 
+# 变成 
+# https://127.0.0.1/admin/index
+app.register_blueprint(api, url_prefix='/admin')
 ```
 
 ### 三、路由参数
@@ -431,12 +379,131 @@ def api(page, a):
     pass
 ```
 
+## 装饰器
+
+1、自定义装饰器
+
+- 装饰器可以简单的理解为添加额外功能，运行流程为：@auth、def index()、@app.route
+- flask中装饰器一定要在路由装饰器下面
+- 由于装饰器的替换效果，多个函数使用同一个装饰器会有函数名重复的错误
+
+``` python
+# 装饰器
+def auth(func):
+    def inner(*arg, **kwargs):
+        # 装饰器要运行的代码
+        if not user:
+            pass
+        # end
+        return func(*args, **kwargs)
+    return inner
+
+# index函数将会替换装饰器中的inner函数
+@app.route("/index")
+@auth
+def index():
+    pass
+```
+
+2、装饰器名称修改
+
+``` python
+import functools
+
+# 装饰器
+# @functools.wraps(func)会将当前运行的函数名换成func变量的名称
+def auth(func):
+    @functools.wraps(func)
+    def inner(*arg, **kwargs):
+        # 这里添加装饰器要运行的函数
+        # end
+        return func(*args, **kwargs)
+    return inner
+
+# index函数将会替换装饰器中的inner函数
+# auth的函数名为index
+@app.route("/index")
+@auth
+def index():
+    pass
+
+# index函数将会替换装饰器中的inner函数
+# auth的函数名为edit
+@app.route("/edit")
+@auth
+def edit():
+    pass
+
+```
+
+## 请求上下文
+
+原理
+current_app 使用了设计模式中的代理模式
+request 
+session
+g   本地代理
+应用上下文-current_app, g, session
+请求上下文-request
+离线应用-单元测试
+app=Flask(__name__)
+ctx=app.app_context()//请求上下文
+ctx.push()
+a=current_app.config[‘debug’]
+ctx.pop()
+使用with语句改写
+with需要
+#
+#上下文管理器
+
+
+
+实现__enter__(); __exit__()两个方法
+
+上下文表达式必要返回一个上下文管理器
+
+with A() as AA:  AA是class A()中__enter__的返回值
+
+with app.app_context():
+current_app[‘debug’]
+
+## 线程隔离
+
+flask多线程
+app = Flask(__name__)
+app.run(threaded=true,)
+
+from werkzeug.local import localStack //栈元素
+from werkzeug.local import local
+oo = local() //线程隔离
+oo.a = 1
+oo.b = b //再不同的线程中修改值
+
+生命周期
+@flask_app.before_reqeust
+def before_request():
+print（所有请求之前调用）
+
+配置文件
+setting.py
+DEBUG = True  //配置文件写法
+
+app Flask核心对象
+app.config.from_object(“app.setting”) //读取/app/setting.py
+读取配置文件
+app.config[‘DEBUG’]
+
+from flask import current_app //当前flask核心对象
+current_app.config[‘DEBUG’]
+
 Form验证
 创建wtform方法
 pip install wtforms
 from wtforms import Form, StringField
 class XXX(Form):
-# validators 是wtforms内置的验证方法
+
+validators 是wtforms内置的验证方法
+
 q = StringField(validators=[PAMS, PAMS])
 
 #自定义验证
@@ -448,7 +515,9 @@ from mywforms import XXX
 def index():
 form = XXX(reqeust.args) //传入所有参数
 if form.validate(): //方法验证
-# 验证通过
+
+验证通过
+
 form.q.data //获取key为q的数据
 form.q.data.strip() //去掉空格
 form.errors //错误信息
@@ -475,28 +544,36 @@ return redirect(“/index”) # 路由跳转
 2、方向构建url
 访问/static/css/index.css文件
 <link rel="stylesheet" href='{{ url_for("static",filename = "css/index.css" ) }}'>
+
 <script src="{{ url_for("static",filename = "js/js.js") }}">
 访问web.book视图
 <a href=”{{ url_for(‘web.book’, isbn=book.isbn)}}”></a>
 5、自定义模板函数
 # 将函数加入模板
 flask_app.add_template_global(“自定义函数”, “buildstatic”)
-
 ## 静态文件
 
-如果不配置static_dir参数，则默认访问启动文件下的static目录
+``` python
+# 如果不配置static_dir参数，则默认访问启动文件下的static目录
+# static_dir默认位置是以Flask核心对象位置区别的，配置static_dir后url路径也会变成文件名
+# 例如:
+# static_dir=”view/aaa”,
+# 这里访问路径将变成
+# http://localhost/aaa/image.jpg
+# ---------
+# static_url_path 设置url访问路径,当设置这个，static_dir将失去效果
+# static_url_path=”ss/cc”  http://localhost/ss/cc,  访问的物理位置为flask核心对象目录下的SS/cc
 Flask_app= Flask(__name__, static_dir=None)
-static_dir默认位置是以Flask核心对象位置区别的，配置static_dir后url路径也会变成文件名例如
-static_dir=”view/aaa”   这里访问路径将变成http://localhost/aaa/image.jpg
 
-static_url_path 设置url访问路径,当设置这个，static_dir将失去效果
-static_url_path=”ss/cc”  http://localhost/ss/cc,  访问的物理位置为flask核心对象目录下的SS/cc
-
-配置蓝图级别静态文件
+# 配置蓝图级别静态文件
 Blueprint(‘web’, __name__, static_folder=””, static_url_path=””)
+```
 
 ## 数据库
 
+### 一、安装/连接方法
+
+``` python
 pip install flask-sqlalchemy
 连接方法
 pip install pymysql
@@ -508,6 +585,44 @@ root 数据库用户名
 @localhost 数据库IP
 shoplow 库名
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:123@localhost/shoplow"
+```
+
+### 二、初级方法使用数据库
+
+缺点：每次使用都要连接，断开数据库，浪费资源
+
+``` python
+from flask import Flask,pymysql
+# 核心启动
+app = Flask(__name__)
+
+# 数据库函数
+def fetch(sql):
+    conn = pymysql.connect(
+        host='127.0.0.1', #地址
+        port=3306,        #端口
+        user='root',      #用户名
+        passwd='123',     #秘密
+        db='t1'           #数据库名称
+    )
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
+
+# 视图
+@app.route('/index')
+def index():
+    res = fetchall('select * from A')
+    return "hallo word"
+
+if __name__ == "__main__":
+    app.run()
+```
+
+
 
 创建model类
 from sqlalchemy import Column
@@ -539,18 +654,22 @@ from werkzeug.security import generate_password_hash
 class User(db.Model):
 _password = Column(“passwd”,String(64), nullable=true)
 
-# 读取
+读取
+
 @property
 def password(self):
 return self._password
 
-# 写入--password加密
-# 可以限制读取
+写入--password加密
+
+可以限制读取
+
 @property.setter
 def password(self, raw):
 self._password = generate_password_hash(raw)
 
-# 验证密码
+验证密码
+
 def check_passwd(self, raw):
 return check_password_hash(self._password, raw) # 读取并验证密码
 自动添加时间
@@ -572,7 +691,9 @@ flask_login中的登录验证方法
 from flask_login import UserMixin
 class User(UserMixin, Base):
 ... //正常的UserModel
-# 如果不是使用id表示用户身份，还要重写get_id方法
+
+如果不是使用id表示用户身份，还要重写get_id方法
+
 def get_id(self):  //固定的方法名
 return self.id  
 生成数据库表
@@ -616,12 +737,19 @@ if request.method == GET:
 #第一次登录写入游览器Cookid
 return 
 else:
-# 验证用户的账号密码
+
+验证用户的账号密码
+
 if ....
-# 登录成功的流程
-# userModel中需要有一个固定的方法 def get_id(),这个函数返回用户的id
+
+登录成功的流程
+
+userModel中需要有一个固定的方法 def get_id(),这个函数返回用户的id
+
 login_user(user) //将用户Model传入
-# REMEMBER_COOKIE_DURATION=10设置cookie有效期
+
+REMEMBER_COOKIE_DURATION=10设置cookie有效期
+
 login_user(user, remeber=True) //记住我
 next = request.args.get(“next”)
 if not next or not next.startswith(“/”):
@@ -636,7 +764,8 @@ from flask_login import login_required
 @login_required   # 添加验证方法
 def index():pass
 
-# login_manager是在create_app上创建
+login_manager是在create_app上创建
+
 @login_manager.user_loader
 def get_user(uid):
 user = User.query.get(int(uid))
@@ -659,11 +788,12 @@ logout_user() //登出
 跳转
 url_for(“web.login”)
 redirect()
-上传文件
-1、前端
+## 上传文件
+#### 一、前端
 
-2、后端
-接收
+#### 二、后端
+
+``` python
 image = []
 for file in files:
 if file and allowed_file(file.name):
@@ -671,9 +801,12 @@ fileTime = str(int(time.time() * 1000))
 filename - fileTime + os.path.splitext(file.filename)[1]
 file.save(os.path.join(UPLOAD_Folder, filename))
 imagesName.append(filename)
+```
 
-错误信息
-路由错误：最后写着got an unexpected keyword argument ‘method’ 路由配置允许访问的方法参数错误
+#### 三、错误信息
+
+1、路由错误：最后写着got an unexpected keyword argument ‘method’ 路由配置允许访问的方法参数错误
+
 限制用户访问静态文件
 @api.route()
 def download(“/download”):
