@@ -82,7 +82,8 @@ request 请求包含所用HTTP请求的参数
 - request.method：请求方法,GET\POST等
 - request.from：整个表单对象
 - request.from.get("名称")：获得表单中某项的属性
-- 
+- request.args.get("名称")：获取url的传递的参数，例: "http://abc.cn?name=22"
+- request.args.to_dict()：转变成可变字典
 
 ``` python
 from flask import request
@@ -107,7 +108,100 @@ from flask import redirect
 @app.route("/index")
 def index():
     return redirect('/index')
+
+# 视图函数-使用url_for
+# 
+@app.route("/index")
+def index():
+    return redirect(url_for('index'))
 ```
+
+### 七、session
+
+1、必须先设置secret_key
+
+- flask的session是存放在用户游览器中的
+- 首先flask会使用secret_key将用户信息加密，然后返回用户游览器的cooke中，之后用户
+
+``` python
+from flask import Flask
+app = Flask(__name__)
+app.secret_key = "自定义字符串"
+```
+
+2、使用session
+
+``` python
+from flask import session
+
+# 视图函数
+@app.route("/index/<name>")
+def index(name):
+    # session 数据保存
+    session['name'] = name
+    # 防止session不存在报错
+    name = session.get('name')
+    return redirect('/index')
+```
+
+## 装饰器
+
+1、自定义装饰器
+
+- 装饰器可以简单的理解为添加额外功能，运行流程为：@auth、def index()、@app.route
+- flask中装饰器一定要在路由装饰器下面
+- 由于装饰器的替换效果，多个函数使用同一个装饰器会有函数名重复的错误
+
+``` python
+# 装饰器
+def auth(func):
+    def inner(*arg, **kwargs):
+        # 装饰器要运行的代码
+        if not user:
+            pass
+        # end
+        return func(*args, **kwargs)
+    return inner
+
+# index函数将会替换装饰器中的inner函数
+@app.route("/index")
+@auth
+def index():
+    pass
+```
+
+2、装饰器名称修改
+
+``` python
+import functools
+
+# 装饰器
+# @functools.wraps(func)会将当前运行的函数名换成func变量的名称
+def auth(func):
+    @functools.wraps(func)
+    def inner(*arg, **kwargs):
+        # 这里添加装饰器要运行的函数
+        # end
+        return func(*args, **kwargs)
+    return inner
+
+# index函数将会替换装饰器中的inner函数
+# auth的函数名为index
+@app.route("/index")
+@auth
+def index():
+    pass
+
+# index函数将会替换装饰器中的inner函数
+# auth的函数名为edit
+@app.route("/edit")
+@auth
+def edit():
+    pass
+
+```
+
+## 请求上下文
 
 原理
 current_app 使用了设计模式中的代理模式
@@ -132,7 +226,8 @@ with需要
 with app.app_context():
 current_app[‘debug’]
 
-线程隔离
+## 线程隔离
+
 flask多线程
 app = Flask(__name__)
 app.run(threaded=true,)
@@ -159,31 +254,183 @@ app.config[‘DEBUG’]
 
 from flask import current_app //当前flask核心对象
 current_app.config[‘DEBUG’]
-蓝图
-本质封装了werkzeug库
-1、基础使用方法
-1、创建蓝图
+
+## 模板
+
+### 一、配置
+
+1、templates_dir：默认模版位置参数，默认访问启动文件下的templates目录
+
+``` python
+Flask_app= Flask(__name__, templates_dir=None)
+```
+
+2、templates_url_path：模版目录参数，默认为当前目录
+
+``` python
+Flask_app= Flask(__name__, templates_url_path=””)
+```
+
+### 二、模板语法
+
+#### 1、传变量
+
+python文件中设置
+
+``` python
+# 视图函数-返回模版参数
+# 1\直接在render_template后面添加要返回的变量与值
+# 2\index.html中要使用 {{}}
+#   <h1>{{error}}</h1>
+@app.route("/index")
+def index():
+    return render_template('index.html', error=123, OK=33)
+```
+
+html文件中设置
+
+``` html
+<img src=”{{error}}” />
+```
+
+#### 2、注释方法
+
+`{# 注释 #}`
+
+#### 3、判断
+
+``` html
+{% if name==1 %} <html> {%else%} {% endif %}
+```
+
+#### 4、遍历
+
+1、数组遍历
+python中设置
+
+``` python
+# 视图函数-返回模版参数
+data = [1,2,3,4,5]
+@app.route("/index")
+def index():
+    return render_template('index.html', MYDATA=data)
+```
+
+html中设置
+
+``` html
+/-- 普通循环 --/
+{% for item in MYDATA %}
+    <span> {{item}} <\span>
+{% endfor %}
+
+/-- 循环变量为空的循环 --/
+{% for item in MYDATA %}
+    <span>{{item}}</span>
+{% else %} 
+    /-- 为空执行 --/
+    <span>没有数据</span> 
+{% endfor %}
+```
+
+2、遍历字典
+
+python中设置
+
+``` python
+# 视图函数-返回模版参数
+data = {
+    '1':{'name':'A'},
+    '2':{'name':'B'}
+}
+@app.route("/index")
+def index():
+    return render_template('index.html', MYDATA=data)
+```
+
+html中设置
+
+``` html
+/-- 普通循环 --/
+{% for key, item in MYDATA.items() %}
+{% endfor %}
+
+/-- MYDATA为空的循环 --/
+{% for key, item in MYDATA.items() %}
+    <span>{{key}}</span>
+    <span>{{item.name}}</span>
+    <span>{{item['name']}}</span>
+    <span>{{item.get('name','200')}}</span>
+{% else %} 
+    <span>没有数据</span> 
+{% endfor %}
+```
+
+#### 5、模板继承
+
+父类模板:
+
+``` html
+{% block head %} <div>this head</div> {% endblock %}  
+```
+
+子类模板  -- view视图调用的模板
+
+``` html
+{% extends ‘layout.html’ %}
+{% block head %}
+{% super() %}  {# 显示父类模板信息 #}
+<div>填充到head中</div>
+{% endblock %}
+```
+
+#### 6、模板过滤器
+
+{{data.name | default(“默认”) }}  不存在的数显示默认值
+{{data.name | default(“”, true)}} 支持检查不存在的数据
+{{ data | length() }}
+
+## 蓝图
+
+### 一、基础使用方法
+
+``` python
+# 1、创建蓝图
 api = Blueprint(“api”, __name__)
-2、注册蓝图
+# 2、注册蓝图
 # 需要导入api模块
 flask_app.register_blueprint(api)
-3、view使用蓝图
+# 3、view使用蓝图
 # 需要导入api
 @api.route(“/”)
 def index():
-print(“index.py”)
-2、配置统一蓝图
+    print(“index.py”)
+```
+
+### 二、配置统一蓝图
+
+``` python
 flask_app.register_blueprint(api, url_prefix=’/admin’)
-访问的路径变成 https://127.0.0.1/admin/index
-/admin 是路由添加
-3、路由参数
-@api.route(“/api/<page>/<a>”, methods=[“GET”])
-def api(page, a):pass  //将值传递给api方法
-4、获取GET参数
-from flask import request  #这个参数包含所有的请求参数，任何地方都可以获取到，通过视图函数创建
-resqust.args.get(“A”, “”) //获取URL请求的参数
-request.args.to_dict() //转变成可变字典
-make_reponse()
+# 访问的路径变成 https://127.0.0.1/admin/index
+# /admin 是路由添加
+```
+
+### 三、路由参数
+
+``` python
+# 获取路由中page,a的值
+# 默认路由值是字符串
+@app.route(“/api/<page>/<a>”, methods=[“GET”])
+def api(page, a):
+    pass  
+
+# 转换路由中的值到指定类型
+# 接受int类型的page，str类型的a
+@app.route("/api/<int:page>/<string:a>")
+def api(page, a):
+    pass
+```
+
 Form验证
 创建wtform方法
 pip install wtforms
@@ -219,13 +466,6 @@ def validate_email(self, field): //对email字段做校验
 User.query.filter_by(email = field.data) //field由系统传入
 raise ValidationError(“错误信息”)
 
-模板
-1、基础使用方法
-如果不配置templates_dir参数，则默认访问启动文件下的templates目录
-（1）配置templates_dir参数
-flask级模板
-Flask_app= Flask(__name__, templates_dir=None， templates_url_path=””)
-蓝图级应用
 Blueprint(“web”, templates_dir, templates_url_path)
 （2）视图调用：
 from flask import render_template, redirect
@@ -242,30 +482,8 @@ return redirect(“/index”) # 路由跳转
 # 将函数加入模板
 flask_app.add_template_global(“自定义函数”, “buildstatic”)
 
-# 模板中使用
-<img src=”{{buildstatic(1,1)}}” />
-4、模板语法
-{# 注释 #}
-{% if name==1 %} {%else%} {% endif %}
-{% for item in name %} {% else %} 为空执行 {% endfor %}
-{# 遍历字典 #}
-{% for key, item in name.items() %} {% else %} 为空执行 {% endfor %}
-5、模板继承
-父类模板
-{% block head %} <div>this head</div> {% endblock %}  
-子类模板  -- view视图调用的模板
-{% extends ‘layout.html’ %}
-{% block head %}
-{% super() %}  {# 显示父类模板信息 #}
-<div>填充到head中</div>
-{% endblock %}
-6、模板过滤器
-{{data.name | default(“默认”) }}  不存在的数显示默认值
-{{data.name | default(“”, true)}} 支持检查不存在的数据
-{{ data | length() }}
+## 静态文件
 
-开发期间响应静态文件
-静态文件
 如果不配置static_dir参数，则默认访问启动文件下的static目录
 Flask_app= Flask(__name__, static_dir=None)
 static_dir默认位置是以Flask核心对象位置区别的，配置static_dir后url路径也会变成文件名例如
@@ -276,7 +494,9 @@ static_url_path=”ss/cc”  http://localhost/ss/cc,  访问的物理位置为fl
 
 配置蓝图级别静态文件
 Blueprint(‘web’, __name__, static_folder=””, static_url_path=””)
-数据库
+
+## 数据库
+
 pip install flask-sqlalchemy
 连接方法
 pip install pymysql
