@@ -571,82 +571,9 @@ Blueprint(‘web’, __name__, static_folder=””, static_url_path=””)
 
 ## 数据库
 
-### 一、安装/连接方法
+详见数据库 - pymysql.md
 
-``` python
-pip install flask-sqlalchemy
-连接方法
-pip install pymysql
-配置文件：
-mysql 数据类型
-pymysql 数据库驱动
-root 数据库用户名
-123 数据库密码
-@localhost 数据库IP
-shoplow 库名
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:123@localhost/shoplow"
-```
-
-### 二、初级方法使用数据库
-
-缺点：每次使用都要连接，断开数据库，浪费资源
-
-``` python
-from flask import Flask,pymysql
-# 核心启动
-app = Flask(__name__)
-
-# 数据库函数
-def fetch(sql):
-    conn = pymysql.connect(
-        host='127.0.0.1', #地址
-        port=3306,        #端口
-        user='root',      #用户名
-        passwd='123',     #秘密
-        db='t1'           #数据库名称
-    )
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return result
-
-# 视图
-@app.route('/index')
-def index():
-    res = fetchall('select * from A')
-    return "hallo word"
-
-if __name__ == "__main__":
-    app.run()
-```
-
-
-
-创建model类
-from sqlalchemy import Column
-db = SQLAlchemy()
-class Book(db.Model):
-id = db.Column(PAMS)
-
-def PAFunc1():pass
-PAMS-参数说明
-Integer 整形
-String(50)  字符串50
-nullable=False  不为空
-default=”” 默认值
-primary_key=True 主键
-autoincrement=True 自增
-
-将数据sqlalchemy连接到flask
-from app.models import db  //引入db=SQLAlchemy()
-def create_app():
-app = Flask(__name__)
-db.init_app(app) //注册到flask
-
-数据库操作函数
-def PAFunc1():
+## 静态文件
 
 预处理数据/设置只读
 from werkzeug.security import generate_password_hash
