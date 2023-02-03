@@ -1,14 +1,26 @@
 # --------------------------------------------------------------------
 # sqlhelperModel
-# 使用类实现的sqlhelper，利用了数据库连接池的方法、原生pymysql
+#
+# 单例模式的SQLhelper
+# 使用类实现的sqlhelper，利用了数据库连接池的方法、原生pymysql、栈、线程
+# 利用栈和线程维护一个栈，这样就可以使用with语句实现不同的连接可关可开
+#
 # 其他文件直接引入对应的查询方法即可，例
 #   index.py文件
 #   from sqlheplerModel import db
 #   def index():
 #       res = db.fetchone("select * from %s", "AAA")
+#
+# 使用with语句
+#   index.py文件
+#   from sqlhelperModel import db
+#   def index():
+#       with db as curse:
+#           curse.execute("XXXXXXXXXXXX")
 #----------------------------------------------------------------------
 import pymysql
 from DBUtils.PooledDB import PooledDB
+import threading
 
 class DqlHelper(object):
     def __init__(self):
@@ -27,6 +39,7 @@ class DqlHelper(object):
             database='pooldb',
             charset='utf8'
         )
+        self.local = threading.local()
 
     def open(self):
         conn = self.POOL.connection()
@@ -39,12 +52,37 @@ class DqlHelper(object):
         conn.close()
 
     # 定义一个查询样例
-    def detchone(self, sql, *args):
+    def fetchone(self, sql, *args):
         conn, cursor = self.open()
         # 注意这里，主要修改位置,sql语句一定要在单引号中
         cursor.execute(sql, args)
         result = cursor.fetchall()
         self.close(conn, cursor)
         return result
+
+    # with上下文所利用的类
+    def __enter__(self):
+        conn,cursor = self.open()
+        # 获取rv中stack的值
+        rv = getattr(self.local, 'stack', None)
+        # 如果rv为空，向rv中添加初始化数据
+        # 如果rv中有值，向rv中添加新创建的连接信息
+        if not rv:
+            self.local.stack = [(conn, cursor),]
+        else:
+            self.local.stack = rv.append((conn, cursor))
+        return cursor
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        rv = getattr(self.local, 'stack', None)
+        # rv为空就删除stack，因为已经什么都没了
+        # 如果有，就弹出关闭连接
+        if not rv:
+            del self.local.stack
+
+        else:
+            conn, cursor = rv.pop()
+            self.close(conn, cursor)
+
 
 db = SqlHelper()

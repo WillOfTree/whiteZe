@@ -4,7 +4,7 @@
 
 ### 一、概念
 
-python有指针的概念，如果多次初始化一个类，python会指向那个变量，并不会再创建一个相同的对象，使用id()方法即可验证
+1、python有指针的概念，如果多次初始化一个类，python会指向那个变量，并不会再创建一个相同的对象，使用id()方法即可验证
 
  
 
@@ -52,43 +52,38 @@ python不能充分利用多核CPU优势
 
 python引用只引用一次（import) 
 
-### print方法
+### 二、print方法
 
-“x”*10 // 连续打印10个x，用于一些需要重复打印的地方
-
- 
-
+``` python
+# // 连续打印10个x，用于一些需要重复打印的地方
+print("x"*10)
 Print(“name=%s,age=$d”%(name,age))
 
-//打印不换行
-
+# 打印不换行
 Print( “****”,end=““)；
-
-//打印换行
-
+# 打印换行
 Print(“”)
 
-//字符串连接新方式
-
-“===%s===”%(a+b)
+# 字符串连接新方式
+print("===%s==="%(a+b))
 
 A,b是变量，
-
 Get()与[] :get不会报错
-
 .Startwith（）以多少开头
-
 .Endwith()以结尾
-
 Input() # 允许获取输入
+```
 
 ### 三、下标和切片
 
 字符串可以通过下标获取字符
 
-Nam[2:6]截取第2个(包含)到第5个
-
-Name[-1::-1]倒序
+``` python
+# 截取第2个(包含)到第5个
+Nam[2:6]
+# 倒序
+Name[-1::-1]
+```
 
 ### 四、全局变量
 
@@ -100,55 +95,59 @@ Name[-1::-1]倒序
 
 \#args 是一个变量名，*类似于指针
 
-Def function_name(one, two, ***args**):
+``` python
+# 这是一个元组
+def function_name(one, two, *args):
+    print(args);
 
-  Print(args);//这是一个元组
+function_name(1,2,3,4,5,6,7)
 
- 
+# 这是一个字典
+def function_name(one, two, **keys):
+	print(keys) 
 
-Function_name(1,2,3,4,5,6,7)
-
-\-----------------------------------------------------------
-
-Def function_name(one, two, ***\*keys**):
-
-  Print(keys) //这是一个字典
-
- 
-
-Function_name(1,2,’aa’=3,’bb’=4)
-
-首先满足没有命名参数的，再满足带有命名参数的变量
+function_name(1,2,’aa’=3,’bb’=4)
+```
 
 ### 六/拆包
 
-创建进程，线程时使用
+``` python
+#创建进程，线程时使用
+#形参传递元组里的内容
+#*args 传递的是一个元组
+#**kwargs 传递的是一个字典
 
-形参传递元组里的内容
+def function_name(*args, **kwargs)
+	A=(1,2,3,4,5)
+	B=(‘a’=1,’b’=2)
 
-*args 传递的是一个元组
-
-**kwargs 传递的是一个字典
-
-Def function_name(*args, **kwargs)
-
-A=(1,2,3,4,5)
-
-B=(‘a’=1,’b’=2)
-
-Function_name(*A,**B)
+function_name(*A,**B)
+```
 
 ### 七/匿名函数
 
- 
-
 ### 枚举
 
+``` python
 class Padding(Enum):
+	aa = 1 
+	bb = 2
+```
 
-aa = 1 
+### 偏函数
 
-bb = 2
+重写函数的参数方法
+
+``` python
+import functools
+def func(a1, a2):
+    print(a1, a2)
+
+# 重写了func函数为new_func，并且将a1赋值为123，
+# 新函数不需要写2个参数
+new_func = functools.partial(func, 123)
+new_func(2)
+```
 
 ## 面向对象
 

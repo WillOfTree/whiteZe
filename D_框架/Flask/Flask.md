@@ -2,19 +2,7 @@
 
 ## 简单应用
 
-### 一、原理
-
-``` python
-from werkzeug.serving import run_simple
-
-def func(environ, start_response):
-    print("请求来了")
-    
-if __name__ == "__main__":
-    run_simple('127.0.0.1', 5000, func)
-```
-
-### 二、Hallo word
+### 一、Hallo word
 
 ``` python
 from flask import Flask
@@ -31,7 +19,7 @@ if __name__ == "__main__":
     app.run()
 ```
 
-### 三、视图常用return函数
+### 二、视图常用return函数
 
 #### 1、模版
 
@@ -67,7 +55,7 @@ def index():
 
 ```
 
-### 四、GET、POST请求
+### 三、GET、POST请求
 
 ``` python
 # 视图函数-响应GET，默认响应GET
@@ -83,7 +71,7 @@ def index():
 
 ```
 
-### 五、request类
+### 四、request类
 
 request 请求包含所用HTTP请求的参数
 
@@ -106,7 +94,7 @@ def index():
     return render_template('index.html')
 ```
 
-### 六、重定向
+### 五、重定向
 
 ``` python
 from flask import redirect
@@ -124,11 +112,11 @@ def index():
     return redirect(url_for('index'))
 ```
 
-### 七、session
+### 六、session
 
 1、必须先设置secret_key
 
-- flask的session是存放在用户游览器中的
+- flask的session是存放在用户游览器中的，只要不删除就一直存在
 - 首先flask会使用secret_key将用户信息加密，然后返回用户游览器的cooke中，之后用户
 
 ``` python
@@ -147,9 +135,25 @@ from flask import session
 def index(name):
     # session 数据保存
     session['name'] = name
-    # 防止session不存在报错
+    # 读取，防止session不存在报错
     name = session.get('name')
+    name = session['name']
+    # 删除session
+    del session['name']
     return redirect('/index')
+```
+
+### 七、是否严格URL访问地址
+
+``` python
+# 视图函数
+# 访问url
+# www.xx.com/index/ 
+# 与
+# www.xx.com/index 都可
+@app.route("/index", striet_slashes=False)
+def index():
+    return 'index'
 ```
 
 ## 模板
@@ -197,12 +201,15 @@ html文件中设置
 #### 3、判断
 
 ``` html
-{% if name==1 %} <html> {%else%} {% endif %}
+{% if name==1 %} 
+<html> </html>
+{%else%} 
+<html> </html>
+{% endif %}
 ```
 
-#### 4、遍历
+#### 4、数组遍历
 
-1、数组遍历
 python中设置
 
 ``` python
@@ -230,7 +237,7 @@ html中设置
 {% endfor %}
 ```
 
-2、遍历字典
+#### 5、遍历字典
 
 python中设置
 
@@ -263,35 +270,128 @@ html中设置
 {% endfor %}
 ```
 
-#### 5、模板继承
+#### 6、模板继承
 
-父类模板:
+index.py
 
-``` html
-{% block head %} <div>this head</div> {% endblock %}  
+- 视图正常调用模板
+
+``` python
+from flask import render_template
+@app.route("/index")
+def index():
+    return render_template('index.html')
 ```
 
-子类模板  -- view视图调用的模板
+index.html
+
+- view视图调用的模板
 
 ``` html
 {% extends ‘layout.html’ %}
-{% block head %}
-{% super() %}  {# 显示父类模板信息 #}
-<div>填充到head中</div>
+{% block head %} 
+<div>填充到layout的head中</div>
 {% endblock %}
 ```
 
-#### 6、模板过滤器
+layout.html:
 
-{{data.name | default(“默认”) }}  不存在的数显示默认值
-{{data.name | default(“”, true)}} 支持检查不存在的数据
-{{ data | length() }}
+- 模板会将index的内容放到block模块中
+- head是模块的名称，可修改稿
+
+``` html
+<html>
+    {% block head %}{% endblock %}  
+</html>
+```
+
+#### 7、模板引入
+
+index.html
+
+``` html
+<html>
+	{% include 'other.html' %}
+</html>
+```
+
+other.html
+
+``` html
+<body>
+    <div>aaa</div>
+</body>
+```
+
+#### 8、模板函数
+
+在蓝图中定义，只能用于当前蓝图，在启动文件中定义可适用于全局
+
+方法1：直接传函数
+
+``` python
+# 视图文件
+def func(arg):
+    return "haigou" + arg
+# 普通的视图函数
+@app.route("/index")
+def index():
+    return render_template('index.html', f=func)
+```
+
+方法2：装饰器，模板函数
+
+``` python
+# 视图
+# 定义全局的模板函数
+@app.template_global()
+def func(arg):
+    return "haigou" + arg
+
+# 全局模板函数，调用方法与global不同
+@app.template_filter()
+def x1(arg):
+    return "xxxx" + arg
+```
+
+index.html模板
+
+``` html
+<html>
+    <div>render_template通过参数传递：{{func()}}</div>
+    <div>template_global的调用方法：{{func('xxx')}}</div>
+    <div>template_filter的调用方法：{{"xxx"|x1()}}</div>
+</html>
+```
+
+#### 9、模板过滤器
+
+index.py
+
+``` python
+
+```
+
+index.html
+
+``` html
+<html>
+    <div>不存在的数显示默认值:{{data.name | default(“默认”) }}
+    </div>
+	<div>
+    支持检查不存在的数据:{{data.name | default(“”, true)}} 
+    </div>
+    <div>
+        {{ data | length() }}
+    </div>
+</html>
+```
 
 ## 蓝图
 
 ### 一、目录结构
 
-``` ejs
+``` shell
 project
 	|-- manage.py
 	|-- pro_excel
@@ -379,9 +479,186 @@ def api(page, a):
     pass
 ```
 
+### 四、中间件+模板函数
+
+``` python
+from flask import Blueprint
+api = Blueprint("api", __name__)
+
+# 当前中间件只作用于api蓝图
+# 注意起始是api不是app
+@api.before_request
+def f1():
+    pass
+
+# 当前模板函数只作用于api蓝图
+# 与template_global效果一样
+@api.app_template_global()
+def f10():
+    pass
+```
+
+### 五、另一种蓝图系统
+
+#### 1、目录结构
+
+``` shell
+bigblue
+	|-- manage.py
+	|-- config
+	+-- bigblue
+		|-- __init__.py
+		+-- blue_one
+			|-- __init__.py
+			+-- view
+				|-- index.py
+			+-- templates
+			+-- statics
+		+-- blue_two
+```
+
+#### 2、使用方法
+
+- 每个蓝图（bigblue）下面的文件都是包，所以blue_one，blue_two都含有__init\_\_.py
+- 每个蓝图的都创建对应的包中的\_\_init__.py中
+- bigblue下的\_\_init__.py负责集合所有蓝图模块
+- 模板、静态文件默认位置是根目录（manage.py所在的目录），设置模板、静态文件参数后会先找根目录，再找对应的蓝图文件下的文件
+
+bigblue\blue_one\\\_\_init__.py
+
+``` python
+from flask import Blueprint
+# 模板和静态文件参数很重要
+ac = Blueprint("ac", __name__)
+
+# 引入当前包的文件index.py文件
+from .view import index
+```
+
+bigblue\\__init\_\_.py
+
+``` python
+from flask import Flask
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object("config.settings")
+    # 引入蓝图
+    from .blue_one import ac
+    # 注册
+    app.register_blueprint(ac)
+```
+
+manage.py
+
+- 运行程序，入口
+
+``` python
+from bigblue import create_app
+app = create_app()
+
+if name == "__name__":
+    app.run
+```
+
+视图文件
+
+bigblue\blue_one\index.py
+
+``` python
+# from .是当前目录，只能找到index.py文件
+from .. import ac
+
+@ac.route("/index")
+def index():
+    return "index"
+```
+
+
+
+## 路由系统
+
+#### 一、路由加载流程
+
+- 将url和函数打包成rule对象
+- 将rule对象添加到map对象中
+- app.url_map = map对象
+
+#### 二、路由的2种写法
+
+``` python
+def index():
+    # flask底层调用
+    app.add_url_rule('/index', 'index', index)
+    
+@app.route('/login')
+def login():
+    return '1'
+```
+
+## 配置文件
+
+#### 一、基于全局变量
+
+\_\_init_\_.py
+
+``` python
+from flask import Flask
+app = Flask(__name__) 
+
+# 添加配置文件，从当前目录中读取settings.py
+app.config.from_object('settings')
+# 从config目录下的settings.py文件导入
+app.config.from_object('config.settings')
+# 打印
+app.config['DB_HOST']
+```
+
+config.py
+
+``` python
+# 配置样例
+xx='123'
+DB_HOST='127.0.0.1'
+# 当服务其与本地不同时，
+# 项目上传到服务器上，只需要删除localsettings文件
+try: 
+    from .localsettings import *
+except ImportError:
+    pass
+```
+
+#### 二、基于类的方式
+
+不能通过删除文件实现开发服务器、线上服务器，必须手动修改
+
+_\_init\_\_.py
+
+``` python
+from flask import Flask
+app = Flask(__name__) 
+
+# 从config目录下的settings.py文件导入
+app.config.from_object('config.settings.DevSEttings')
+# 打印
+app.config['DB_HOST']
+```
+
+config.py
+
+``` python
+class Base(object):
+    HOST = '1.1.1.1'
+
+class DevSettings(Base):
+    HOST = '1.1.1.1'
+    
+class LocalSettings(Base):
+    HOST = '1.1.1.1'
+```
+
 ## 装饰器
 
-1、自定义装饰器
+#### 一、自定义装饰器
 
 - 装饰器可以简单的理解为添加额外功能，运行流程为：@auth、def index()、@app.route
 - flask中装饰器一定要在路由装饰器下面
@@ -405,7 +682,7 @@ def index():
     pass
 ```
 
-2、装饰器名称修改
+#### 二、装饰器名称修改
 
 ``` python
 import functools
@@ -433,289 +710,450 @@ def index():
 @auth
 def edit():
     pass
+```
 
+#### 三、中间件
+
+before_request：先执行
+
+after_request：最后执行
+
+``` python
+from flask import Flask
+app = Flask(__name__)
+
+# 不能有返回值，如果有返回值，就会直接停止
+@app.before_request
+def f1():
+    pass
+
+# 必须有参数和返回值
+@app.after_request
+def f10(response):
+    return response
+
+# 运行流程 
+# 	f1-> index() ->f10
+@app.route("/index")
+def index():
+    print("index")
+```
+
+其他写法
+
+``` python
+from flask import Flask
+app = Flask(__name__)
+def f1():
+    pass
+def f10(response):
+    return response
+@app.route("/index")
+def index():
+    print("index")
+    
+app.before_request(f1)
+app.after_request(f10)
 ```
 
 ## 请求上下文
 
-原理
+### 一、原理
+
 current_app 使用了设计模式中的代理模式
 request 
 session
-g   本地代理
-应用上下文-current_app, g, session
-请求上下文-request
-离线应用-单元测试
-app=Flask(__name__)
-ctx=app.app_context()//请求上下文
-ctx.push()
-a=current_app.config[‘debug’]
-ctx.pop()
-使用with语句改写
-with需要
-#
-#上下文管理器
 
+### 二、LocalProxy对象
 
+session、request、current_app、g都是LocalProxy对象
 
-实现__enter__(); __exit__()两个方法
+- current_app：就是Flask（_\_name__）生成的对象
+- session：生命周期一直存在
+- g变量：在一次请求周期中保存任意数据
 
-上下文表达式必要返回一个上下文管理器
-
-with A() as AA:  AA是class A()中__enter__的返回值
-
-with app.app_context():
-current_app[‘debug’]
-
-## 线程隔离
-
-flask多线程
-app = Flask(__name__)
-app.run(threaded=true,)
-
-from werkzeug.local import localStack //栈元素
-from werkzeug.local import local
-oo = local() //线程隔离
-oo.a = 1
-oo.b = b //再不同的线程中修改值
-
-生命周期
-@flask_app.before_reqeust
-def before_request():
-print（所有请求之前调用）
-
-配置文件
-setting.py
-DEBUG = True  //配置文件写法
-
-app Flask核心对象
-app.config.from_object(“app.setting”) //读取/app/setting.py
-读取配置文件
-app.config[‘DEBUG’]
-
-from flask import current_app //当前flask核心对象
-current_app.config[‘DEBUG’]
-
-Form验证
-创建wtform方法
-pip install wtforms
-from wtforms import Form, StringField
-class XXX(Form):
-
-validators 是wtforms内置的验证方法
-
-q = StringField(validators=[PAMS, PAMS])
-
-#自定义验证
-def 
-使用wtform
-from mywforms import XXX
-
-@api.router(“/index”, methods=[“GET”])
-def index():
-form = XXX(reqeust.args) //传入所有参数
-if form.validate(): //方法验证
-
-验证通过
-
-form.q.data //获取key为q的数据
-form.q.data.strip() //去掉空格
-form.errors //错误信息
-Field类型
-StringField, IntergerField，PasswordField
-PAMS-参数设置1
-default=1  验证失败填写默认值1
-Length(min=1, max=30)   验证长度1-30
-NumberRange(min=1, max=30)
-message=”11”  错误提示信息  
-DataRequired()  数据不能为空
-自定义验证
-from wtform import ValidationError
-def validate_email(self, field): //对email字段做校验
-User.query.filter_by(email = field.data) //field由系统传入
-raise ValidationError(“错误信息”)
-
-Blueprint(“web”, templates_dir, templates_url_path)
-（2）视图调用：
-from flask import render_template, redirect
-def hello(name=None):
-return render_template('hello.html', name=name) #调用模板
-return redirect(“/index”) # 路由跳转
-2、方向构建url
-访问/static/css/index.css文件
-<link rel="stylesheet" href='{{ url_for("static",filename = "css/index.css" ) }}'>
-
-<script src="{{ url_for("static",filename = "js/js.js") }}">
-访问web.book视图
-<a href=”{{ url_for(‘web.book’, isbn=book.isbn)}}”></a>
-5、自定义模板函数
-# 将函数加入模板
-flask_app.add_template_global(“自定义函数”, “buildstatic”)
-## 静态文件
+### 三、g使用方法
 
 ``` python
-# 如果不配置static_dir参数，则默认访问启动文件下的static目录
-# static_dir默认位置是以Flask核心对象位置区别的，配置static_dir后url路径也会变成文件名
-# 例如:
-# static_dir=”view/aaa”,
-# 这里访问路径将变成
-# http://localhost/aaa/image.jpg
-# ---------
-# static_url_path 设置url访问路径,当设置这个，static_dir将失去效果
-# static_url_path=”ss/cc”  http://localhost/ss/cc,  访问的物理位置为flask核心对象目录下的SS/cc
-Flask_app= Flask(__name__, static_dir=None)
+from flask import Flask, g
+app = Flask(__name__)
 
-# 配置蓝图级别静态文件
-Blueprint(‘web’, __name__, static_folder=””, static_url_path=””)
+@app.before_request
+def f1():
+    # g从请求开始就存在
+    g.x1 = 123
+    
+@app.route("/index")
+def index():
+    print(g.x1)
+    return "hello"
 ```
 
 ## 数据库
 
 详见数据库 - pymysql.md
 
+## 信号
+
+flask框架中预留的钩子，可以自定义操作
+
+一、安装
+
+``` python
+pip install blinker
+```
+
+### 二、flash闪存
+
+flask基于session，特点是只能用1次，存读结束
+
+``` python
+from flask import Flask, render-template
+# 导入flash
+from flask import flash, get_flash_messages
+
+app = Flask(__name__)
+# 设置secret_key
+app.secret_key = "111111111111"
+
+@app.before_request
+def f1():
+    # 保存数据
+    flash(123)
+    
+@app.route("/index")
+def index():
+    # 获取数据
+    messages = get_flashed_messages()
+    return "hello"
+
+if __name__ == '__main__':
+    app.run()
+```
+
+### 三、可扩展的地点
+
+#### 1、中间件扩展
+
+意义不大，因为没有session，g，request等变量，尚未进入flask请求
+
+``` python
+from flask import Flask, render-template
+app = Flask(__name__)
+    
+@app.route("/index")
+def index():
+    return "hello"
+
+class MyMiddleware(object):
+    def __init__(self, old_app):
+        self.wsgi_app = old_app.wsgi_app
+        
+    def __call__(self, *args, **kwargs):
+        # 添加自定义语句
+        print("自定义位置")
+        result = self.wsgi_app(*args, **kwargs)
+        print("自定义位置")
+        return result
+    
+app.wsgi_app = MyMiddleware(app)
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 2、appcontext_pushed信号
+
+当app_ctx被push到local中栈之后，会触发appcontext_pushed信号，之前注册到这个信号的方法会被触发
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@signals.appcontext_pushed.connext
+def f1(arg):
+    pass
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 3、before_first_request信号
+
+``` python
+from flask import Flask
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@app.before_first_request
+def f1():
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 4、request_started信号
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+# 这里的arg就是app对象
+@signals.request_started.connext
+def f1(arg):
+    pass
+
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 5、url_value_preprocessor
+
+``` python
+from flask import Flask, render-template
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+# 这个信号在视图前，befor_request之前调用
+# endpoint路由，args是url参数
+@app.url_value_preprocessor
+def f1(endpoint, args):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 6、before_request
+
+#### 7、before_render_template
+
+模板（render_template）渲染之前
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@signals.before_render_template.connect
+def f1(app, template, context):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 8、template_rendered
+
+模板（render_template）渲染之后
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@signals.template_rendered.connect
+def f1(app, template, context):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 9、after_request
+
+#### 10、request_finished信号
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@signals.request_finished.connect
+def f1(app, request):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 11、got_request_exception
+
+请求异常的信号，并不是视图函数出问题，而是flask框架运行时出问题
+
+``` python
+from flask import Flask, render-template
+# 引入信号
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@signals.got_request_exception.connect
+def f1():
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 12、teardown_request
+
+请求结束时，不论请求成功还是失败，都会运行到
+
+``` python
+from flask import Flask, render-template
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+@app.teardown_request
+def f1(exc):
+    pass
+
+# 额外的一个信号
+@signals.request_tearing_down
+def f1(app, exc):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
+#### 13、appcontext_popped
+
+``` python
+from flask import Flask, render-template
+from flask import signals
+app = Flask(__name__)
+
+# 注册到信号中的代码会被执行
+# 这个信号在最后
+@signals.appcontext_popped.connect
+def f1(exc):
+    pass
+
+@app.route("/index")
+def index():
+    return "aaa"
+if __name__ == '__main__':
+    app.run()
+```
+
 ## 静态文件
 
-预处理数据/设置只读
-from werkzeug.security import generate_password_hash
+### 一、配置
 
-class User(db.Model):
-_password = Column(“passwd”,String(64), nullable=true)
+static_folder参数：
 
-读取
+- 静态文件目录
 
-@property
-def password(self):
-return self._password
+static_url_path参数：
 
-写入--password加密
+  - 设置url访问路径（当设置这个，static_dir将失去效果）
 
-可以限制读取
+  - 默认值是：'/static'
 
-@property.setter
-def password(self, raw):
-self._password = generate_password_hash(raw)
+  - 例：static_url_path=“/ss/cc” ，
 
-验证密码
+    访问url由：
 
-def check_passwd(self, raw):
-return check_password_hash(self._password, raw) # 读取并验证密码
-自动添加时间
-class Base(db.Model)
-__abstract__ = True
-time = Column(“create_time”, Integer)  //数据库中的字段名为create_time
-def __init__(self):
-self.time = int(datetime.now().timestamp()) //当前时间戳
-时间转换
-class Base(db.Model):
-@property
-def create_time(self):
-if self.create_time:
-return datetime.fromtimestamp(self.time)
-else:
-return None
-flask_login中的登录验证方法
-因为其flask_login中配置了多种方法，所以要继承
-from flask_login import UserMixin
-class User(UserMixin, Base):
-... //正常的UserModel
+    http://localhost/static
 
-如果不是使用id表示用户身份，还要重写get_id方法
+    变为
 
-def get_id(self):  //固定的方法名
-return self.id  
-生成数据库表
-1、引入所有model
-2、db.create_all(app=app)
-Xadmin操作方法
-消息闪现
-基于session实现，flask的session是保存在客户端，所以需要加密，使用secretyKey
-（1）配置secretyKey
-配置文件：
-SECRET_KEY = “” 
-（2）view视图
-from flask import flash
-flash(“这里添加消息”)  //产生消息
-flash(“xxx”, category=”erry”) //分类消息
+    http://localhost/ss/cc
 
-（3）模板
-{% set meg = get_flashed_messages() %}//获取消息
-{{meg}} //打印消息
-{% set msg = get_flashed_messages(category_filter[‘erry’])%} //获取分类消息
-{% with msg = get_flashed_message() %}
-限制作用域
-{% endwith %}
-token登录
-生成令牌
-def 
-flask_login登录登出
-pip install flask-login
+    访问的物理位置为是static_folder中设置的文件目录
 
-from flask_login import LoginManager
-login_mananger = LoginManager()
-def create_app():
-login_mananger.init_app(app) # 将flask核心对象传入
-login_manager.login_view = “web.login” //指定用户登录页
-login_manager.login_message = “请登录”  //显示权限登录信息
+static_dir参数：
 
-from flask_login import login_user()
-@web.route(“/login”, methods=[“GET”,”POST”]
-def login():
-if request.method == GET:
-#第一次登录写入游览器Cookid
-return 
-else:
+- 如果不配置static_dir参数，则默认访问启动文件下的static目录
 
-验证用户的账号密码
+- static_dir默认位置是以Flask视图所在的目录，配置static_dir后url路径也会变成文件名
 
-if ....
+  例如:
 
-登录成功的流程
+  static_dir=”view/aaa”,
 
-userModel中需要有一个固定的方法 def get_id(),这个函数返回用户的id
+  这里访问路径将变成
 
-login_user(user) //将用户Model传入
-
-REMEMBER_COOKIE_DURATION=10设置cookie有效期
-
-login_user(user, remeber=True) //记住我
-next = request.args.get(“next”)
-if not next or not next.startswith(“/”):
-next = url_for(“web.index”)
-return redirect(next)
-else:
-#登录失败--flask-login会自动闪现一条消息
+  http://localhost/aaa/image.jpg
 
 
-from flask_login import login_required
-@web.route(“index”, methods=[“GET”])
-@login_required   # 添加验证方法
-def index():pass
+``` python
+from flask import Flask
 
-login_manager是在create_app上创建
+app = Flask(
+	__name__,
+    # 静态文件目录名称
+    static_folder='static',
+)
 
-@login_manager.user_loader
-def get_user(uid):
-user = User.query.get(int(uid))
-return user
+Flask_app= Flask(__name__, static_dir=None)
+```
 
-从cookie中获取用户id
-from flask_login import current_user
+### 二、HTML中样例
 
-current_user 是获取的@login_manager.user_loader中的方法
-gif.uid = current_user.id
-验证是否是登录状态
-current_user.is_authenticated
-true: 登录中
-登出
-from flask_login import logout_user
-@web.route(“logout”, method=[“POST”])
-def logout():
-logout_user() //登出
-功能
-跳转
-url_for(“web.login”)
-redirect()
+``` html
+<!--一般写法-->
+<img src="/staic/mm.jpg" />
+
+<!--优点：当static_url_path的参数发生变化，url_for会自动修改-->
+<img src="{{url_for('static', filename='mm.jpg')}}"
+```
+
+### 三、蓝图中配置静态文件
+
+``` python
+from flask import Blueprint
+
+# 配置蓝图级别静态文件
+api = Blueprint('web', __name__, static_folder="", static_url_path="")
+
+@api.route("/index")
+def func():
+    return "f1"
+```
+
 ## 上传文件
+
 #### 一、前端
 
 #### 二、后端
@@ -723,11 +1161,11 @@ redirect()
 ``` python
 image = []
 for file in files:
-if file and allowed_file(file.name):
-fileTime = str(int(time.time() * 1000))
-filename - fileTime + os.path.splitext(file.filename)[1]
-file.save(os.path.join(UPLOAD_Folder, filename))
-imagesName.append(filename)
+	if file and allowed_file(file.name):
+		fileTime = str(int(time.time() * 1000))
+		filename - fileTime + os.path.splitext(file.filename)[1]
+		file.save(os.path.join(UPLOAD_Folder, filename))
+		imagesName.append(filename)
 ```
 
 #### 三、错误信息
@@ -739,4 +1177,75 @@ imagesName.append(filename)
 def download(“/download”):
 判断用户信息
 send_static_file() // FLask处理静态文件的方法
+
+## WSGI
+
+### 一、原理
+
+``` python
+from werkzeug.serving import run_simple
+
+def func(environ, start_response):
+    print("请求来了")
+    
+if __name__ == "__main__":
+    run_simple('127.0.0.1', 5000, func)
+```
+
+### 二、threadlocal实现
+
+## flask-script
+
+flask组件，用于运行flask程序
+
+### 一、安装
+
+``` python
+pip install flask-script
+```
+
+### 二、使用
+
+app.py
+
+``` python
+from flask import Flask
+from flask_script import Manager
+
+manager = Manager(app)
+
+if __name__ == "__main__":
+    manager.run()
+```
+
+shell命令
+
+``` shell
+python app.py runserver -H 127.0.0.1 -p 8000
+```
+
+### 三、自定义命令
+
+``` python
+from flask import Flask
+from flask_script import Manager
+
+manager = Manager(app)
+# 自定义任务
+# 命令：python manage.py custom 123
+# custom是自定义任务的函数名
+# 123是参数，会传递到arg中
+@manager.command
+def custom(arg):
+    pass
+
+# 另外的方式
+@manager.option('-n', '-name', dest='name')
+@manager.option('-u', '-user', dest='user')
+def cmd(name, user):
+    pass
+
+if __name__ == "__main__":
+    manager.run()
+```
 
