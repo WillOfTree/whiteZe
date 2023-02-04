@@ -1,5 +1,22 @@
 # nginx部署
 
+1、三个模块，全局配置、events、http
+
+2、location的访问流程，例如：www.avem.top/lib/statics/123.png
+
+- location / ：访问的是www.avem.top
+- location /lib ：访问的是www.avem.top/lib
+- location /statics：当访问完前avem.top、/lib后匹配/statics路径
+- location ~/statics：访问的是www.avem.top/statics
+
+## nginx参数
+
+### alias
+
+通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
+
+### nginx正则
+
 ## 一般部署
 
 ### 基于域名配置（默认方法）
@@ -49,6 +66,30 @@ http {
 }
 ```
 
+### 静态文件
+
+```nginx
+server {
+    listen       10.0.105.199:8080; # 填写IP
+    server_name  web.testpm.com; # 填写域名
+    location / {
+        root   /var/www/nginx/;
+        index  index.html index.htm;
+  	}
+    # 根据文件后缀匹配
+    location ~*\.(css|gif|ico|jpg|js|png|ttf|woff)$ {
+        # 静态文件的目录
+        alias /var/www/statics/;
+    }  
+    # 根据路径匹配
+    # 只要路径中含有/lib/data既符合
+    # 例：/lib/data/123 符合
+    location /lib/data {
+        alias /var/www/statics/;
+    }
+}
+```
+
 ## 部署项目常见问题
 
 首先：你应该配置nginx的error_log选项，并将最后一个参数设为debug，这样可以输出更多错误信息，或者请求信息
@@ -77,26 +118,30 @@ http {
 
 ### 403 Forbidden
 
-1. nginx没有项目目录的操作权限 -> 修改目录权限
-2. 目录下没有 **index参数** 定义的文件，例如 index index.html，若是没有index.html也会出现403
+1. nginx的**index参数**错误
 
-### PHP无法解析（File not found.）;
+   - index  index.html：若是没有index.html也会出现403
 
-查看日志文件确定是php-fpm与nginx交互问题
+   - index  index：nginx并不会找index.html文件，出现403错误
 
-检查fastcgi_pass 127.0.0.1:9000，确定与php-fpm中的配置相同，php-fpm位置在php的文件夹中。
+2. nginx没有项目目录的操作权限 
+
+   - 修改目录权限
+   - 修改nginx的用户名，将nginx的user参数修改为目录的所有者
+
+### PHP无法解析（File not found）
+
+1. 查看日志文件确定是php-fpm与nginx交互问题
+2. 检查fastcgi_pass 127.0.0.1:9000，确定与php-fpm中的配置相同，php-fpm位置在php的文件夹中。
 
 ### 500 服务器错误
 
-代码有错误
-
-**对于PHP**
-
-直接进入php.ini 配置display_error=On显示错误信息，然后修改错误。
+1. 代码有错误
+2. 对于PHP：直接进入php.ini 配置display_error=On显示错误信息，然后修改错误。
 
 ### 其他较长错误信息
 
-Fatal error: Uncaught Error: Failed opening required
+1. Fatal error: Uncaught Error: Failed opening required
 
 ``` nginx
 # 位置：/usr/local/nginx/fastcgi.conf 文件

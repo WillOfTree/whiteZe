@@ -621,6 +621,7 @@ xx='123'
 DB_HOST='127.0.0.1'
 # 当服务其与本地不同时，
 # 项目上传到服务器上，只需要删除localsettings文件
+# 导入localsettings的参数
 try: 
     from .localsettings import *
 except ImportError:
