@@ -7,37 +7,48 @@
 #
 # 其他文件直接引入对应的查询方法即可，例
 #   index.py文件
-#   from sqlheplerModel import db
+#   from flask import current_app
+#   db = current_app.DataBase
 #   def index():
 #       res = db.fetchone("select * from %s", "AAA")
 #
 # 使用with语句
 #   index.py文件
-#   from sqlhelperModel import db
+#   from flask import current_app
+#   db = current_app.DataBase
 #   def index():
 #       with db as curse:
 #           curse.execute("XXXXXXXXXXXX")
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 import pymysql
-from DBUtils.PooledDB import PooledDB
+# 老版本1.30以前用法
+# from DBUtils.PooledDB import PooledDB
+from dbutils.pooled_db import PooledDB
 import threading
 
-class DqlHelper(object):
-    def __init__(self):
+
+class SqlHelper(object):
+    def __init__(self, HOST, PORT, USER, PASSWORD, DATABASE):
         # 创建一个连接池
-        self.POOL = PersistentDB(
+        self.POOL = PooledDB(
             creator=pymysql,
             maxconnections=None,
             blocking=True,
             ping=0,
 
             # 以下正常的数据库连接
-            host='127.0.0.1',
-            port=3306,
-            user='root',
-            password='123',
-            database='pooldb',
+            host=HOST,
+            port=PORT,
+            user=USER,
+            password=PASSWORD,
+            database=DATABASE,
             charset='utf8'
+            # host='127.0.0.1',
+            # port=3306,
+            # user='root',
+            # password='',
+            # database='code_miaomu',
+            # charset='utf8'
         )
         self.local = threading.local()
 
@@ -46,29 +57,25 @@ class DqlHelper(object):
         cursor = conn.cursor()
         return conn, cursor
 
-    def close(self, cursor, conn)
+    def close(self, cursor, conn):
         cursor.close()
         # 因为使用了连接池，这不是释放连接，而是放回连接池
         conn.close()
 
     # 定义一个查询样例
-    def fetchone(self, sql, *args):
-        conn, cursor = self.open()
-        # 注意这里，主要修改位置,sql语句一定要在单引号中
-        cursor.execute(sql, args)
-        result = cursor.fetchall()
-        self.close(conn, cursor)
-        return result
+    # def fetchone(self, sql, *args):
+    #     result = self.cursor.fetchone(sql, args)
+    #     return result
 
     # with上下文所利用的类
     def __enter__(self):
-        conn,cursor = self.open()
+        conn, cursor = self.open()
         # 获取rv中stack的值
         rv = getattr(self.local, 'stack', None)
         # 如果rv为空，向rv中添加初始化数据
         # 如果rv中有值，向rv中添加新创建的连接信息
         if not rv:
-            self.local.stack = [(conn, cursor),]
+            self.local.stack = [(conn, cursor), ]
         else:
             self.local.stack = rv.append((conn, cursor))
         return cursor
@@ -83,6 +90,3 @@ class DqlHelper(object):
         else:
             conn, cursor = rv.pop()
             self.close(conn, cursor)
-
-
-db = SqlHelper()

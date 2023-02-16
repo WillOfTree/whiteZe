@@ -1,8 +1,8 @@
 # uWSGI配置安装
 
-## 一、适用
+## 一、部署流程
 
-django\flask等项目部署
+$\frac{上传项目}{上传数据库}\to 安装python虚拟环境\to 配置nginx服务\to 配置uwsgi\to 测试$
 
 ## 二、安装虚拟环境
 
@@ -11,13 +11,15 @@ django\flask等项目部署
 ## 三、安装uwsgi
 
 ``` shell
-# 首先进入创建的虚拟环境
+# 首先进入创建的虚拟环境，env是自己创建的虚拟环境
 source /env/bin/active
 # 在虚拟环境中安装uwsgi
 pip install uwsgi
 ```
 
-## 四、通过命令行运行
+## 四、运行
+
+### 1、通过命令行运行（不推荐）
 
 ``` shell
 # http：端口
@@ -25,54 +27,54 @@ pip install uwsgi
 uwsgi --http :80 --wsgi-file app.py --callable app 
 ```
 
-### 五、通过配置文件运行
+### 2、通过配置文件运行
 
-### 1、创建文件uwsgi.ini
+#### （1）创建文件uwsgi.ini
 
 touch uwsgi.ini
 
-### 2、修改文件
+#### （2）修改文件
 
 ``` toml
 [uwsgi]
 # 通过socket方式启动
 socket=127.0.0.1:8001 
+
 # 项目根目录
-chdir=/home/www/flask 
+chdir=** 
+# virtualenv虚拟环境目录，不必要写到bin/active,写到bin所在的目录即可
+virtualenv=**
+# pid保存的文件
+pidfile=**/pid.pid 
+disable-logging=false
+# 日志文件，这个很重要，500错误时，错误信息会记录在这个位置
+daemonize=**/daemonize.log
+
 # manager -> 启动文件manager.py
-# app -> flask实例化的类， app=flask(__name__)
 # 指定启动文件
 wsgi-file = /var/www/flask/manager.py 
-# 指定Flask(__name__)的变量名称
-# eg：app = Flask(__name__)
+
+# app -> app = Flask(__name__)
+# flask实例化的类名称
 callable = app
-# 后台
+# 后台启动
 master=true 
-# virtualenv虚拟环境目录，不必要写到bin/active
-virtualenv=/envs/nb/
+
+# 这个配置项一般与服务器配置相关
 # 4个进程
 processes=4 
 # 2个线程
 threads=2  
-# pid保存的文件
-pidfile=/home/www/flask/conf/pid.pid 
-disable-logging=false
-# 日志文件
-daemonize=/home/www/flask/conf/daemonize.log
 ```
 
-### 3、修改nginx配置文件
+#### （3）修改nginx配置文件
 
 ``` shell
 server{
+	# 主要配置，ssl，静态文件见nginx部署方案
 	location / {
 		include uwsgi_params;
 		uwsgi_pass 127.0.0.1:8001;
-	}
-
-	location /static {
-	# 静态文件
-		alias /home/www/flask/static/; 
 	}
 }
 ```

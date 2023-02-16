@@ -2,27 +2,29 @@
 
 ## pipenv
 
-**安装**
+### 一、安装
 
+``` shell
 pip install pipenv
+```
 
-**使用--****必须进入项目目录才能pipenv install****命令**
+ ### 二、命令
 
- 
-
-**pipenv install**      **创建一个环境，**
-
- 
-
-pipenv shell        进入虚拟环境
-
-pipenv install 库名    安装库
-
-pipenv uninstall 库名   删除库
-
-pipenv install  //部署时会自动安装依赖
-
-exit() 退出
+``` shell
+# 必须进入项目目录才能pipenv install命令
+# 创建一个环境
+pipenv install 
+# 进入虚拟环境
+pipenv shell        
+# 安装库
+pipenv install 库名    
+# 删除库
+pipenv uninstall 库名   
+# 部署时会自动安装依赖
+pipenv install  
+# 退出
+exit() 
+```
 
 ## virtualenv
 
@@ -31,11 +33,12 @@ exit() 退出
 1. 在没有权限的情况下安装新套件
 2. 不同应用可以使用不同的套件版本
 3. 套件升级不影响其他应用
+4. 虚拟环境不需要和项目在同一个目录
 
 ### 一、安装
 
 ``` shell
-# 系统安装
+# ubunto系统安装
 sudo apt install python-virtualenv
 # 使用pip安装（推荐）
 pip install virtualenv
@@ -53,6 +56,8 @@ cd envs
 virtualenv 虚拟环境名称
 # 指定目录，python版本
 virtualenv 目录 --python=python3.9
+# 以当前目录名创建虚拟环境
+virtualenv .
 
 # 默认情况下，虚拟环境会依赖系统环境中的site packages，
 # 就是说系统中已经安装好的第三方package也会安装在虚拟环境中，
@@ -65,7 +70,8 @@ virtualenv --no-site-packages [虚拟环境名称]
 
 ``` shell
 # 创建虚拟环境env后 
-# 运行虚拟环境中bin\activate激活环境
+# 运行虚拟环境中bin/activate激活环境
+# /envs/bin/是目录
 source /envs/bin/activate
 
 # 删除虚拟环境，直接删除文件即可
@@ -84,21 +90,21 @@ export PIP_REQUIRE_VIRTUALENV=true
 export PIP_RESPECT_VIRTUALENV=true
 ```
 
-## 命令
+### 六、常见错误
+
+#### 1、错误信息：not on PATH
+
+主要原因是python是系统级应用（root账号安装），而安装virtualenv的时候没有使用root账户
+
+>  WARNING: The script virtualenv is installed in '/home/tree/.local/bin' which is not on PATH.
+>   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+
+解决方案：
 
 ``` shell
-# 创建一个虚拟环境
-virtualenv env 
-# 启动一个环境
-.venv/bin/activate 
-# 安装包
-pip install xxxx  
-# 记录依赖
-pip freeze > requirements.txt 
-
-# 先进入虚拟环境
-# 安装requirement.txt中记录的依赖
-pip install -r requirements.txt 
+# /home/tree/.local/bin 是提示的virtualenv的安装路径
+echo 'export PATH=/home/tree/.local/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## Virtualenvwrapper
@@ -155,7 +161,7 @@ rmvirtualenv [虚拟环境名称] #删除虚拟环境
 
 deactivate #离开虚拟环境
 
-# PYthon环境安装
+## PYthon环境安装
 
 1、安装python3
 
@@ -163,7 +169,20 @@ ln -s /python3目录 /usr/bin/python 替换系统中默认的python2
 
 2、使用python3安装pip
 
- 
+##  pip收集包信息命令
+
+``` shell
+# 安装包
+pip install xxxx  
+# 记录依赖
+pip freeze > requirements.txt 
+
+# 先进入虚拟环境
+# 安装requirement.txt中记录的依赖
+pip install -r requirements.txt 
+```
+
+### 
 
 　
 

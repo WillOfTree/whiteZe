@@ -95,7 +95,9 @@ db.close()
 #sql:sql语句，args:参数
 # 显示sql语句是怎么写的
 cursor.mogrify(sql,args) 
-# select返回值是受影响行数
+
+# 查询成功返回 受影响行数，最小为1
+# 失败返回 0，没有查询到结果也是0
 cursor.execute(sql,args) 
 # 执行多条数据
 cursor.executemany(sql,args) 
@@ -107,14 +109,22 @@ nextset(self)
 
 ## 五、查询命令
 
+前置添加：执行execute/方法
+
 ``` python
-# 前置添加：执行execute/方法
-# 返回一条结果，包含所有字段，通过元组截取
+# 返回一个元组，通过json改写后会变成数组，
+# 没有结果返回None
+# 例：('id','title')
 cursor.fetchone()
-# 返回所有结果
+
+# 返回多个元组，没有结果返回None
+# 例：(('title','id'),('id', 'name'))
 cursor.fetchall()
+
 # 返回多条数据,size是返回条数
+# 获取前size行数据，元组包含元组
 cursor.fetchmany(size)
+
 # 获取自增ID
 cursor.lastrowid 
 # 移动指针到某一行.如果mode='relative',则表示从当前所在行移动value条,如果mode='absolute',则表示从结果集的第一行移动value条
@@ -128,15 +138,15 @@ scroll(self, value, mode='relative'):
 ### 1、安装
 
 ``` shell
-pip3 install dbutils
-pip3 install pymysql
+pip3 install DBUtils
+pip3 install pyMySQL
 ```
 
 ### 2、使用-普通
 
 为每个线程创建一个连接，线程即使调用了close方法，也不会关闭，只是把连接重新放到连接池，供自己线程再次使用。当线程终止时，连接自动关闭。
 
-PersistentDB参数：
+PooledDB参数：
 
 - creator：使用链接数据库的模块，一般填写pymysql
 
@@ -173,10 +183,13 @@ PersistentDB参数：
 
 ``` python
 import pymysql
-from DBUtils.PooledDB import PooledDB
+# 老版本1.30以前用法
+# from DBUtils.PooledDB import PooledDB
+# 注意新的导入方法为
+from dbutils.pooled_db import PooledDB
 
 # 创建一个连接池
-POOL = PersistentDB(
+POOL = PooledDB(
     creator=pymysql, 
     maxconnections=None,
     blocking=True,
@@ -190,7 +203,6 @@ POOL = PersistentDB(
     database='pooldb',
     charset='utf8'
 )
-
 
 # 获取一个连接
 conn = POOL.connection(shareable=False)
@@ -257,6 +269,19 @@ func()
 # 需要分别的关闭指针对象和连接对象.他们有名字相同的方法 
 cursor.close()
 conn.close()
+```
+
+## 八、设置返回数据为字典
+
+``` python
+# 创建游标时设置
+db = pymysql.connect(...)
+db.cursor(pymysql.cursors.DictCursor)
+
+# 数据库连接时创建
+db = pymysql.connect(
+	cursorclass=pymysql.cursors.DictCursor
+)
 ```
 
 ## 注意

@@ -43,7 +43,7 @@ def index():
     return render_template('index.html', error=123, OK=33)
 ```
 
-#### 2、jsonResponse
+#### 2、返回json
 
 ``` python
 from flask import jsonify
@@ -75,11 +75,53 @@ def index():
 
 request 请求包含所用HTTP请求的参数
 
-- request.method：请求方法,GET\POST等
-- request.from：整个表单对象
-- request.from.get("名称")：获得表单中某项的属性
-- request.args.get("名称")：获取url的传递的参数，例: "http://abc.cn?name=22"
-- request.args.to_dict()：转变成可变字典
+- request.method：请求方法
+
+#### GET请求
+
+参数通过URL传输
+
+1、request.args.get("名称")
+
+- 获取url的传递（get方式）的参数，例: "http://abc.cn?name=22"
+
+2、request.args.to_dict()：
+
+- 转变成可变字典（get方式）
+
+#### POST请求
+
+参数通过body体传输
+
+request.get_json
+
+- 获取Content-Type类型为：**application/json**的数据
+- 不需要json.loads()来序列化
+
+request.json.get("名称", None)
+
+- 获取Content-Type类型为：**application/json**的数据
+- 不需要json.loads来序列化
+
+request.form
+
+- 获取Content-Type类型为：**multipart/form-data**的数据
+
+- get()方法
+
+  request.form.get("名称", None)；获取指定元素，没有返回None
+
+request.data：接收POST数据，且没有get方法
+
+request.values：
+
+- 获取Content-Type类型为：**application/x-www-form-urlencoded**
+
+- get()方法
+
+  request.values.get("名称", None)
+
+#### 使用样例
 
 ``` python
 from flask import request
@@ -154,6 +196,20 @@ def index(name):
 @app.route("/index", striet_slashes=False)
 def index():
     return 'index'
+```
+
+### 八、解析json字符串
+
+``` python
+import json
+
+# 将对象转换为json对象
+data = {'name': 'lilei', 'age': 30}
+json.dumps(data)
+
+# 将字符串转换为json对象
+json_str= '{"userId": "1", "id": "1"}'
+obj = json.loads(json_str))
 ```
 
 ## 模板
@@ -773,7 +829,19 @@ session、request、current_app、g都是LocalProxy对象
 - session：生命周期一直存在
 - g变量：在一次请求周期中保存任意数据
 
-### 三、g使用方法
+### 三、current_app
+
+``` python
+from flask import current_app
+@app.route("/index")
+def index():
+    # app在非create_app函数外引用会出错
+    # 需要使用current_app代替
+```
+
+
+
+### 四、g使用方法
 
 ``` python
 from flask import Flask, g
