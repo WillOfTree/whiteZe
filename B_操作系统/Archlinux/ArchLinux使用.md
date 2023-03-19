@@ -287,7 +287,30 @@ export GOPROXY=https://goproxy.cn
 
 ```
 
+### 四、运行windons程序
 
+安装：`pacmac -S wine`
+
+配置，运行命令：`winedfg`
+
+运行：`wine xxxx.exe`
+
+若文字乱码，可以将windows中字体复制到`\usr\share\wine\fonts`目录下，安装文件默认即可
+
+错误二：输入框不显示
+
+`pacman -S winetricks`
+
+执行：`winetricks riched20`
+
+```shell
+winetricks corefonts 
+winetricks cjkfonts
+winetricks msxml6 
+winetricks riched20
+winetricks riched30
+winetricks vcrun6
+```
 
 # 6、调整目录颜色
 
