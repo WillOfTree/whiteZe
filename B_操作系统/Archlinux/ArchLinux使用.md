@@ -244,6 +244,45 @@ GLFW_IM_MODULE=ibus
 
 i3添加执行fcitx5：`exec --u fcitx5`
 
+### 十一、蓝牙安装
+
+1、安装方法
+
+``` shell
+# 提供蓝牙的协议栈。
+pacman -S bluez
+# 提供 bluetoothctl 工具。 bluetoothctl 蓝牙终端
+pacman -S bluez-utils
+# 蓝牙音频驱动
+pacman -S pulseaudio-bluetooth
+# 开机启动蓝牙服务
+systemctl Start bluetooth
+systemctl enable bluetooth
+```
+
+2、蓝牙图形界面
+
+sudo pacman -S bluedevil
+
+sudo pacman -S blueman
+
+
+
+需要重启系统
+
+blueman-manage启动程序，首次启动会提示开启应用，确定后会退出，应多次启动
+
+连接成功后可退出blueman-manage程序
+
+这个程序默认开机启动。但经常发生开机后能连接音响，却不是用音响输出声音的情况。
+
+执行
+
+```
+$ pulseaudio -k
+$ ulseaudio --start
+```
+
 ## 软件安装
 
 ### 一、feh桌面背景、图片查看
@@ -293,7 +332,10 @@ export GOPROXY=https://goproxy.cn
 
 配置，运行命令：`winedfg`
 
-运行：`wine xxxx.exe`
+运行：
+
+- 32位运行：`wine xxxx.exe`
+- 64位运行：`wine64 xxxxx.exe`
 
 若文字乱码，可以将windows中字体复制到`\usr\share\wine\fonts`目录下，安装文件默认即可
 
@@ -312,6 +354,108 @@ winetricks riched30
 winetricks vcrun6
 ```
 
+### 五、运行AppImage文件
+
+安装：`pacman -S fuse`
+
+使用：`运行直接加./xxxx.appimage` 
+
+### 六、安装播放器mplayer
+
+安装：`pacman -S mplayer smplayer mencoder`
+
+- mencoder：简单的解码器
+- Smplayer：是前端页面，并没有播放解码功能，需要mplayer支持
+- mplayer：需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
+
+Mplayer 
+
+错误一：
+
+mplayer: could not connect to socket
+
+mplayer: No such file or directory
+
+Failed to open LIRC support. You will not be able to use your remote control
+
+没有远程控制器，一般禁用即可
+
+```
+配置文件： ~/.mplayer/config 
+加入lirc=no
+ 
+错误二：
+接下来需要安装解码器。
+从下面的网页下载一个最新的解码器。
+http://www1.mplayerhq.hu/MPlayer/releases/codecs/
+并且把其中的文件解压之后放入/usr/lib/codecs目录下。
+tar xvjf all-20061022.tar.bz2 -C /tmp
+cp /tmp/all-20061022/* /usr/lib/codecs
+ 
+```
+
+### 七、安装QT
+
+``` shell
+pacman -S qt5-base qt5-doc
+
+pacman -S qtcreator 
+
+qtcreator启动
+
+pacman -S qt5-translations //中文汉化，需要在设置中设置
+```
+
+### 八、使用代理服务
+
+#### 1、clash for windows
+
+图像界面，终端中无法使用
+
+也可以通关github上的clash-for-windows-pfk项目进行安装，下载64位解压运行cfw即可
+
+``` shell
+# 安装命令
+pacman -S clash-for-windows-bin
+```
+
+开启clash后还应开启系统代理服务
+
+``` shell
+# 这个应写成proxy.sh脚本文件，方便运行
+# 设置代理：
+export http_proxy='http://127.0.0.1:7777'
+export https_proxy='https://127.0.0.1:7777'
+export all_proxy='socks5://127.0.0.1:7890'
+# 并不是必须项
+export ftp_proxy=""
+export no_proxy=""
+
+
+# 同样写成脚本文件
+# 取消代理：
+unset http_proxy
+unset https_proxy
+unset all_proxy
+```
+
+验证：使用ping无法验证，使用wget www.google.com
+
+#### 2、v2raya
+
+``` shell
+# 安装命令
+pacman -S xray 
+pacman -S v2raya
+# 启动v2raya
+systemctl enable v2raya
+
+```
+
+打开游览器配置v2raya，地址：127.0.0.1：2017
+
+将“全局透明代理”和“规则端口的分流模式”都设置为GFWList，其他设置默认，点击保存并应用，回到主界面，点击导入订阅或节点链接
+
 # 6、调整目录颜色
 
 ~/.bashrc
@@ -323,20 +467,6 @@ alias ls=”ls --color” #起别名
 xprop | grep WM_CLASS
 
 然后点击响应的窗口
-
-
-
-# 10、安装QT
-
-pacman -S qt5-base qt5-doc
-
-pacman -S qtcreator 
-
-qtcreator启动
-
-pacman -S qt5-translations //中文汉化，需要在设置中设置
-
- 
 
 # 11、安装mysql
 
@@ -386,8 +516,6 @@ pacman -S wps-office ttf-wps-fonts //wps，字体
 
 yaourt -S otf-font-awesome //图标
 
-pacman -S nautilus //打开文件管理器
-
 pacman -S aria2  //xia
 
 ### 常用字体
@@ -401,96 +529,9 @@ pacman –S wqy-microhei
 pacman –S wqy-zenhei 
 ```
 
-# 安装播放器mplayer
-
-Pacman -S mplayer smplayer mencoder
-
-mencoder 简单的解码器
-
-Smplayer 是前端页面，并没有播放解码功能，需要mplayer支持
-
-Smplayer需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
-
- 
-
-Mplayer 
-
-错误一：
-
-mplayer: could not connect to socket
-
-mplayer: No such file or directory
-
-Failed to open LIRC support. You will not be able to use your remote control
-
-没有远程控制器，一般禁用即可
-
-```
-配置文件： ~/.mplayer/config 
-加入lirc=no
- 
-错误二：
-接下来需要安装解码器。
-从下面的网页下载一个最新的解码器。
-http://www1.mplayerhq.hu/MPlayer/releases/codecs/
-并且把其中的文件解压之后放入/usr/lib/codecs目录下。
-tar xvjf all-20061022.tar.bz2 -C /tmp
-cp /tmp/all-20061022/* /usr/lib/codecs
- 
-```
-
-# AppImage文件
-
-一个新的全平台软件
-
-前提pacman -S fuse
-
-运行直接加./xxxx.appimage
-
-# 蓝牙
-
-[安装](https://wiki.archlinux.org/title/Install) [bluez](https://archlinux.org/packages/?name=bluez)，这个软件包提供蓝牙的协议栈。
-
-[安装](https://wiki.archlinux.org/title/Install) [bluez-utils](https://archlinux.org/packages/?name=bluez-utils)， 其提供 bluetoothctl 工具。 bluetoothctl 蓝牙终端
-
-2款蓝牙图形界面
-
-sudo pacman -S bluedevil
-
-sudo pacman -S blueman
-
-蓝牙音频驱动
-
-pacman -S pulseaudio-bluetooth
-
- 
-
-通用蓝牙驱动是 btusb 内核模块。[检查](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#获取信息) 模块是否加载了。如果没有就先[加载模块](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#手动加载卸载)。
-
-systemctl [Start/enable](https://wiki.archlinux.org/title/Start/enable) bluetooth.service。
-
- 
-
-需要重启系统
-
-blueman-manage启动程序，首次启动会提示开启应用，确定后会退出，应多次启动
-
-连接成功后可退出blueman-manage程序
-
-这个程序默认开机启动。但经常发生开机后能连接音响，却不是用音响输出声音的情况。
-
-执行
-
-```
-$ pulseaudio -k
-$ ulseaudio --start
-```
-
- 
-
 ## 常见软件安装错误
 
-## 1、invalid or corrupted package (PGP signature)
+### 1、invalid or corrupted package (PGP signature)
 
 ``` shell
 # 删除gnupg目录及其文件
@@ -500,13 +541,13 @@ sudo pacman-key --populate archlinux
 sudo pacman-key --populate archlinuxcn
 ```
 
-## 2、failed to commit transaction (invalid or corrupted package)
+### 2、failed to commit transaction (invalid or corrupted package)
 
 ``` shell
 pacman -Sy archlinux-keyring && pacman -Su
 ```
 
-## 3、archlinuxcn.gpg不存在
+### 3、archlinuxcn.gpg不存在
 
 选择PGP signature或者更新指定key
 
