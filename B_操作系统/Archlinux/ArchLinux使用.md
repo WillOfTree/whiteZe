@@ -312,6 +312,51 @@ winetricks riched30
 winetricks vcrun6
 ```
 
+### 五、运行.deb
+
+``` shell
+# 安装debtab
+yay -S debtap
+# 更新debtab库
+sudo debtap -u
+# 将deb包转换为pkg包
+debtap XXXX.deb
+# 安装pkg包
+pacman -S XXXXXX.pkg
+```
+
+### 六、运行.AppImage
+
+``` shell
+# 错误，需要安装的软件
+pacman -S fuse
+# 添加可执行权限
+chmod a+x XXXXXX.AppImage
+# 运行
+./XXXXXXX.AppImage
+```
+
+### 七、安装QT
+
+``` shell
+# 可直接使用pacman -S qt
+# 然后选择base、doc包（qt分为qt5、qt6）
+pacman -S qt5-base qt5-doc
+# /中文汉化，需要在设置中设置 
+pacman -S qt5-translations 
+# 安装IDE
+pacman -S qtcreator 
+
+# 启动命令
+qtcreator启动
+
+
+```
+
+
+
+
+
 # 6、调整目录颜色
 
 ~/.bashrc
@@ -326,15 +371,7 @@ xprop | grep WM_CLASS
 
 
 
-# 10、安装QT
 
-pacman -S qt5-base qt5-doc
-
-pacman -S qtcreator 
-
-qtcreator启动
-
-pacman -S qt5-translations //中文汉化，需要在设置中设置
 
  
 
@@ -439,14 +476,6 @@ cp /tmp/all-20061022/* /usr/lib/codecs
  
 ```
 
-# AppImage文件
-
-一个新的全平台软件
-
-前提pacman -S fuse
-
-运行直接加./xxxx.appimage
-
 # 蓝牙
 
 [安装](https://wiki.archlinux.org/title/Install) [bluez](https://archlinux.org/packages/?name=bluez)，这个软件包提供蓝牙的协议栈。
@@ -490,7 +519,7 @@ $ ulseaudio --start
 
 ## 常见软件安装错误
 
-## 1、invalid or corrupted package (PGP signature)
+### 1、invalid or corrupted package (PGP signature)
 
 ``` shell
 # 删除gnupg目录及其文件
@@ -500,13 +529,13 @@ sudo pacman-key --populate archlinux
 sudo pacman-key --populate archlinuxcn
 ```
 
-## 2、failed to commit transaction (invalid or corrupted package)
+### 2、failed to commit transaction (invalid or corrupted package)
 
 ``` shell
 pacman -Sy archlinux-keyring && pacman -Su
 ```
 
-## 3、archlinuxcn.gpg不存在
+### 3、archlinuxcn.gpg不存在
 
 选择PGP signature或者更新指定key
 
