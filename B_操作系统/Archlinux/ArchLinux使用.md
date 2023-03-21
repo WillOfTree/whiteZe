@@ -354,6 +354,7 @@ winetricks riched30
 winetricks vcrun6
 ```
 
+<<<<<<< HEAD
 ### 五、运行AppImage文件
 
 安装：`pacman -S fuse`
@@ -392,11 +393,36 @@ http://www1.mplayerhq.hu/MPlayer/releases/codecs/
 tar xvjf all-20061022.tar.bz2 -C /tmp
 cp /tmp/all-20061022/* /usr/lib/codecs
  
+=======
+### 五、运行.deb
+
+``` shell
+# 安装debtab
+yay -S debtap
+# 更新debtab库
+sudo debtap -u
+# 将deb包转换为pkg包
+debtap XXXX.deb
+# 安装pkg包
+pacman -S XXXXXX.pkg
+```
+
+### 六、运行.AppImage
+
+``` shell
+# 错误，需要安装的软件
+pacman -S fuse
+# 添加可执行权限
+chmod a+x XXXXXX.AppImage
+# 运行
+./XXXXXXX.AppImage
+>>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 ```
 
 ### 七、安装QT
 
 ``` shell
+<<<<<<< HEAD
 pacman -S qt5-base qt5-doc
 
 pacman -S qtcreator 
@@ -455,6 +481,25 @@ systemctl enable v2raya
 打开游览器配置v2raya，地址：127.0.0.1：2017
 
 将“全局透明代理”和“规则端口的分流模式”都设置为GFWList，其他设置默认，点击保存并应用，回到主界面，点击导入订阅或节点链接
+=======
+# 可直接使用pacman -S qt
+# 然后选择base、doc包（qt分为qt5、qt6）
+pacman -S qt5-base qt5-doc
+# /中文汉化，需要在设置中设置 
+pacman -S qt5-translations 
+# 安装IDE
+pacman -S qtcreator 
+
+# 启动命令
+qtcreator启动
+
+
+```
+
+
+
+
+>>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 
 # 6、调整目录颜色
 
@@ -468,6 +513,15 @@ xprop | grep WM_CLASS
 
 然后点击响应的窗口
 
+<<<<<<< HEAD
+=======
+
+
+
+
+ 
+
+>>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 # 11、安装mysql
 
 **（1****）安装MariaDb****和其客户端工具**
@@ -529,6 +583,88 @@ pacman –S wqy-microhei
 pacman –S wqy-zenhei 
 ```
 
+<<<<<<< HEAD
+=======
+# 安装播放器mplayer
+
+Pacman -S mplayer smplayer mencoder
+
+mencoder 简单的解码器
+
+Smplayer 是前端页面，并没有播放解码功能，需要mplayer支持
+
+Smplayer需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
+
+ 
+
+Mplayer 
+
+错误一：
+
+mplayer: could not connect to socket
+
+mplayer: No such file or directory
+
+Failed to open LIRC support. You will not be able to use your remote control
+
+没有远程控制器，一般禁用即可
+
+```
+配置文件： ~/.mplayer/config 
+加入lirc=no
+ 
+错误二：
+接下来需要安装解码器。
+从下面的网页下载一个最新的解码器。
+http://www1.mplayerhq.hu/MPlayer/releases/codecs/
+并且把其中的文件解压之后放入/usr/lib/codecs目录下。
+tar xvjf all-20061022.tar.bz2 -C /tmp
+cp /tmp/all-20061022/* /usr/lib/codecs
+ 
+```
+
+# 蓝牙
+
+[安装](https://wiki.archlinux.org/title/Install) [bluez](https://archlinux.org/packages/?name=bluez)，这个软件包提供蓝牙的协议栈。
+
+[安装](https://wiki.archlinux.org/title/Install) [bluez-utils](https://archlinux.org/packages/?name=bluez-utils)， 其提供 bluetoothctl 工具。 bluetoothctl 蓝牙终端
+
+2款蓝牙图形界面
+
+sudo pacman -S bluedevil
+
+sudo pacman -S blueman
+
+蓝牙音频驱动
+
+pacman -S pulseaudio-bluetooth
+
+ 
+
+通用蓝牙驱动是 btusb 内核模块。[检查](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#获取信息) 模块是否加载了。如果没有就先[加载模块](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#手动加载卸载)。
+
+systemctl [Start/enable](https://wiki.archlinux.org/title/Start/enable) bluetooth.service。
+
+ 
+
+需要重启系统
+
+blueman-manage启动程序，首次启动会提示开启应用，确定后会退出，应多次启动
+
+连接成功后可退出blueman-manage程序
+
+这个程序默认开机启动。但经常发生开机后能连接音响，却不是用音响输出声音的情况。
+
+执行
+
+```
+$ pulseaudio -k
+$ ulseaudio --start
+```
+
+ 
+
+>>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 ## 常见软件安装错误
 
 ### 1、invalid or corrupted package (PGP signature)
