@@ -136,29 +136,31 @@ fdisk -l /dev/sda
 - quit：退出
 
 ``` shell
-# 进入分区程序，默认选择/dev/sda磁盘
+#-- 进入分区程序
+# 方式一、进入分区程序，默认选择/dev/sda磁盘
 root@archiso~# parted 
-# 指定磁盘，进入分区程序
+# 选择磁盘，若默认磁盘不是直接希望得磁盘
+(parted) select /dev/sda 
+# 方式二、指定磁盘，进入分区程序
+root@archiso~# parted 
 (parted) parted /dev/sda
 
-# 选择磁盘
-(parted) select /dev/sda 
-
-# 设置分区格式-GPT分区表
+#-- 设置分区表
+# 1、设置分区格式-GPT分区表
 (parted) mklabel gpt 
-# 设置分区格式-MBR分区表
+# 2、设置分区格式-MBR分区表
 (parted) mklabel msdos
 
-# 开始创建分区
+#-- 开始创建分区
 (parted) mkpart ESP fat32 0M 512M
 (parted) mkpart swap linux-swap 512M 4.5G 
 (parted) mkpart primary ext4 4.5G -1 
 
-# 设置boot开关
+#-- 设置boot开关
 # 说明： 1 磁盘编号；boot on //设置boot启动标志
 (parted) set 1 boot on 
 
-# 退出
+#-- 退出
 (parted) q
 ```
 
