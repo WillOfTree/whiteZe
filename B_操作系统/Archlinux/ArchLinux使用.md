@@ -19,12 +19,6 @@ vi /etc/sudoers
 # 添加 tree ALL=(ALL) ALL
 ```
 
-### 二、开机启动
-
-systemctl enable NetworkManager
-
-systemctl enable 
-
 ### 三、配置archlinuxcn源
 
 配置仓库（/etc/pacman.conf）
@@ -34,17 +28,22 @@ systemctl enable
 [archlinuxcn]
 # archlinuxcn-mirrorlist可自定义，但路径一定要正确
 Include = /etc/pacman.d/archlinuxcn-mirrorlist
-# 官方中国源镜像
-Server = https://repo.archlinuxcn.org/$arch
 ```
 
 配置源地址集合：通过网站https://www.archlinux.org/mirrorlist/ 获取所有中国源
 
-更新源命令：`pacman -Syy`
+在/etc/pacman.d/目录下创建archlinuxcn-mirrorlist文件，并填写中国源
+
+``` shell
+# 清华源
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+# 网易源
+Server = http://mirrors.163.com/archlinux-cn/$arch
+```
+
+更新源命令：`pacman -Syu`
 
 更新PGP key：`sudo pacman -S archlinuxcn-keyring`  
-
-
 
 ### 四、更新系统
 
@@ -65,7 +64,9 @@ $ sudo reboot
 
 解决：dhcpcd没有开启
 
-#### dhcpcd-必须配置项
+#### 1、iwctl-可选
+
+安装dhcpcd
 
 ``` shell
 # 必须使用手机、网线或者其他物理设备
@@ -77,19 +78,22 @@ pacman -S dhcpcd
 ip link 
 # 启动网卡
 ip link set enp4s0 up 
+
 # 自动配置有线网络
+# 注意这个命令必须在连接网络后才可以使用，不然会等待网络连接
 dhcpcd 网卡名 
-# 配置开机启动有线网络
+# 配置开机启动网络
 systemctl enable dhcpcd@网卡名
 ```
 
-#### 1、iwctl-可选
+安装iwd
 
 ``` shell
 # 安装命令
 pacman -S iwd
 # 开启iwd服务
 systemctl start iwd
+systemctl enable iwd
 
 # 进入iwd
 iwctl
@@ -125,26 +129,205 @@ ip link set 网卡名 up
 
 #### 2、NetworkManager-可选
 
+因为networkmanager版本内置了dhcp，所以不用安装
+
 ``` shell
 # 安装命令
 pacman -S NetworkManager
 
 # 启动
 NetworkManager 
+
 # 图形界面配置网络
 nmtui
+
 # 开机启动
 systemctl enable NetworkManager
 systemctl start NetworkManager
 ```
 
-### 六、声音
+### 六、修改gamema值
+
+安装软件：`pacman -Sy xorg-xrandr` 
+
+修改命令： `xrandr --gamma 1.3:1.3:1.3`
 
 ``` shell
-pacman -S alsa-utils
+#使用～/.xprofile，允许在会话开始前执行xrandr命令
+vim ~/.xprofile
+# 查看当前屏幕
+xrandr
+
+# 修改指定 edp-1-1显示器的gamma值
+xrandr --output eDP-1-1 --gamma 0.5:1.0:0.9
+xrandr --output eDP-1-1 --gamma 1
 ```
 
-### 七、shell配置安装
+### 七、调整archlinux亮度
+
+#### 1、使用xbacklight
+
+xorg-xbacklight中包含以前的xbacklight软件
+
+安装命令：`pacman -S xorg-xbacklight`
+
+使用命令：（必须使用管理员权限才可以设置）
+
+- 增加亮度：`xbacklight -inc 10`
+- 减少亮度：`xbacklight -dec 10` 
+- 获取当前亮度：`xbacklight -get`
+
+#### 2、使用light
+
+与xorg-xbacklight功能相同
+
+安装命令：`pacman -S light`  
+
+使用命令：（必须使用管理员权限才可以设置）
+
+- 增加亮度：`light -A 10` 
+- 减少亮度：
+
+#### 3、手动控制
+
+``` shell
+# 方式一
+# 屏幕亮度调到1000，超过屏幕最亮年度，无法保存
+echo 1000 > /sys/class/backlight/intel_backlight/brightness 
+
+# 方式二
+# 1最亮  0黑
+xrandr --output LVDS --brightness 0.5
+```
+
+## 配置i3
+
+### 一、alacritty
+
+号称最快的终端模拟器，
+
+①、安装命令：`pacman -S alacritty` 
+
+②、修改i3配置文件中的回车绑定键，将alcritty绑定到回车上
+
+``` shell
+bindsym $mod+Enter exec_always --no-startup-id alacritty
+```
+
+③、修改配置
+
+- 默认配置文件位置（默认不会创建）：`$HOME/.config/alacritty/alacritty.yml`
+- 使用主题，参考Github：[alacritty主题库](https://github.com/alacritty/alacritty-theme) 
+
+``` shell
+#引入样例，‘-’ 是必须的语法结构，不能省略
+import:
+  - ~/.alacritty-colorscheme/themes/breeze.yaml
+# 注意，windows参数，只有重启才能看到效果
+window:
+	# 透明度
+	opacity: 0.5
+	# 终端内边距
+	padding:
+		x: 10
+		y: 5
+```
+
+### 二、picom
+
+默认配置文件位置（默认不会创建）：`~/.config/picom/picom.conf` 
+
+``` shell
+# i3配置启动
+exec --no-startup-id picom -b
+```
+
+### 三、状态栏polybar
+
+#### 1、配置文件
+
+默认配置文件（默认不会创建）：` ~/.config/polybar/config.ini` 
+
+polybar带有一个样例配置文件，位置在：` /usr/share/doc/polybar/examples/config.ini` 
+
+#### 2、修改i3配置文件
+
+- 注释自带的bar 或者i3blocks
+- 添加命令：`exec_always --no-startup-id polybar -c 配置文件路径` 
+
+#### 3、polybar-theme配置
+
+``` shell
+# 下载主题，或者去github上参考polybar-themes
+$ git clone --depth=1 https://github.com/adi1090x/polybar-themes.git
+$ cd polybar-themes
+$ chmod +x setup.sh
+$ ./setup.sh
+
+# 选择主题
+cd ~/.config/polybar/
+# 运行launch.sh程序
+./launch.sh --forest
+```
+
+#### 4、配置bar
+
+- 屏幕亮度模块：ls -1 /sys/class/backlight
+
+- 设置背景透明：修改参数background #000000
+
+- 电池模块：
+
+- 边框距离 / 
+  border-top-size = 5
+  border-left-size = 5
+  border-right-size = 5
+  
+- 内边距:
+  
+  ; padding-{left,right}
+  ; 内边距
+  padding = 5
+
+### 四、背景feh
+
+``` shell
+# 设置随机壁纸
+exec_always --no-startup-id feh --randomize --bg-scale --bg-fill 图片目录
+```
+
+### 五、rofi
+
+默认配置文件：`~/.config/rofi/config.rasi` 
+
+使用方法
+
+- **run**: `$PATH`下的应用程序
+- **drun**: 桌面程序，一般对应目录`/usr/share/applications`下的`.desktop`文件.
+- **window**: 窗口
+- **ssh**: 通过ssh链接远程服务器
+- **file-browser**: 简单的文件浏览器.
+- **keys**: 快捷键.
+- **combi**: 混合模式.
+
+``` shell
+# 添加进i3
+bindsym $mod+d exec --no-startup-id rofi -show drun
+```
+
+### 六、网络托盘图标
+
+nm-applet需要networkmanager支持，而且与dhcpcd互斥
+
+命令：`pacman -S network-manager-applet`
+
+启动命令：`nm-applet`
+
+i3wm配置：`exec --no-startup-id nm-applet`
+
+## 系统工具
+
+### 一、shell配置安装
 
 ``` shell
 # 查看当前shell
@@ -177,40 +360,11 @@ chsh -s `which zsh`
 
 修改ZSH_THEME关键字
 
-可选主题：clond，bira，random  //随机主题
+可选主题：clond，bira，funky、agnoster //随机主题
 
 更新source ~/.zshrc 
 
-### 八、修改gamema值
-
-安装软件：`pacman -Sy xorg-xrandr` 
-
-修改命令： `xrandr --gamma 1.3:1.3:1.3`
-
-``` shell
-#使用～/.xprofile，允许在会话开始前执行xrandr命令
-vim ~/.xprofile
-# 查看当前屏幕
-xrandr
-
-# 修改指定 edp-1-1显示器的gamma值
-xrandr --output eDP-1-1 --gamma 0.5:1.0:0.9
-xgamma --output eDP-1-1 --gamma 0.75
-```
-
-### 九、调整archlinux亮度
-
-``` shell
-# 方式一
-# 屏幕亮度调到1000，超过屏幕最亮年度，无法保存
-echo 1000 > /sys/class/backlight/intel_backlight/brightness 
-
-# 方式二
-# 1最亮  0黑
-xrandr --output LVDS --brightness 0.5
-```
-
-### 十、输入法
+### 二、输入法
 
 ``` shell
 # 包含一些框架必须的组件，全选
@@ -220,7 +374,6 @@ pacman -S fcitx5-im
 # 输入法引擎,包含拼音、双拼、五笔等输入法
 pacman -S fcitx5-chinese-addons
 # 词库
-pacman -S fcitx5-pinyin-moegirl
 pacman -S fcitx5-pinyin-zhwiki
 # 输入法皮肤-微软外观
 pacman -S fcitx5-material-color
@@ -242,9 +395,9 @@ SDL_IM_MODULE=fcitx
 GLFW_IM_MODULE=ibus
 ```
 
-i3添加执行fcitx5：`exec --u fcitx5`
+i3添加执行fcitx5：`exec --no-startup-id fcitx5`
 
-### 十一、蓝牙安装
+### 三、蓝牙安装
 
 1、安装方法
 
@@ -262,28 +415,55 @@ systemctl enable bluetooth
 
 2、蓝牙图形界面
 
+``` shell
+# 图形界面一
+# 安装命令
 sudo pacman -S bluedevil
+# 进入图像界面
+bluedevi-wizard
 
+# 图形界面二
 sudo pacman -S blueman
-
-
-
-需要重启系统
-
-blueman-manage启动程序，首次启动会提示开启应用，确定后会退出，应多次启动
-
-连接成功后可退出blueman-manage程序
-
-这个程序默认开机启动。但经常发生开机后能连接音响，却不是用音响输出声音的情况。
-
-执行
-
-```
-$ pulseaudio -k
-$ ulseaudio --start
 ```
 
-## 软件安装
+### 四、声音
+
+``` shell
+pacman -S alsa-utils
+```
+
+### 六、安装播放器mplayer
+
+安装：`pacman -S mplayer smplayer mencoder`
+
+- mencoder：简单的解码器
+- Smplayer：是前端页面，并没有播放解码功能，需要mplayer支持
+- mplayer：需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
+
+Mplayer 
+
+错误一：
+
+mplayer: could not connect to socket
+
+mplayer: No such file or directory
+
+Failed to open LIRC support. You will not be able to use your remote control
+
+没有远程控制器，一般禁用即可
+
+配置文件： ~/.mplayer/config 
+加入lirc=no
+
+错误二：
+接下来需要安装解码器。
+从下面的网页下载一个最新的解码器。
+http://www1.mplayerhq.hu/MPlayer/releases/codecs/
+并且把其中的文件解压之后放入/usr/lib/codecs目录下。
+tar xvjf all-20061022.tar.bz2 -C /tmp
+cp /tmp/all-20061022/* /usr/lib/codecs
+
+## 常用软件
 
 ### 一、feh桌面背景、图片查看
 
@@ -326,7 +506,51 @@ export GOPROXY=https://goproxy.cn
 
 ```
 
-### 四、运行windons程序
+### 四、常用软件集合
+
+- pacman -S yaourt
+- 网易云
+  1. 官方：`pacman -S netease-cloud-music`
+  2. 号称最好看的第三方：`pacman -S iease-music` 
+- 基于Blink引擎的google：`pacman -S chromium`
+-  chromium引擎的游览器
+  1. edge：`pacman -S microsoft-edge-stable-bin`
+  2.  google：`pacman -S google-chrome` 
+- 代理：`pacmans -S shadowsocks-qt5` 
+- 下载器：`pacman -S aria2`
+
+## 常用功能设置项
+
+### 1、调整目录颜色
+
+``` shell
+vim ~/.bashrc
+# 起别名，使用显示颜色的命令
+alias ls=”ls --color”
+```
+
+### 2、如何查找i3的class
+
+``` shell
+# 运行命令，然后选中想要知道class的窗口
+xprop | grep WM_CLASS
+```
+
+### 3、切换回终端
+
+- 切换终端：ctrl + alt + F2 
+- 退出：ctrl + alt + esc 
+
+### 4、复制粘贴
+
+粘贴软件安装命令：`pacman -S copyq`
+
+- 粘贴：ctrl + shift + v
+- 复制：ctrl + shift + c
+
+## 运行第三方程序
+
+### 一、运行windons程序
 
 安装：`pacmac -S wine`
 
@@ -354,47 +578,7 @@ winetricks riched30
 winetricks vcrun6
 ```
 
-<<<<<<< HEAD
-### 五、运行AppImage文件
-
-安装：`pacman -S fuse`
-
-使用：`运行直接加./xxxx.appimage` 
-
-### 六、安装播放器mplayer
-
-安装：`pacman -S mplayer smplayer mencoder`
-
-- mencoder：简单的解码器
-- Smplayer：是前端页面，并没有播放解码功能，需要mplayer支持
-- mplayer：需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
-
-Mplayer 
-
-错误一：
-
-mplayer: could not connect to socket
-
-mplayer: No such file or directory
-
-Failed to open LIRC support. You will not be able to use your remote control
-
-没有远程控制器，一般禁用即可
-
-```
-配置文件： ~/.mplayer/config 
-加入lirc=no
- 
-错误二：
-接下来需要安装解码器。
-从下面的网页下载一个最新的解码器。
-http://www1.mplayerhq.hu/MPlayer/releases/codecs/
-并且把其中的文件解压之后放入/usr/lib/codecs目录下。
-tar xvjf all-20061022.tar.bz2 -C /tmp
-cp /tmp/all-20061022/* /usr/lib/codecs
- 
-=======
-### 五、运行.deb
+### 二、运行.deb
 
 ``` shell
 # 安装debtab
@@ -407,7 +591,7 @@ debtap XXXX.deb
 pacman -S XXXXXX.pkg
 ```
 
-### 六、运行.AppImage
+### 三、运行.AppImage
 
 ``` shell
 # 错误，需要安装的软件
@@ -416,53 +600,81 @@ pacman -S fuse
 chmod a+x XXXXXX.AppImage
 # 运行
 ./XXXXXXX.AppImage
->>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 ```
 
-### 七、安装QT
+## 开发环境
+
+### 一、安装QT
 
 ``` shell
-<<<<<<< HEAD
-pacman -S qt5-base qt5-doc
+# 可直接使用
+# 然后选择base、doc包（qt分为qt5、qt6）
+pacman -S qt
 
-pacman -S qtcreator 
+# 中文汉化，需要在设置中设置 
+pacman -S qt5-translations 
+pacman -S qt6-translations 
+# 安装IDE
+pacman -S qtcreator
 
+# 启动命令
 qtcreator启动
-
-pacman -S qt5-translations //中文汉化，需要在设置中设置
 ```
 
-### 八、使用代理服务
+### 二、使用代理服务
 
 #### 1、clash for windows
 
 图像界面，终端中无法使用
 
-也可以通关github上的clash-for-windows-pfk项目进行安装，下载64位解压运行cfw即可
+也可以github上的项目进行安装，
 
 ``` shell
-# 安装命令
+# 安装命令-没有这个库
 pacman -S clash-for-windows-bin
+
+# 方式二、通过github进行下载
+# 项目名称：clash-for-windows-pfk
+# 下载64位解压运行cfw即可
 ```
 
-开启clash后还应开启系统代理服务
+开启clash后还应开启系统代理服务（终端使用代理）
 
 ``` shell
 # 这个应写成proxy.sh脚本文件，方便运行
 # 设置代理：
-export http_proxy='http://127.0.0.1:7777'
-export https_proxy='https://127.0.0.1:7777'
-export all_proxy='socks5://127.0.0.1:7890'
-# 并不是必须项
-export ftp_proxy=""
-export no_proxy=""
+proxy_set(){
+	export http_proxy='http://127.0.0.1:7890'
+	export https_proxy='https://127.0.0.1:7890'
+	export all_proxy='socks5://127.0.0.1:7890'
+	# 并不是必须项
+	export ftp_proxy=""
+	export no_proxy=""
+}
 
 
 # 同样写成脚本文件
 # 取消代理：
-unset http_proxy
-unset https_proxy
-unset all_proxy
+proxy_off(){
+	unset http_proxy
+	unset https_proxy
+	unset all_proxy
+}
+
+# github设置代理
+proxy_git_on(){
+	git config --global http.proxy http://127.0.0.1:7890 
+	git config --global https.proxy http://127.0.0.1:7890 
+}
+
+proxy_git_off(){
+	git config --global --unset http.proxy
+	git config --global --unset https.proxy
+}
+
+# 修改.zshrc文件
+# 在文件最后添加source ~/sys_files/proxy.sh
+# 运行文件source .zshrc
 ```
 
 验证：使用ping无法验证，使用wget www.google.com
@@ -475,54 +687,13 @@ pacman -S xray
 pacman -S v2raya
 # 启动v2raya
 systemctl enable v2raya
-
 ```
 
 打开游览器配置v2raya，地址：127.0.0.1：2017
 
 将“全局透明代理”和“规则端口的分流模式”都设置为GFWList，其他设置默认，点击保存并应用，回到主界面，点击导入订阅或节点链接
-=======
-# 可直接使用pacman -S qt
-# 然后选择base、doc包（qt分为qt5、qt6）
-pacman -S qt5-base qt5-doc
-# /中文汉化，需要在设置中设置 
-pacman -S qt5-translations 
-# 安装IDE
-pacman -S qtcreator 
 
-# 启动命令
-qtcreator启动
-
-
-```
-
-
-
-
->>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
-
-# 6、调整目录颜色
-
-~/.bashrc
-
-alias ls=”ls --color” #起别名
-
-# 8、如何查找i3的class
-
-xprop | grep WM_CLASS
-
-然后点击响应的窗口
-
-<<<<<<< HEAD
-=======
-
-
-
-
- 
-
->>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
-# 11、安装mysql
+### 三、安装mysql
 
 **（1****）安装MariaDb****和其客户端工具**
 
@@ -548,123 +719,40 @@ mysql -uroot -p  #默认密码为空
 
 sudo systemctl enable mysqld
 
+## 常用字体
 
+### 英文字体集合
 
-# 13、切换回终端
+#### Iosevka
 
-ctrl + alt + F2 切换终端
+安装命令：`pacman -S ttc-iosevka`
 
-ctrl + alt + esc 退出
+常用字体名称
 
-# 15、软件
+- Iosevka / Iosevka Normal：正常字体
+- Iosevka Extended：加宽字体
+- Iosevka Light：细字体
+- Iosevka Bold / Iosevka ExtraBold：正常粗 / 特粗
+- Iosevka Italic：斜体
 
-pacman -S yaourt
+### 中文字体集合
 
-**pacman -S netease-cloud-music //****网易云**
+#### wqy-microhei
 
-pacman -S google-chrome //google
+安装命令：`pacman –S wqy-microhei`
 
-pacmans -S shadowsocks-qt5 //代理
+#### wqy-zenhei
 
-pacman -S wps-office ttf-wps-fonts //wps，字体
+安装命令：`pacman -S wqy-zenhei ` 
 
-yaourt -S otf-font-awesome //图标
+#### wps字体
 
-pacman -S aria2  //xia
+安装命令：`pacman -S wps-office ttf-wps-fonts` 
 
-### 常用字体
+### 图标集合
 
-``` shell
-# polybar需要的一些字体
-pacman -S ttc-iosevka
-pacman -S 
-# 中文字体
-pacman –S wqy-microhei  
-pacman –S wqy-zenhei 
-```
+安装命令：yaourt -S otf-font-awesome
 
-<<<<<<< HEAD
-=======
-# 安装播放器mplayer
-
-Pacman -S mplayer smplayer mencoder
-
-mencoder 简单的解码器
-
-Smplayer 是前端页面，并没有播放解码功能，需要mplayer支持
-
-Smplayer需要配置播放器是mplayer还是mpv，在设置里可以看到选项，默认是指定一个第三方路径，没有解码器会播放失败
-
- 
-
-Mplayer 
-
-错误一：
-
-mplayer: could not connect to socket
-
-mplayer: No such file or directory
-
-Failed to open LIRC support. You will not be able to use your remote control
-
-没有远程控制器，一般禁用即可
-
-```
-配置文件： ~/.mplayer/config 
-加入lirc=no
- 
-错误二：
-接下来需要安装解码器。
-从下面的网页下载一个最新的解码器。
-http://www1.mplayerhq.hu/MPlayer/releases/codecs/
-并且把其中的文件解压之后放入/usr/lib/codecs目录下。
-tar xvjf all-20061022.tar.bz2 -C /tmp
-cp /tmp/all-20061022/* /usr/lib/codecs
- 
-```
-
-# 蓝牙
-
-[安装](https://wiki.archlinux.org/title/Install) [bluez](https://archlinux.org/packages/?name=bluez)，这个软件包提供蓝牙的协议栈。
-
-[安装](https://wiki.archlinux.org/title/Install) [bluez-utils](https://archlinux.org/packages/?name=bluez-utils)， 其提供 bluetoothctl 工具。 bluetoothctl 蓝牙终端
-
-2款蓝牙图形界面
-
-sudo pacman -S bluedevil
-
-sudo pacman -S blueman
-
-蓝牙音频驱动
-
-pacman -S pulseaudio-bluetooth
-
- 
-
-通用蓝牙驱动是 btusb 内核模块。[检查](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#获取信息) 模块是否加载了。如果没有就先[加载模块](https://wiki.archlinux.org/title/Kernel_module_(简体中文)#手动加载卸载)。
-
-systemctl [Start/enable](https://wiki.archlinux.org/title/Start/enable) bluetooth.service。
-
- 
-
-需要重启系统
-
-blueman-manage启动程序，首次启动会提示开启应用，确定后会退出，应多次启动
-
-连接成功后可退出blueman-manage程序
-
-这个程序默认开机启动。但经常发生开机后能连接音响，却不是用音响输出声音的情况。
-
-执行
-
-```
-$ pulseaudio -k
-$ ulseaudio --start
-```
-
- 
-
->>>>>>> 6da45e4f0a093880caebe8f7e947dc5925674f84
 ## 常见软件安装错误
 
 ### 1、invalid or corrupted package (PGP signature)
@@ -692,4 +780,12 @@ pacman -S archlinuxcn-keyring
 pacman -Syy
 ```
 
-## 
+## 应急启动
+
+1、准备好archlinux的安装盘，开机时设置u盘启动
+
+2、进入live CD，配置好网络
+
+3、mount /dev/sda3 /mnt
+
+4、arch-chroot /mnt

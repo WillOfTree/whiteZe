@@ -29,9 +29,9 @@ $ lspci | grep -e VGA -e 3D
 $ pacman -Ss xf86-video
 
 # intel卡：
-pacman -S xf86-video-intel #首选
+pacman -S xf86-video-intel 
 # NVIDIA卡：
-pacman -S xf86-video-nouveau #这个是错误的
+pacman -S xf86-video-nouveau 
 # AMD卡：
 pacman -S xf86-video-ati
 
@@ -77,15 +77,16 @@ exec compon -b &
 startx
 ```
 
-#### 方式二：通过显示管理器
+#### 方式二：通过显示管理器（推荐）
 
-详见三、显示管理器（推荐）
+详见：四、显示管理器
 
 ## 三、安装I3
 
 ``` shell
 # i3 包含所有可安装软件，i3gaps与i3wm在2021年前是有区别额，
 # 但2021年7月左右，i3gaps被整合到i3wm中，i3gaps不在可用，archlinux中记录如此
+# 安装i3wm
 pacman -S i3
 ```
 
@@ -97,7 +98,7 @@ GDM、LightDM、SDDM、LXDM会调用.xprofile和.xinitrc文件
 
 ### 1、GDM
 
-GDM会自动安装Gome桌面，登录时选择i3桌面
+GDM会自动安装Gome桌面，**登录时选择i3桌面**
 
 ``` shell
 pacman -S gdm
@@ -106,6 +107,8 @@ pacman -S gdm
 设置开机自启动：`systemctl enable gdm.service`
 
 ### 2、lightDM（推荐）
+
+启动i3时不用做任何操作，默认进入i3
 
 ``` shell
 # 安装启动器
@@ -121,153 +124,52 @@ pacman -S lightdm-gtk-greeter
 - `systemctl disable lightdm`：关闭
 - `systemctl status lightdm`：状态
 
-### 3、sddm
+### 3、sddm（不好用）
 
 ``` shell
 # 安装命令
 pacman –S sddm
 ```
 
-配置命令：
-
-- `systemctl enable sddm.service`：设置sddm开机启动
+设置sddm开机启动：`systemctl enable sddm.service` 
 
 ### 4、其他启动器
 
 gdm3和KDM
 
-## 安装终端模拟器
-
-### 1、alacritty
-
-号称最快的终端模拟器，修改i3配置文件中的回车绑定键，将alcritty绑定到回车上
-
-安装命令：`pacman -S alacritty` 
-
-默认配置文件位置（默认不会创建）：`$HOME/.config/alacritty/alacritty.yml`
-
-配置项，参考[alacritty主题库]([GitHub - alacritty/alacritty-theme: Collection of Alacritty color schemes](https://github.com/alacritty/alacritty-theme)) 
-
-``` shell
-windown:
-	padding:
-		x: 10
-		y: 5
-font:
-	size: 15
-	normal:
-		family:
-		style: Regular
-	bold:
-		family:
-```
-
-### 2、urxvt
-
 ## 配合i3的软件
 
-### 一、透明软件
+这里只记录安装命令，详细软件配置请看archlinux使用.md
 
-可以不装透明软件，因为alacritty、polybar自带背景透明，效果可以
+### 一、安装终端模拟器
 
-#### 1、compton
+alacritty号称最快的终端模拟器，
 
-``` shell
-pacman -S compton 
-# 启动
-exec --no-startup-id compton -b
-# 带有配置文件启动
-exec --no-startup-id compton -b --config 路径
-```
+1、alacritty（推荐）：`pacman -S alacritty` 
 
-#### 2、picom
+2、urxvt：
 
-``` shell
-# 执行pacman -S compton也会选择
-pacman -S picom 
-# 启动
-# --experimental-backends实验参数，配置文件中填写，这可不写
-exec --no-startup-id  -b picom
-# 带有配置文件启动
-exec --no-startup-id --experimental-backends -b picom --config 路径
-```
+### 二、透明软件
 
-### 二、状态栏polybar
+alacritty、polybar自带背景透明，特别是alacritty，他自己的透明效果不会透明文本
 
-安装命令：`pacman -S polybar` 
+1、compton：`pacman -S compton `
 
-默认配置文件目录：` ~/.config/polybar/config.ini` 
+2、picom（推荐）：`pacman -S picom`
 
-- 这个目录需要自己创建
-- polybar带有一个样例配置文件，位置在：` /usr/share/doc/polybar/examples/config.ini` 
+### 二、状态栏
 
-修改i3配置文件
+1、polybar：`pacman -S polybar` 
 
-- 注释自带的bar 或者i3blocks
-- 添加命令：`exec_always --no-startup-id polybar` 
+### 三、桌面背景
 
-使用polybar-theme配置
-
-``` shell
-# 下载主题，或者去github上参考polybar-themes
-$ git clone --depth=1 https://github.com/adi1090x/polybar-themes.git
-$ cd polybar-themes
-$ chmod +x setup.sh
-$ ./setup.sh
-
-# 选择主题
-cd ~/.config/polybar/
-# 运行launch.sh程序
-./launch.sh --forest
-
-# 不显示错误
-export DISPLAY=:0
-```
-
-error:moule/mpd:connect refused
-
-需要安装mpd：`pacman -S mpd` 
-
-配置bar
-
-配置屏幕亮度，ls -1 /sys/class/backlight
-
-设置背景透明：修改参数background #000000
-
-### 三、背景feh
-
-``` shell
-# 设置随机壁纸
-exec_always --no-startup-id feh --randomize --bg-scale --bg-fill 图片目录
-exec_always --no-startup-id feh --bg-scale "/home/background.jpg"
-```
+1、feh：`pacman -S feh` 
 
 ### 四、软件启动器
 
-#### 1、rofi
+1、rofi（推荐）：`pacman -S rofi` 
 
-安装命令：`pacman -S rofi` 
-
-默认配置文件：`~/.config/rofi/config.rasi` 
-
-使用方法
-
-- **run**: `$PATH`下的应用程序
-- **drun**: 桌面程序，一般对应目录`/usr/share/applications`下的`.desktop`文件.
-- **window**: 窗口
-- **ssh**: 通过ssh链接远程服务器
-- **file-browser**: 简单的文件浏览器.
-- **keys**: 快捷键.
-- **combi**: 混合模式.
-
-``` shell
-rofi -show drun
-
-# 添加进i3
-bindsym $mod+d exec --no-startup-id rofi -show drun
-```
-
-#### 2、dmenu_run
+2、dmenu_run：
 
 ## i3配置
 
@@ -283,10 +185,8 @@ bindsym $mod+d exec --no-startup-id rofi -show drun
  ### 二、参数说明
 
 ``` shell
-# ---------------------------------------------------------------------
 # 当启动了某些并不支持启动提醒的某脚本或程序时，鼠标指针会逗留在忙碌状态六十秒以上。
 # 为防止此现象，凡是 exec 命令都均加 --no-startup-id 后缀，
-# ---------------------------------------------------------------------
 --no-startup-id
 
 # ----------------------
@@ -294,6 +194,7 @@ bindsym $mod+d exec --no-startup-id rofi -show drun
 # 例子：
 exec --no-startup-id feh
 
+# -----------------------
 # exec_always：每次重启i3，使用该命令启动的程序都会重新执行一次
 # 例子：
 exec_always --no-startup-id feh
@@ -326,6 +227,44 @@ i3-save-tree --workspace your-workspace-name > ~/.config/i3/workspace.json
 
 #配置 i3 conf
 exec --no-startup-id "i3-msg '$your-workspace-name; append_layout ~/.config/i3/workspace.json'"
+```
+
+### 四、配置界面
+
+#### 1、边距设置
+
+``` shell
+# 内边距
+gaps inner 10
+# 外边距
+gaps outer 10
+```
+
+#### 2、可移动窗口
+
+移动浮动窗口。你可以选择其中一个方式，1拖动标题栏，2配置可以通过按键和鼠标点击窗口来移动窗口的浮动调节器
+
+`floating_modifier <Modifier>`
+
+#### 3、浮动窗口大小
+
+``` shell
+# -1不限制大小
+floating_maximum_size -1 x -1
+```
+
+#### 4、边框样式
+
+``` shell
+# 无边框
+new_window none
+
+# 浮动窗口无边框
+new_float none
+
+# 隐藏靠近屏幕边缘的边框
+# smart，只有一个窗口隐藏边框，多个不隐藏
+hide_edge_borders none|vertical|horizontal|both|smart
 ```
 
 ## i3命令

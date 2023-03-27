@@ -50,13 +50,15 @@ Archlinux镜像分为网络版（Arch linux Netboot）与ISO文件，这里我�
 
 <img src="images_arch/135522.png" style="zoom:55%;" />
 
-#### 2、软碟通选择RAW方式写入
+#### 2、软碟通
+
+选择RAW方式写入
 
 ## 安装前置配置
 
-### 一、配置系统启动模式
+### 一、设置BIOS启动项
 
-进入系统BOIS中设置启动模式（boot）
+进入系统BOIS中设置启动模式，通过U盘启动
 
 ### 二、验证启动模式
 
@@ -69,13 +71,9 @@ ls /sys/firmware/efi/efivars
 
 默认是英文键盘
 
-### 五、更新系统时间
+### 四、分区
 
-timedatectl set-ntp true
-
-### 六、分区
-
-swap分区：swap为内存的2倍，最大4G
+swap分区：swap为内存的2倍
 
 #### 1、分区目标
 
@@ -107,6 +105,8 @@ swap分区：swap为内存的2倍，最大4G
 parted /dev/sda print
 # 可选命令二
 fdisk -l /dev/sda
+# 命令三
+lsblk -f
 ```
 
 #### 3、分区工具
@@ -164,55 +164,78 @@ root@archiso~# parted
 (parted) q
 ```
 
-##### cfdisk：图形界面
+##### cfdisk：图形界面（推荐）
+
+- 设置EFI system分区，大小512M
+- 设置Linux swap分区，大小8G
+- 设置硬盘空间（Linux filesystem），所有剩余空间
+- 光标移动到 write 回车，输出 yes 确定
+- 退出
 
 <img src="images_arch/151220.png" style="zoom:55%;" />
 
-### 七、格式化磁盘
+### 五、格式化磁盘
+
+1、格式EFI system分区（boot分区）
 
 ``` shell
-# 格式化EFI（boot）分区，EFI分区必须是fat格式
-mkfs.fat -F32 /dev/sdaX
-# 或者，这2个命令都可以，二选一
-# 不指定-F32会生成-F16格式
-mkfs.vfat -F32 /dev/sdaX
+# EFI分区必须是fat格式
+mkfs.fat -F 32 /dev/sdaX
+# 或者
+mkfs.vfat /dev/sdaX
+```
 
-# 格式化普通分区
+2、格式硬盘分区
+
+``` shell
+# 一般来讲就是最大的分区，linux filesystem分区
 mkfs.ext4 /dev/sdaX
+```
 
+3、格式Linux swap分区
+
+``` shell
 # 初始交换分区
 mkswap /dev/sdaX # 格式化swap分区，
 swapon /dev/sdaX # 初始化swap分区(不需要挂载）
 ```
 
-### 八、检查磁盘类型和分区
+### 六、检查磁盘类型和分区
 
-命令：`fdisk -l` 
+命令：`fdisk -l`或`lsblk -f` 
 
 文件系统Type必须是EFI System、Linux swap、Linux filesystem
 
-### 九、挂载
+### 七、挂载
 
-#### 1、命令
+**swap分区不用挂载**
 
-swap分区不用挂载
+#### 1、挂载根分区
 
 ``` shell
 # 必须先挂载根目录，才能挂载其他分区
+# 将ext4格式的挂载到/mnt
 mount /dev/sdaX /mnt
+```
 
-# 创建/home目录（没有home分区，不同挂载）,boot目录
+#### 2、挂载boot分区
+
+``` shell
+# 创建boot目录
 mkdir /mnt/boot
-
-# 挂载boot目录，将EFI分区挂载到boot
+# 挂载boot目录，将EFI分区挂载到boot分区
 mount /dev/sdaX /mnt/boot 
+```
 
+#### 3、挂载其他分区（没有则不挂）
+
+``` shell
 #如果有其它分区，分别进行挂载，例如home分区
 mkdir /mnt/home
 mount /dev/sdaX /mnt/home
 ```
 
-#### 2、检查挂载是否成功
+#### 4、检查挂载是否成功
 
 如果/mnt/boot与/mnt目录大小相同，需要先挂载/mnt再挂载/mnt/boot
 
@@ -232,29 +255,25 @@ sda3 ext4 1.0    431.7G /mnt
 
 验证能ping通archlinux.com，确保自己能联网，设置动态IP
 
-- 使用手机USB联网：手机开启USB共享，输入命令dhcpcd
+（1）使用手机USB联网：手机开启USB共享，输入命令dhcpcd
 
-- wifi-menu：使用wifi-menu命令，进入图形界面联网
+（2）使用wifi-menu：使用wifi-menu命令，进入图形界面联网
 
-- iwctl：
+（3）使用iwctl（推荐）：
 
-  iwctl：进入命令行
-
-  device list：列出设备名
-
-  station wlan0 scan：扫描网络
-
-  station wlan0 get-networks：列出网络
-
-  station wlan0 connect 名称：连接网络
-
-  exit：退出
+- iwctl：进入命令行
+- device list：列出设备名
+- station wlan0 scan：扫描网络
+- station wlan0 get-networks：列出网络
+- station wlan0 connect 名称：连接网络
+- station list：连接情况
+- exit：退出
 
 #### 2、设置网络同步时间
 
-timedatectl set-ntp true
+命令：`timedatectl set-ntp true`
 
-#### 3、添加中国源
+#### 3、添加中国源（非必须）
 
 加快系统安装速度
 
@@ -273,16 +292,39 @@ vi /etc/pacman.d/mirrorlist
 
 ### 二、安装命令
 
-- 联网软件：iwd、dhcpcd（基础）、NetworkManager
-- 登录的shell：base、zsh
+- 联网软件：
+
+  iwd、dhcpcd（基础）、NetworkManager、iproute2
+
+- 登录的shell：zsh
+
+- linux固件：linux、linux-firmware
+
+- 其他软件：
+
+  bash-completion：命令补全
+
+  man：帮助手册
+
+  git：
+
+  wget：网络下载
+
+  openssh：远程登录
+
+  vim：编辑工具
+
+  sudo：切换root权限
 
 ``` shell
 # 最小化安装，会缺少基本的软件
-pacstrap /mnt base 
+pacstrap /mnt base base-devel
 # 基础安装
 pacstrap /mnt base base-devel linux linux-firmware
-# 安装大部分软件
-pacstrap /mnt base base-devel linux linux-firmware dhcpcd iwd vim sudo bash-completion net-tools openssh man git wget zsh
+# 安装大部分软件-使用dhcpcd\iwd联网（推荐）
+pacstrap /mnt base base-devel linux linux-firmware dhcpcd iwd vim sudo bash-completion iproute2 openssh man git wget zsh
+# 安装大部分软件-使用networkmanager联网（推荐）
+pacstrap /mnt base base-devel linux linux-firmware networkmanager vim sudo bash-completion iproute2 openssh man git wget zsh
 ```
 
 ### 三、生成fstab文件
@@ -293,7 +335,7 @@ pacstrap /mnt base base-devel linux linux-firmware dhcpcd iwd vim sudo bash-comp
 
 - 注意查看swap、vfat、ext4这几个文件类型，以及所有的分区是否都正常存在
 
-### 五、切换系统，命令提示符会变
+### 五、切换系统
 
 命令：`arch-chroot /mnt`  
 
@@ -302,7 +344,7 @@ pacstrap /mnt base base-devel linux linux-firmware dhcpcd iwd vim sudo bash-comp
 ### 一、设置时区
 
 ```shell
-ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 # 设置硬件时间
 hwclock --systohc 
 ```
@@ -310,7 +352,7 @@ hwclock --systohc
 ### 二、配置语言环境
 
 ``` shell
-# vi /etc/locale.gen
+vi /etc/locale.gen
 # 去掉 ‘#’ 注释
 zh-CN utf-8
 en-us utf-8
@@ -332,7 +374,9 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 ::1       localhost
 ```
 
-2、echo 主机名 > /etc/hostname
+2、新建主机名
+
+命令：`echo 主机名 > /etc/hostname`
 
 ### 五、修改root密码
 
@@ -347,17 +391,109 @@ passwd root
 # inter的CPU需要安装，cpu微码补丁
 pacman -S intel-ucode
 
-# 通用安装
-pacman -S amd-ucode os-prober
+# amd的CPU
+pacman -S amd-ucode 
+
+# 多系统安装
+pacman -S os-prober
 ```
 
-### 七、联网
+## 安装引导程序
+
+grub是一个引导器，同时支持UEFI启动、BIOS启动、还支持Windows系统。
+
+### 启动中国源加快程序下载（选用）
+
+参考：联网 $\to$  三、配置中国源
+
+### 一、BIOS（不用）
+
+``` shell
+#安装grub命令
+pacman -S grub    
+
+# 将引导程序安装到E
+# --target=i386-pc 32位系统，默认64位
+grub-install /dev/sdaX  
+
+# 配置
+grub-mkconfig -o /boot/grub/grub.cfg   
+```
+
+### 二、UEFI安装（推荐）
+
+#### 1、安装引导软件
+
+命令：`pacman -S grub efibootmgr` 
+
+#### 2、写入硬盘引导区
+
+**如果提示系统不是EFI需要退出当前系统到U盘中（命令：exit）重写设置磁盘挂载目录**
+
+如果出现错误也可退出当前系统，重新配置（命令：exit）
+
+``` shell
+# 参数说明：
+# --target=x86_64-efi：安装64位引导文件，efi引导方式
+# --efi-directory=/boot：挂载EFI系统分区的目录（根据前面配置设置）
+# --bootloader-id=GRUB：UEFI启动菜单选项
+grub-install 
+	--target=x86_64-efi 
+	--efi-directory=/boot 
+	--bootloader-id=GRUB
+```
+
+#### 3、生成引导文件
+
+`grub-mkconfig -o /boot/grub/grub.cfg`
+
+## 最后-完成
+
+``` shell
+# 退出chroot到安装环境
+exit 
+# 取消挂载 
+umount -R /mnt 
+# 重启
+reboot 
+```
+
+## 常见安装错误
+
+### 1、invalid or corrupted package (PGP signature)
+
+``` shell
+# 删除gnupg目录及其文件
+sudo rm -R /etc/pacman.d/gnupg/ 
+sudo pacman-key --init
+sudo pacman-key --populate archlinux
+sudo pacman-key --populate archlinuxcn
+```
+
+### 2、failed to commit transaction (invalid or corrupted package)
+
+``` shell
+pacman -Sy archlinux-keyring && pacman -Su
+```
+
+### 3、archlinuxcn.gpg不存在
+
+选择PGP signature或者更新指定key
+
+``` shell
+pacman -S archlinuxcn-keyring
+pacman -Syy
+```
+
+## 
+
+## 联网
 
 错误：Temporary failure in name resolution
 
 解决：dhcpcd没有开启
 
-#### dhcpcd-必须配置项
+### 一、dhcpcd-必须配置项
 
 ``` shell
 # 必须使用手机、网线或者其他物理设备
@@ -374,6 +510,8 @@ dhcpcd 网卡名
 # 配置开机启动有线网络
 systemctl enable dhcpcd@网卡名
 ```
+
+### 二、联网程序
 
 #### 1、iwctl-可选
 
@@ -430,7 +568,7 @@ systemctl enable NetworkManager
 systemctl start NetworkManager
 ```
 
-### 八、配置中国源
+### 三、配置中国源
 
 可去中科大镜像、网易开源镜像、清华开源镜像获取最新地址
 
@@ -446,69 +584,4 @@ Server = http://mirrors.163.com/archlinux-cn/$arch
 
 添加源成功后运行`pacman -Syyu`命令，可以看到archlinux，multilib库在更新
 
-## 安装引导程序
-
-grub是一个引导器，同时支持UEFI和BIOS启动，还支持Windows系统，以下三种选择一种即可
-
-### 一、BIOS
-
-1、pacman -S grub    #安装grub命令
-
-2、grub-install --target=i386-pc /dev/sda  #/dev/sda根据自己的硬盘确定
-
-3、grub-mkconfig -o /boot/grub/grub.cfg   #配置？
-
-### 二、UEFI安装
-
-#### 1、安装引导软件
-
-命令：`pacman -S grub efibootmgr` 
-
-#### 2、写入硬盘引导区
-
-grub-install 
-
-- --target=x86_64-efi：安装64位引导文件，efi引导方式
-- --efi-directory=/boot：挂载EFI系统分区的目录（根据前面配置设置）
-- --bootloader-id=GRUB：UEFI启动菜单选项
-
-!!!如果提示系统不是EFI需要exit重写设置磁盘挂载目录，
-
-#### 3、生成引导文件
-
-`grub-mkconfig -o /boot/grub/grub.cfg`
-
-### 三、常见安装错误
-
-#### 1、invalid or corrupted package (PGP signature)
-
-``` shell
-# 删除gnupg目录及其文件
-sudo rm -R /etc/pacman.d/gnupg/ 
-sudo pacman-key --init
-sudo pacman-key --populate archlinux
-sudo pacman-key --populate archlinuxcn
-```
-
-#### 2、failed to commit transaction (invalid or corrupted package)
-
-``` shell
-pacman -Sy archlinux-keyring && pacman -Su
-```
-
-#### 3、archlinuxcn.gpg不存在
-
-选择PGP signature或者更新指定key
-
-``` shell
-pacman -S archlinuxcn-keyring
-pacman -Syy
-```
-
-## 最后
-
-\# exit //退出chroot到安装环境
-
-\# umount -R /mnt //取消挂载 
-
-\# reboot //重启
+## 
