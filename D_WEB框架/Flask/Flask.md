@@ -2,6 +2,8 @@
 
 ## 简单应用
 
+推荐使用pycharm IDE，集成开发环境，简单方便
+
 ### 一、Hallo word
 
 ``` python
@@ -445,7 +447,9 @@ index.html
 
 ## 蓝图
 
-### 一、目录结构
+### 一、基本说明
+
+#### 1、目录结构
 
 ``` shell
 project
@@ -458,6 +462,20 @@ project
 			|-- index.html 
 		|-- statics
 ```
+
+#### 2、Blueprint参数说明
+
+`api = Blueprint("api", __name__, url_prefix='/admin', template_folder='templates', static_folder='static')`
+
+- api：蓝图名称
+- __name\_\_：固定写法
+- url_prefix：指定url前缀（**这个参数与register_blueprint中的url_prefix是同一个属性，同时设置会发生覆盖）**
+- template_folder：模板目录
+- static_folder：静态文件目录
+
+#### 3、register_blueprint参数说明
+
+register_blueprint参数与Blueprint参数相同
 
 ### 二、基础使用方法
 
@@ -497,8 +515,10 @@ from flask import Blueprint
 
 # 创建一个蓝图
 # xm是蓝图的自定义名称
+# 访问路径与这里的api无关
 api = Blueprint("api", __name__)
 
+# 这里的/index是访问路径，这时的路径为:https://127.0.0.1/index 
 @api.route("/index")
 def func():
     return "f1"
@@ -629,17 +649,15 @@ def index():
     return "index"
 ```
 
-
-
 ## 路由系统
 
-#### 一、路由加载流程
+### 一、路由加载流程
 
 - 将url和函数打包成rule对象
 - 将rule对象添加到map对象中
 - app.url_map = map对象
 
-#### 二、路由的2种写法
+### 二、路由的2种写法
 
 ``` python
 def index():
@@ -653,7 +671,7 @@ def login():
 
 ## 配置文件
 
-#### 一、基于全局变量
+### 一、基于全局变量
 
 \_\_init_\_.py
 
@@ -684,7 +702,7 @@ except ImportError:
     pass
 ```
 
-#### 二、基于类的方式
+### 二、基于类的方式
 
 不能通过删除文件实现开发服务器、线上服务器，必须手动修改
 
@@ -715,7 +733,7 @@ class LocalSettings(Base):
 
 ## 装饰器
 
-#### 一、自定义装饰器
+### 一、自定义装饰器
 
 - 装饰器可以简单的理解为添加额外功能，运行流程为：@auth、def index()、@app.route
 - flask中装饰器一定要在路由装饰器下面
@@ -739,7 +757,7 @@ def index():
     pass
 ```
 
-#### 二、装饰器名称修改
+### 二、装饰器名称修改
 
 ``` python
 import functools
@@ -769,7 +787,7 @@ def edit():
     pass
 ```
 
-#### 三、中间件
+### 三、中间件
 
 before_request：先执行
 
@@ -866,7 +884,7 @@ def index():
 
 flask框架中预留的钩子，可以自定义操作
 
-一、安装
+### 一、安装
 
 ``` python
 pip install blinker
@@ -1223,9 +1241,9 @@ def func():
 
 ## 上传文件
 
-#### 一、前端
+### 一、前端
 
-#### 二、后端
+### 二、后端
 
 ``` python
 image = []
@@ -1237,7 +1255,7 @@ for file in files:
 		imagesName.append(filename)
 ```
 
-#### 三、错误信息
+### 三、错误信息
 
 1、路由错误：最后写着got an unexpected keyword argument ‘method’ 路由配置允许访问的方法参数错误
 

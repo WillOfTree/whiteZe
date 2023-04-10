@@ -81,6 +81,8 @@ server{
 
 ## 命令
 
+必须先进入虚拟环境，然后运行命令
+
 ``` shell
 # 关闭
 uwsgi --stop pid.pid 

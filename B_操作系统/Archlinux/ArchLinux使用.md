@@ -62,7 +62,7 @@ $ sudo reboot
 
 错误：Temporary failure in name resolution
 
-解决：dhcpcd没有开启
+查看常见软件错误
 
 #### 1、iwctl-可选
 
@@ -160,7 +160,7 @@ xrandr
 
 # 修改指定 edp-1-1显示器的gamma值
 xrandr --output eDP-1-1 --gamma 0.5:1.0:0.9
-xrandr --output eDP-1-1 --gamma 1
+xrandr --output eDP-1-1 --gamma 0.9
 ```
 
 ### 七、调整archlinux亮度
@@ -366,20 +366,29 @@ chsh -s `which zsh`
 
 ### 二、输入法
 
+1、安装命令
+
 ``` shell
-# 包含一些框架必须的组件，全选
-# 包含fcitx5-qt fxitx5-gtk 输入法模块
-# fcitx5-configtool图形配置工具
-pacman -S fcitx5-im
+# 包含一些框架必须的组件，
+# 安装项说明：
+# fcitx5-qt：对于qt程序不可用安装
+# fxitx5-gtk：对gtk不可用安装
+# fcitx5-configtool：图形配置工具
+pacman -S fcitx5
+
 # 输入法引擎,包含拼音、双拼、五笔等输入法
 pacman -S fcitx5-chinese-addons
+
 # 词库
 pacman -S fcitx5-pinyin-zhwiki
-# 输入法皮肤-微软外观
+
+# 输入法皮肤
 pacman -S fcitx5-material-color
 ```
 
-添加配置，防止某些程序不能正常使用中文输入法
+2、添加配置
+
+①、防止某些程序不能正常使用中文输入法
 
 ``` shell
 # 方式一,使用AUR安装
@@ -395,7 +404,9 @@ SDL_IM_MODULE=fcitx
 GLFW_IM_MODULE=ibus
 ```
 
-i3添加执行fcitx5：`exec --no-startup-id fcitx5`
+②、i3添加执行fcitx5：`exec --no-startup-id fcitx5` 
+
+③、运行`fcitx5-configtool`配置中文输入键盘
 
 ### 三、蓝牙安装
 
@@ -427,6 +438,8 @@ sudo pacman -S blueman
 ```
 
 ### 四、声音
+
+i3中修改语音控制参数
 
 ``` shell
 pacman -S alsa-utils
@@ -503,7 +516,6 @@ makepkg -si
 # go网站无法访问
 export GO111MODULE=on
 export GOPROXY=https://goproxy.cn
-
 ```
 
 ### 四、常用软件集合
@@ -511,10 +523,10 @@ export GOPROXY=https://goproxy.cn
 - pacman -S yaourt
 - 网易云
   1. 官方：`pacman -S netease-cloud-music`
-  2. 号称最好看的第三方：`pacman -S iease-music` 
+  2. 号称最好看的第三方：`yay -S yesplaymusic` 
 - 基于Blink引擎的google：`pacman -S chromium`
 -  chromium引擎的游览器
-  1. edge：`pacman -S microsoft-edge-stable-bin`
+  1. edge：`yay -S microsoft-edge-stable-bin`
   2.  google：`pacman -S google-chrome` 
 - 代理：`pacmans -S shadowsocks-qt5` 
 - 下载器：`pacman -S aria2`
@@ -721,6 +733,14 @@ sudo systemctl enable mysqld
 
 ## 常用字体
 
+### 字体格式说明
+
+- TTF：常用字体类型
+- OTF：ttf的升级版本（对于pc来说，有otf用otf，没有就选ttf）
+- ttc：微软字体
+- EOT：微软的web字体
+- SVG：基本是苹果专用字体
+
 ### 英文字体集合
 
 #### Iosevka
@@ -734,6 +754,18 @@ sudo systemctl enable mysqld
 - Iosevka Light：细字体
 - Iosevka Bold / Iosevka ExtraBold：正常粗 / 特粗
 - Iosevka Italic：斜体
+
+#### Fira code
+
+安装命令：`yay -S otf-fira-code-git`
+
+字体名称：otf-fira-code
+
+#### 微软字体
+
+安装命令：`yay -S ttf-ms-fonts` 
+
+字体名称：ttf-font
 
 ### 中文字体集合
 
@@ -753,7 +785,7 @@ sudo systemctl enable mysqld
 
 安装命令：yaourt -S otf-font-awesome
 
-## 常见软件安装错误
+## 常见软件错误
 
 ### 1、invalid or corrupted package (PGP signature)
 
@@ -779,6 +811,13 @@ pacman -Sy archlinux-keyring && pacman -Su
 pacman -S archlinuxcn-keyring
 pacman -Syy
 ```
+
+### 4、Temporary failure in name resolution
+
+原因是域名不能解析或者DNS配置错误
+
+- 添加域名解析：`127.0.0.1 localhost.localdomain localhost` 
+- 添加DNS服务：`DNS=8.8.8.8`
 
 ## 应急启动
 

@@ -48,7 +48,7 @@ Archlinux镜像分为网络版（Arch linux Netboot）与ISO文件，这里我�
 
 下载地址：[Rufus - 轻松创建 USB 启动盘](https://rufus.ie/zh/) 
 
-<img src="images_arch/135522.png" style="zoom:55%;" />
+<img src="assets/archlinux/135522.png" style="zoom:55%;" />
 
 #### 2、软碟通
 
@@ -83,14 +83,14 @@ swap分区：swap为内存的2倍
 - 主分区（/）：
 - EFI分区（/boot）：EFI分区最大512M
 
-<img src="images_arch/141811.png" style="zoom:55%;" />
+<img src="assets/archlinux/141811.png" style="zoom:55%;" />
 
 ##### MBR BIOS分区
 
 - swap分区：
 - 主分区（/）：
 
-<img src="images_arch/141924.png" style="zoom:55%;" />
+<img src="assets/archlinux/141924.png" style="zoom:55%;" />
 
 #### 2、查看分区信息
 
@@ -172,7 +172,7 @@ root@archiso~# parted
 - 光标移动到 write 回车，输出 yes 确定
 - 退出
 
-<img src="images_arch/151220.png" style="zoom:55%;" />
+<img src="assets/archlinux/151220.png" style="zoom:55%;" />
 
 ### 五、格式化磁盘
 
@@ -367,11 +367,12 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 
 ### 三、修改hosts、hostname
 
-1、创建/etc/hosts文件
+1、创建/etc/hosts文件（不添加localdomain有可能会造成无法联网）
 
 ``` shell
 127.0.0.1 localhost
 ::1       localhost
+127.0.0.1 localhost.localdomain localhost
 ```
 
 2、新建主机名
