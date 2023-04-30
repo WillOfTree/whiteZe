@@ -111,7 +111,7 @@ select host,user,password from user;
 
   (1)有时想用本地IP登录，那么可以将以上的Host值改为自己的Ip即可。
 
-### 实现远程连接(授权法)
+### 实现远程连接（授权法）
 
   将host字段的值改为%就表示在任何客户端机器上能以root用户登录到mysql服务器，建议在开发时设为%。  
   update user set host = ’%’ where user = ’root’;
