@@ -1741,7 +1741,35 @@ int main(void)
 }
 ```
 
+### 八、函数传递字符串
 
+共有2种情况，字符串数组，字符串指针
+
+- 字符串数组：`char s[] = "xxxxx";` 
+- 字符串指针：`char *s = "xxxxxxx";` 
+
+``` c++
+/* 字符数组 */
+// 声明
+void func_array(char s[]);
+// 定义
+void func_array(char s[]){
+    
+}
+// 调用
+char s[] = "xxxxx";
+func_array(s);
+
+/* 字符串指针 */
+// 声明
+void func_array(char * s);
+// 定义
+void func_array(char * s) {
+}
+// 调用
+char *s = "xxxxx";
+func_array(s);
+```
 
 ## 结构体
 

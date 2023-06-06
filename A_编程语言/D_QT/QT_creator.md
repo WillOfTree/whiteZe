@@ -105,7 +105,9 @@
 
 QObject $\to$ QWidget $\to$ QFrame $\to$ QLabel 
 
-#### 4、实现ui控件的功能
+#### 4、自动生成函数方法
+
+右键控件 $\to$ go to slot（转到槽） $\to$ 选择对应的事件 $\to$ 完成
 
 #### 5、坐标
 
@@ -115,7 +117,15 @@ qt的坐标在屏幕的左上角（0，0）；x以右为正方向，y以下为�
 
 所有通过UI添加的控件他们都有一个属性 QObject $\to$ objectName，objectname是当前点击的控件名称（`ui->控件名称` ）
 
+#### 7、ui发送关闭信号
+
+屏幕下方Signals and Slots Editor $\to$ ➕ $\to$ 选择发送者，指向事件
+
+<img src="assets/QT_creator/113549.png" style="zoom:55%;" /> <img src="assets/QT_creator/113615.png" style="zoom:55%;" />
+
 ### 三、添加资源文件
+
+#### 1、加载资源
 
 1、应先将资源文件复制到项目类
 
@@ -123,7 +133,81 @@ qt的坐标在屏幕的左上角（0，0）；x以右为正方向，y以下为�
 
 3、添加资源文件：Projects栏 $\to$ Resources文件夹 $\to$ 找到.qrc文件 $\to$ 右键.qrc文件，open in Editor $\to$ add Files（添加前缀用于资源分类）
 
-4、使用资源：`QIcon(":/资源文件位置")`
+4、使用资源：`QIcon(":/资源文件位置")` 
+
+**提醒信息：File are not auto matically added to the CMakeList.txt file of the CMake project. copy the path to the source files  to the clipboard** 
+
+找到后添加自己的文件
+
+``` c++
+set(PROJECT_SOURCES
+        main.cpp
+        mainwindow.cpp
+        mainwindow.h
+        mainwindow.ui
+        dialog.h     //这是后来添加的对话框文件
+        dialog.cpp  //
+        dialog.ui    //
+)
+```
+
+#### 2、加载字体
+
+使用加载字体时，有些控件字体可能需要单独设置
+
+``` c++
+// 设置全局字体
+QFontDatabase::addApplicationFont(":/test.ttf");
+/* 获取字体名称 */
+int f = QFontDatabase::addApplicationFont(":x.ttf");
+QString font_name = QFontDatabase::applicationFontFamilies(f).at(0);
+
+/* 根据字体名称设置字体 */
+QFont font(font_name, 字号，权重);
+// 给指定控件设置字体
+ui->控件名->setFont(font);
+
+/* 另一种设置 */
+QFont font;
+// 设置字号
+font.setPointSize(12);
+// 设置字体
+font.setFamily("KaiTi");
+// 给指定控件设置字体
+ui->控件名->setFont(font);
+```
+
+#### 3、加载ico文件-cmake
+
+1、创建ico文件：[在线制作ico图标 | 在线ico图标转换工具 方便制作favicon.ico - 比特虫 - Bitbug.net](https://www.bitbug.net/) 生成 `logo.ico`文件，并将文件放到cmakeLists.txt同级目录下
+
+**无法显示的ico文件会**出现 `ninja: build stopped: subcommand failed.` 错误
+
+2、创建 `.rc` 文件：在 `cmakeLists.txt` 同级目录创建 `.txt` 文件并改名为 `logo.rc` 
+
+3、修改`logo.rc` 文件
+
+``` cmake
+IDI_ICON1 ICON DISCARDABLE "logo.ico"
+```
+
+4、修改cmakeList.txt文件
+
+``` cmake
+# 第一步
+# ${CMAKE_CURRENT_SOURCE_DIR}：cmakeList所在的位置
+# 设置app_icon变量
+set(app_icon "${CMAKE_CURRENT_SOURCE_DIR}/logo.rc")
+
+# 第二步
+# 找到qt_add_executable项添加${app_icon}
+# 例子：
+qt_add_executable(Qt_app_tomato_cpp
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+    ${app_icon} # 添加项
+)
+```
 
 ### 四、对象树
 
@@ -132,6 +216,61 @@ qt的坐标在屏幕的左上角（0，0）；x以右为正方向，y以下为�
 ### 新建项目大量警告
 
 Help $\to$ About Plugins $\to$ C++ $\to$ ClangCodeModel 将其勾选掉
+
+## 不同UI之间传值
+
+### 一、信号槽传值
+
+信号发出者：定义一个信号
+
+``` c++
+class Dialog{
+signals:
+    void send(int);
+}
+```
+
+信号发出者：定义一个发出信号的槽函数
+
+``` c++
+class Dialog{
+private slots:
+    // 这个槽函数是dialog页面中的button等控件调用
+    void emit_sign();
+}
+
+// 这个函数发出信号
+Dialog::emit_sign(){
+    emit send(11);
+}
+```
+
+信号接收者：定义一个槽函数用来处理信号
+
+``` c++
+class Dialog_main{
+private slots:
+    void show();
+}
+```
+
+连接信号与槽
+
+``` c++
+// 要导入UI头文件
+#include "Dialog"
+// 显示Dialog窗口
+Dialog *d = new Dialog;
+d->show();
+// 将信号连接
+connect(d, &Dialog::send, this, &Dialog_main::show);
+```
+
+### 二、public函数传值
+
+### 三、静态变量传值
+
+
 
 ## 信号
 
@@ -156,15 +295,11 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 	QPushButton *btn = new QPushButton;
 	/* 
 	参数列表：信号发送者，发送的信号，信号的接收者，处理的槽函数 
-	功能说明：给btn按钮绑定一个信号（clicked单击信号），当点击时触发关闭方法
+	功能说明：
+		给btn按钮绑定一个信号（clicked单击信号），当点击时触发关闭方法
+	Qwidget::close：系统提供关闭程序的处理方法
 	*/ 
 	connect(btn, &QPushButton::clicked, this，&Qwidget::close);
-    
-    /* Lambda表达式 */
-	// []:表示lambda的开始,
-	connect(btn, &Mybutten::clicked, [=](){ 
-        // 这里直接写处理方法 
-    })
 }
 ```
 
@@ -176,8 +311,14 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     // 创建一个按钮
 	QPushButton *btn = new QPushButton;
 	
+    // classOver是自己定义的
     // 触发自己写的函数
 	connect(btn, &QPushButton::clicked, this，&widget::classOver);
+    /* Lambda表达式 */
+	// []:表示lambda的开始,
+	connect(btn, &Mybutten::clicked, [=](){ 
+        // 这里直接写处理方法 
+    })
 }
 
 void widget::classOver() {
@@ -530,20 +671,20 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     
    	/* 消息对话框是静态属性，可以直接使用（不用New） */ 
     // 错误提示
-    QMessageBox::critical(this, "标题", "内容");
+    int k = QMessageBox::critical(this, "标题", "内容");
     // 消息提示
-    QMessageBox::information(this, "标题", "内容");
+    int k=QMessageBox::information(this, "标题", "内容");
     // 警告提示
-    QMessageBox::warning(this, "标题", "内容");
+    int k=QMessageBox::warning(this, "标题", "内容");
     
     /* 询问提示, 带有yes，no按钮 */ 
     // 参数4：
     // 	QMessageBox::Save：保存按钮，更多按钮查看手册
     // 参数5：
     // 	默认选项,QMessageBox::Save默认点击保存
-    QMessageBox::question(this, "标题", "内容", QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Save);
+    int k = QMessageBox::question(this, "标题", "内容", QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Save);
     // 判断当前选择
-    if (QMessageBox::Save == QMessageBox::question(....)){}
+    if (QMessageBox::Save == k){}
 }
 ```
 
@@ -641,6 +782,51 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 }
 ```
 
+#### 3、窗体根据鼠标移动
+
+``` c++
+// widget类的父类有响应的方法
+//获取：窗口基于屏幕的位置，左上角位置
+QPoint pt = this->pos();
+//获取当前点位于屏幕坐标的点
+QPoint pt0 = this->cursor().pos();
+//屏幕坐标点 --> 成当前窗口坐标点
+QPoint pt1 = this->mapFromGlobal(pt0);
+//窗口上坐标点 -- >屏幕坐标
+QPoint pt2 = this->mapToGlobal(pt1);
+//当前窗口坐标 -- > 成屏幕坐标
+QPoint pt3 = this->mapToParent(pt1);
+//屏幕坐标 -- >窗口坐标
+QPoint pt4 = this->mapFromParent(pt0);
+```
+
+操作样例
+
+``` c++
+/* 1、获取鼠标位置 */
+class Widget: public widget {
+private:
+    // 鼠标与左三角的偏移量
+    QPoint mOffset;
+protected:
+	// 获取鼠标当前位置
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+}
+
+/* 实现鼠标方法 */
+void widget::mousePressEvent(QMouseEvent *event) {
+    // 计算偏移量
+    // globalPos鼠标相对于左上角的点位置
+    // event->pos() == this->pos();
+    mOffset = event->globalPos() - this->pos();
+}
+void widget::mouseMoveEvent(QMouseEvent *event) {
+    // 
+    this->move(event->globalPos() - mOffset);
+}
+```
+
 ### 二、QPushButton-按钮
 
 1、头文件：`#include <QPushButton>`
@@ -667,6 +853,10 @@ btn->setText(“按钮名称”);
 btn->move(100, 100);
 /* 调整大小 */
 btn->resive(50,50);
+/*覆盖样式*/
+btn->setStyleSheet("background:#fff");
+/* 不可点击 */
+btn->seEnabled(true);
 
 /* 显示到窗体哪个位置 */
 // 顶层弹出，单独一个窗口
@@ -718,6 +908,8 @@ connect(ui->控件名， &QCheckBox::stateChanged, [=](int state){
 
 基于用户自定义数据，用于展示列表数据
 
+#### 1、生成添加数据
+
 ``` c++
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     /* 创建控件 */
@@ -737,6 +929,45 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     ui->控件名称->addItem(list);
 }
 ```
+
+#### 2、单击事件
+
+``` c++
+// 槽函数声明
+class Widget : public QWidget{
+    // QT定义的宏，允许使用类中的信号和槽机制
+    Q_OBJECT
+public:
+private:
+public:
+    // 单击事件
+    void onItemClicked(QListWidgetItem *item);
+    // 双击事件
+    void onItemDoubleClicked(QListWidgetItem *item);
+};
+
+/* 建立连接 */
+// 控件是整个QListWidget
+connect(ui->控件名称, &QListWidget::itemclicked, this, &Widget::onItemClicked);
+connect(ui->控件名称, &QListWidget::itemDoubleclicked, this, &Widget::onItemClicked);
+
+/* 被触发函数 */
+void onItemClicked(QListWidgetItem *item){
+    // 获取当前点击的文本
+    item->text();
+    
+}
+```
+
+#### 3、ListWidget效果集合
+
+``` c++
+// 设置无边框
+ui->控件名称->setFrameShape(QListWidget::NoFrame);
+
+```
+
+
 
 ### 七、tree_widget（ItemBase）
 
@@ -878,10 +1109,37 @@ connect(movie, &QMovie::frameChanged, [=](int frameId){
     if(frameId == movie->frameCount()-1){
         movie->stop();
     }
-})
+});
+
+/* 显示文本 */
+label->setText("xxxx");
+    
 ```
 
-### 十四、封装控件
+### 十四、QSlider-滑块
+
+常用信号：
+
+- `QSlider::valueChanged` ：滑块数字改变时发出信号
+- `QSlider::sliderMoved` ：滑块移动时发出信号，不能准确的获取滑块的值
+
+常用方法：
+
+``` c++
+QSlider *p = new QSlider;
+
+/* 常用方法 */
+// 设置最大值
+p->setMaximum(int);
+// 设置最小值
+p->setMinimum(int);
+// 设置当前值
+p->setValue(int);
+// 获取当前值
+int i = p->value();
+```
+
+### 十五、封装控件
 
 1、右键项目 $\to$ 添加新文件 $\to$ 选中模板：Qt $\to$ Qt设计师界面类（<img src="assets/QT_creator/124348.png" style="zoom:45%;" />）
 
@@ -952,13 +1210,11 @@ iconNameList.at(1); 使用数据
 QString str //声明
 
 //格式化字符串
-
 QString(“:/images/%1.png”).arg(nameList[1]);
 
- 
-
+/* 类型转换 */
+QString::nemeber(123);
 str.toInt() //转数字
-
 str.toUtf8() // 转QByteArray类型
 ```
 
@@ -976,16 +1232,11 @@ QByteArray array = QByteArray(size, 0);
 .toInt()
 ```
 
-### QDebug
-
-`qDebug() << "sssss";` 
-
-### 五、QSound
+### 五、QDebug
 
 ``` c++
-QSound *ss = new QSound(":/sss.wav");
-// 播放音效
-ss->play();
+#include <QDebug>
+qDebug() << "sssss";
 ```
 
 ### 六、Socket
@@ -1011,6 +1262,376 @@ QByteArray array = QByteArray(size, 0);
 udp->readDatagram(array.data(), size);
 
 })
+
+### 七、HTTP请求
+
+- QT Network是异步工作，不用考虑同步获取信息
+
+#### 基本流程
+
+``` c++
+/* 定义槽函数 */
+class Widget : public QWidget
+{
+private slots:
+    // 注意，只有槽函数才能用在connect中
+    void http_get(QNetworkReply *rep);
+};
+
+/* 创建对象 */
+QNetworkAccessManager *net = QNetworkAccessManager(this);
+// 当请求结束后，net会发射一个finished信号
+connect(net, &QNetworkAccessManager::finished, this, &widget::http_get);
+
+/* 创建请求 */
+QNetworkRequest request;
+request.setUrl(QUrl("http://"));
+// 注意：这里net发送请求后会自动触发finished信号，
+// 而根据connect方法，将finished信号与http_get联系在一起
+net->get(request);
+```
+
+#### 1、修改配置文件
+
+- pro文件：`QT += core gui network` 
+
+- cmake文件：
+  1. `find_package(Qt6 REQUIRED COMPONENTS Network)` 
+  
+      find_package直接复制
+  
+  2. `target_link_libraries(Qt6::Network)`
+  
+      target_link_libraries删除mytarget
+
+#### 2、设置信号
+
+``` c++
+// 网络请求完成后调用onReplied函数
+// QNetworkAccessManager::finished 网络请求完成
+connect(netm, &QNetworkAccessManager::finished, this, &widget::onReplied);
+void widget::onReplied(QNetworkReply *reply) {}
+```
+
+#### 2、GET请求
+
+头文件：
+
+- `#include <QNetWork/QNetworkAccessManager>` 
+- `#include <QNetWork/QNetworkReply>`
+- `#include <QNetWork/QNetworkRequest>`
+
+创建网络访问管理对象：`QNetworkAccessManager *netm = new QNetworkAccessManager(this);` 
+
+发送请求：
+
+``` c++
+/*  方式一 */
+#include <QNetworkRequest>
+QUrl url("http://");
+QNetworkReply * reply = netM->get(QNetworkRequest(url));
+
+/* 方式二（可以方便设置请求头） */ 
+#include <QNetworkRequest>
+QNetworkRequest request;
+request.setUrl(QUrl("http://"));
+QNetworkReply * reply = netM->get(request);
+```
+
+获取请求返回数据
+
+``` c++
+// reply是QNetWorkReply数据
+
+/* 获取响应数据 */  
+QByteArray r_data = reply->readAll();
+
+// 请求方式
+reply->operation();
+// 请求Url 
+reply->url();
+// 请求头列表
+reply->rawHeaderList();
+
+/* 释放内容 */ 
+reply->deleteLater();
+
+/* 响应状态码 */ 
+int status_code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+/* 判读请求是否成功 */ 
+if(reply->error() != QNetworkReply::NoError || status_code != 200) {
+    // 请求失败
+   QMessageBox::warning(this, "提示", "请求错误", QMessageBox::ok);
+} 
+```
+
+设置请求头：
+
+``` c++
+#include <QNetworkRequest>
+QNetworkRequest request;
+
+/* 设置头内容 */
+request.setRawHeader("Connection", "keep-alive");
+request.setRawHeader("User-Agent", "Client");
+```
+
+#### 3、POST请求
+
+``` c++
+// 准备json字符串
+QJsonObject js;
+js.insert("xxx", "sss");
+QJsonDocument doc(js);
+QByteArray d = doc.toJson();
+
+// 构造请求
+QNetworkRqeust request;
+request.setUrl(QUrl("http://"));
+request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+request.setRawHeader("content-type", "application/json");
+
+// 构造管理类
+QNetworkAccessManager *manager = new QNetworkAccessManager(this); 
+manager->post(request, d);
+```
+
+### 八、Json对象
+
+json数组中元素可以是不同数据类型
+
+- json数组：`[1,2.4,“aa”,4]`
+- json对象：`{"key":value, "key2":value}`
+
+#### 1、json对象 / json数组创建
+
+``` c++
+/* 创建一个接送对象 */
+#include <QJsonObject>
+QJsonObject j;
+
+/* 创建json数组 */
+#include <QJsonArray>
+QJsonArray j_array;
+
+/* jsonDocument */
+#include <QJsonDocument>
+// 创建一个jsondocument对象
+// j是一个jsonObject对象
+QJsonDocument doc(j);
+// 等价于
+QJsonDocument doc;
+doc.setObject(json);
+```
+
+#### 2、向json对象中添加数据
+
+``` c++
+/* 将键值对添加到j */ 
+j.insert("name", "xxxx");
+
+/* 将json对象添加进j */
+// 创建一个j2对象
+QJsonObject j2;
+// 将j2添加进j
+json.insert("x2", j2);
+```
+
+#### 3、json数组添加数据
+
+``` c++
+/* 向json数组中添加json对象 */
+QJsonObject j3;
+ja.append(j3);
+```
+
+#### 4、jsonDocument
+
+``` c++
+QJsonDocument doc(j);
+// 将jsonDocument对象转换为json字符串
+QByteArray jdoc = doc.tojson();
+```
+
+#### 5、json解析
+
+``` c++
+/* 1、获取json文本 */
+// 可以从网络，本地文件获取
+QByteArray bytext = reply->readAll(); 
+
+/* 2、创建jsondocument对象 */ 
+// 创建QJsonDocument对象解析bytext
+QJsonDocument doc = QJsonDocumnet::fromJson(bytext);
+// 判断似乎是json对象
+if (!doc.isObject()) {
+    qDbug() << "error";
+}
+
+// 带有错误信息的error
+QJsonParseError err;
+QJsonDocument doc = QJsonDocumnet::fromJson(json, &err);
+if (err.error != QJsonParseError::NoError) {
+    return;
+}
+
+/* 3、将jsonDocument转换为json对象 */ 
+QJsonObject obj = doc.object();
+
+/* 4、读取json对象 */
+// 根据key获取value 
+// 注意一定是双引号，单引号是字符
+QString info = obj["name"].toString();
+QString info = obj.value("key").toString();
+// 获取接送所有key
+QStringList keys = obj.keys();
+// 获取一个指定key
+QString key = keys[1];
+// 根据key获取value
+QJsonValue v = obj.value(key);
+
+/* 根据不同类型解析不同字符 */ 
+#include <QJsonValue>
+if(v.isBool()){
+    v.toBool();
+}else if(v.isString()){
+    v.toString();
+}else if(v.isDouble()){
+    v.toInt();
+}else if(v.isObject()){
+    v.toObject();
+}else if(v.isArray()){
+    v.toArray();
+}
+```
+
+### 九、DateTime
+
+头文件：`#include <QDateTime>`
+
+#### 1、获取QDateTime类型
+
+``` c++
+// 通过当前时间
+QDateTime T = QDateTime::currentDateTime();
+
+// 通过字符串
+QString s= "2019-03-31 12:24:36";
+QDateTime T = QDateTime::fromString(s, "yyyy-MM-dd hh:mm:ss"); 
+
+// 通过int类型
+int ms = 1537537358;
+// 秒
+QDateTime T = QDateTime::fromSecsSinceEpoch(ms);
+// 毫秒
+QDateTime T = QDateTime::fromMSecsSinceEpoch(ms);
+```
+
+#### 2、常用方法
+
+``` c++
+/* QDateTime转Qstring： */
+// 2019.03.13 14:47:24:333 周三 
+QString S = T.toString("yyyy.MM.dd hh:mm:ss.zzz ddd");
+QString S = T.toString("yyyy-MM-dd hh:mm:ss");
+
+/* QDateTime转时间戳 */
+int date = T.toSecsSinceEpoch();
+int date = T.toMSecsSinceEpoch();
+```
+
+### 十、QTime
+
+获取QTime中的时分秒
+
+``` c++
+// 时间字符串
+QString Ts = "01:20:30";
+QTime T = QTime::fromString(Ts);
+// 获取小时
+T.hour();
+// 获取分钟
+T.minute();
+// 获取秒
+T.second();
+// 总秒数
+T.hour()*60*60 + T.minute()*60 +T.second();
+```
+
+时间戳转字符串
+
+``` c++
+// QTime(0, 0, 0)创建时分秒对象
+QString time=QTime(0, 0, 0).addSecs(t).toString(QString::fromLatin1("HH:mm:ss"));
+qDebug()<<timer; //输出:"00:01:40"
+```
+
+### 十一、QTimer-计时器
+
+``` c++
+QTimer t = new QTimer;
+//this->time->setInterval(1000);
+// 信号，每次QTimer计时结束后调用time_run方法
+connect(t, &QTimer::timeout, this, &Dialog::time_run);
+
+void Dialog::time_run(){
+    // 开始计时，1000单位是毫秒
+    t->start(1000);
+    // 结束计时
+    t->stop();
+}
+```
+
+### 十二、音乐播放
+
+需要在项目目录中添加对应的模块，find_package内容直接复制，target_link_libraries只添加自己需要的类
+
+#### 1、QSound-最简单
+
+6.2版本以上使用QSoundEffect替代
+
+音频文件应先添加进资源
+
+#### 2、QSoundEffect-适合提示音
+
+只能播放wav格式音频
+
+``` c++
+#include <QSoundEffect>
+QSoundEffect *effect=new QSoundEffect;
+effect->setSource(QUrl::fromLocalFile("/666.wav"));
+effect->setLoopCount(1);  //循环次数
+effect->setVolume(0.25f); //音量  0~1之间
+effect->play();
+```
+
+#### 3、QMediaPlayer-音乐播放器
+
+播放wav格式文件
+
+``` c++
+#include <QMediaPlayer>
+QMediaPlayer *player = new QMediaPlayer;
+player->setMedia(QUrl::fromLocalFile(":/666.wav"));
+player->setVolume(50); //0~100音量范围,默认是100
+player->play();
+```
+
+播放mp3格式
+
+``` c++
+ #include <QMediaPlayer>
+ QMediaPlayer *player = new QMediaPlayer;
+ //播放进度的信号提示
+ connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+
+ player->setMedia(QUrl::fromLocalFile(":/owa.mp3"));
+ player->setVolume(50); //0~100音量范围,默认是100
+ player->play();
+```
+
+
 
 ## 事件
 
@@ -1109,12 +1730,12 @@ info.created().toString("yyyy-MM-dd hh:mm:ss");
 
 #### 2、数据量大
 
-
-
 ## 打包发布
 
 1、qt打包方式
 
 修改 debug 模式到 Release 模式 $\to$ 编译运行 $\to$ 找到Release目录下的exe文件 $\to$ 复制到新文件夹 $\to$ 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
+
+windeployqt也可以通过菜单的qt $\to$ qt(MSVC)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行）
 
 2、hm nis edit（第三方打包）

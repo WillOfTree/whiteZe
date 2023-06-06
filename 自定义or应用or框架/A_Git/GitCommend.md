@@ -1,6 +1,8 @@
-# git 工作区说明
+# Git使用
 
-![](D:\A-SYS-reject\whiteZe\A_手册\Git\image\2.png)
+## 工作区说明
+
+![](assets/GitCommend/2.png)
 
 | 名称            | 说明                                                        |
 | ------------- | --------------------------------------------------------- |
@@ -9,7 +11,7 @@
 | Repository    | 仓库区（或版本库），就是安全存放数据的位置，这里面有你提交到所有版本的数据。其中 HEAD 指向最新放入仓库的版本 |
 | Remote        | 远程仓库                                                      |
 
-# 常用命令
+## 常用命令
 
 ```shell
 git status # 查看工作状态
@@ -18,9 +20,7 @@ git log    # 日志
     git log --decorate --all --oneline --graph
 ```
 
-## 创建
-
-### 在github中创建项目
+### 一、在github中创建项目
 
 1、New repository（创建新仓库）
 
@@ -34,9 +34,7 @@ git log    # 日志
 
 6、Create repository
 
-### 本地创建项目
-
-#### 克隆
+### 二、克隆远程项目
 
 1、得到项目地址。
 
@@ -44,7 +42,7 @@ git log    # 日志
 
 3、git clone 项目地址
 
-#### 本地有项目
+### 三、本地有项目
 
 1、在本地创建项目文件
 
@@ -60,23 +58,7 @@ git log    # 日志
 
 7、Git push origin master
 
-#### 创建github的个人页面
-
-1、进入项目
-
-2、Setting【设置】
-
-3、GitHub Pages【github页面】
-
-4、Source选项下的master branch选项
-
-5、Save
-
-Source旁会出现一个github域名的url地址
-
-## 提交
-
-#### 上传文件到github
+### 四、上传文件到github
 
 1、Git add README.md【添加readme文件】
 
@@ -86,7 +68,7 @@ Source旁会出现一个github域名的url地址
 
 -u 是下次不用填写origin master
 
-#### 更新本地
+### 五、更新本地
 
 1、普通更新
 
@@ -102,13 +84,13 @@ git reset --hard origin/master
 
 ## 退回
 
-### 1、git reset [OPTION] [time]
-
-回滚指针
+### 1、回滚指针
 
 当向前滚动时，可使用 git checkout 将已经删除的文件生成
 
-#### OPTION
+**命令：**git reset [OPTION] [time]
+
+**参数：**OPTION
 
 ```shell
 --soft  # 移动 head 指针，不会改变 workspace 和 index 的内容
@@ -118,7 +100,7 @@ git reset --hard origin/master
 --hard  # 当前 head 指针、workspace 和 index 内容全部改变
 ```
 
-#### [time]
+**参数：**[time]
 
 | 状态   | 说明        |
 | ---- | --------- |
@@ -127,7 +109,7 @@ git reset --hard origin/master
 | \~n  | 上n个版本     |
 | ^    | 步数，一个^，一步 |
 
-#### 例子
+**例子**
 
 ```shell
 git reset HEAD~ # 退回上一个版本
@@ -135,7 +117,7 @@ git reset 版本号 文件名 # 回滚个别文件
 git reset 版本号 # 回到指定版本，版本号可略写
 ```
 
-#### 回看版本
+**回看版本**
 
 ```shell
 git reflog
@@ -150,13 +132,13 @@ git checkout -- <file> # 用 index 内容覆盖 workspace 内容
 
 ## 版本比较
 
-### 1、git diff [OPTION]
+命令：git diff [OPTION]
 
 ``` shell 
 git diff  # workspace 与 index
 ```
 
-#### OPTION
+OPTION
 
 ```shell
 --chche 版本号 # 对比 index 与 Repository 中指定版本
@@ -181,7 +163,7 @@ git commit --amend -m "xxx" # 修改提交说明
 git rm <file>
 ```
 
-# 分支命令
+## 分支命令
 
 | 名称      | 说明         |
 | ------- | ---------- |
@@ -204,7 +186,7 @@ git checkout <name> # 切换分支
 git merge <name> # 合并指定分支
 ```
 
-## 2、冲突
+### 2、冲突
 
 git 会给冲突的文件标示冲突的位置
 
@@ -212,12 +194,12 @@ git 会给冲突的文件标示冲突的位置
 > 
 > 文件1冲突内容
 > 
-> ===========
+> ====
 > 文件2冲突内容
 > 
 > \>\>\>\>\>\>feature
 
-## 3、匿名分支
+### 3、匿名分支
 
 内容不会被保存
 
@@ -225,13 +207,23 @@ git 会给冲突的文件标示冲突的位置
 git checkout HEAD~ # 会生成匿名分支，
 ```
 
-# 远程命令
+## 创建github的个人页面
 
+1、进入项目
 
+2、Setting【设置】
 
-# 错误信息
+3、GitHub Pages【github页面】
 
-## 1、SECURITY WARNING
+4、Source选项下的master branch选项
+
+5、Save
+
+Source旁会出现一个github域名的url地址
+
+## 错误信息
+
+### 1、SECURITY WARNING
 
 ```shell
 warning: ----------------- SECURITY WARNING ----------------
@@ -246,13 +238,13 @@ warning: HTTPS connections may not be secure. See https://aka.ms/gcm/tlsverify f
 git config --global http.sslVerify true
 ```
 
-## 2、中文乱码
+### 2、中文乱码
 
 ```shell
 git config --global core.quotepath false
 ```
 
-## 3、443错误
+### 3、443错误
 
 ```shell
 fatal: unable to access 'https://github.com/WillOfTree/whiteZe.git/': Failed to connect to github.com port 443 after 21133 ms: Timed out
