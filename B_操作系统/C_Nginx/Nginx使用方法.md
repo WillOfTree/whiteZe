@@ -1,21 +1,134 @@
-# nginx部署
+# nginx使用方法
 
-1、三个模块，全局配置、events、http
+## 说明
 
-2、location的访问流程，例如：www.avem.top/lib/statics/123.png
+1. 三个模块，全局配置、events、http
+2. URL 尾部的 / 表示目录，没有 / 表示文件
+
+## nginx参数
+
+### 一、location
+
+#### Ⅰ、location的访问流程
+
+例如：www.avem.top/lib/statics/123.png
 
 - location / ：访问的是www.avem.top
 - location /lib ：访问的是www.avem.top/lib
 - location /statics：当访问完前avem.top、/lib后匹配/statics路径
 - location ~/statics：访问的是www.avem.top/statics
 
-## nginx参数
+#### Ⅱ、location正则说明
 
-### alias
+1. 空格：表示从头开始匹配，不单独使用
 
-通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
+2. =：精确匹配，匹配到立刻停止其他匹配
 
-### nginx正则
+    ``` nginx
+    # www.avem.top/adcd 匹配
+    # www.avem.top/ad   不匹配
+    location = /abcd {
+    	...
+    }
+    ```
+
+3. ^~：正则匹配，普通字符串匹配
+
+    ``` nginx
+    location ^~ /index {
+      .....
+    }
+    #以/index 开头的请求，都会匹配上
+    #http://abc.com/index/index.page  [匹配成功]
+    #http://abc.com/error/error.page [匹配失败]
+    ```
+
+4. ~：执行正则匹配，区分大小写。
+
+    ``` nginx
+    location ~ /Abc {
+      .....
+    }
+    #http://abc.com/Abc/ [匹配成功]
+    #http://abc.com/abc/ [匹配失败]
+    ```
+
+5. ~*：正则匹配，忽略大小写
+
+    ``` nginx
+    location ~* /Abc/ {
+      .....
+    }
+    #http://abc.com/Abc/ [匹配成功]
+    #http://abc.com/abc/ [匹配成功]
+    ```
+
+6. 不加任何规则，默认是大小写敏感匹配
+
+    ``` nginx
+    location /index {
+      ......
+    }
+    #http://abc.com/index  [匹配成功]
+    #http://abc.com/index/index.page  [匹配成功]
+    #http://abc.com/test/index  [匹配失败]
+    #http://abc.com/Index  [匹配失败]
+    ```
+
+7. @：nginx内部跳转
+
+    ``` nginx
+    location /index/ {
+      error_page 404 @index_error;
+    }
+    location @index_error {
+      .....
+    }
+    #以 /index/ 开头的请求，如果链接的状态为 404。则会匹配到 @index_error 这条规则上。
+    ```
+
+#### Ⅲ、location常用方法
+
+``` nginx
+# 匹配以.gif|jpg|png|js|css结尾的url
+location ~ \.(gif|jpg|png|js|css)$ { }
+```
+
+#### Ⅳ、获取location正则的值
+
+``` nginx
+# 使用（）获取正则匹配的值
+# 使用 $n 输出匹配到的值，从1开始
+location ~* /(\d*)/(.*) {
+	return 200 "$1,$2"
+}
+```
+
+### 二、全局变量
+
+1. alias：通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
+
+2. `$query_string` ：get方法中的参数
+
+    ``` nginx
+    # http://abc.top/aaa?type=1
+    location /aaa {
+        if ($query_string == "type=1"){}
+    }
+    ```
+
+3. `$args`：与`$query_string` 相同
+
+4. `$document_root`：当前请求的根路径地址
+
+5. `$uri`：当前便令的url地址
+
+### 三、文件参数
+
+1. `-f` 和 `!-f`：判断是否文件
+2. `-d` 和 `!-d`：判断是否目录
+3. `-e` 和 `!-e`：判断是否存在文件或目录
+4. `-x` 和 `!-x`：判断是否可执行文件
 
 ## 一般部署
 
