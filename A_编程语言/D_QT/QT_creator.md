@@ -133,7 +133,9 @@ qt的坐标在屏幕的左上角（0，0）；x以右为正方向，y以下为�
 
 3、添加资源文件：Projects栏 $\to$ Resources文件夹 $\to$ 找到.qrc文件 $\to$ 右键.qrc文件，open in Editor $\to$ add Files（添加前缀用于资源分类）
 
-4、使用资源：`QIcon(":/资源文件位置")` 
+4、在Cmake.txt中添加资源文件
+
+5、使用资源：`QIcon(":/资源文件位置")` 
 
 **提醒信息：File are not auto matically added to the CMakeList.txt file of the CMake project. copy the path to the source files  to the clipboard** 
 
@@ -179,19 +181,21 @@ ui->控件名->setFont(font);
 
 #### 3、加载ico文件-cmake
 
-1、创建ico文件：[在线制作ico图标 | 在线ico图标转换工具 方便制作favicon.ico - 比特虫 - Bitbug.net](https://www.bitbug.net/) 生成 `logo.ico`文件，并将文件放到cmakeLists.txt同级目录下
+1、创建ico文件：[在线制作ico图标 | 在线ico图标转换工具 方便制作favicon.ico - 比特虫 - Bitbug.net](https://www.bitbug.net/) 生成 `logo.ico`文件，
+
+2、将logo.ico文件放到cmakeLists.txt同级目录下
 
 **无法显示的ico文件会**出现 `ninja: build stopped: subcommand failed.` 错误
 
-2、创建 `.rc` 文件：在 `cmakeLists.txt` 同级目录创建 `.txt` 文件并改名为 `logo.rc` 
+3、创建 `.rc` 文件：在 `cmakeLists.txt` 同级目录创建 `.txt` 文件并改名为 `logo.rc` 
 
-3、修改`logo.rc` 文件
+4、修改`logo.rc` 文件
 
 ``` cmake
 IDI_ICON1 ICON DISCARDABLE "logo.ico"
 ```
 
-4、修改cmakeList.txt文件
+5、修改cmakeList.txt文件
 
 ``` cmake
 # 第一步
@@ -274,18 +278,24 @@ connect(d, &Dialog::send, this, &Dialog_main::show);
 
 ## 信号
 
-使用观察者模式实现，connect 是QObject类型下的
+### 说明
 
-### 一、系统信号
+使用观察者模式实现，`connect` 必须继承`QObject`
+
+`connect(信号发送者，发送的信号，信号的接收者，处理的槽函数 )` 
+
+### 一、系统槽（处理方法）
 
 ``` c++
 // 退出方法 
 &Qwidget::close
 ```
 
-### 二、信号连接
+### 二、信号槽
 
-#### 1、连接系统槽
+- 槽：处理方法，信号的回调函数
+
+#### 1、使用系统槽
 
 ``` c++
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
@@ -295,9 +305,8 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 	QPushButton *btn = new QPushButton;
 	/* 
 	参数列表：信号发送者，发送的信号，信号的接收者，处理的槽函数 
-	功能说明：
-		给btn按钮绑定一个信号（clicked单击信号），当点击时触发关闭方法
-	Qwidget::close：系统提供关闭程序的处理方法
+	功能说明：给btn按钮绑定一个信号（clicked单击信号），当点击时触发关闭方法
+	&Qwidget::close：系统提供关闭程序的处理方法
 	*/ 
 	connect(btn, &QPushButton::clicked, this，&Qwidget::close);
 }
@@ -308,38 +317,38 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 ``` c++
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     ui->setupUi(this);
-    // 创建一个按钮
+    // 创建一个按钮、触发方法
 	QPushButton *btn = new QPushButton;
 	
+    /* 方法一 */
     // classOver是自己定义的
     // 触发自己写的函数
 	connect(btn, &QPushButton::clicked, this，&widget::classOver);
-    /* Lambda表达式 */
+    
+    /* 方法二、Lambda表达式 */
 	// []:表示lambda的开始,
 	connect(btn, &Mybutten::clicked, [=](){ 
         // 这里直接写处理方法 
     })
 }
 
+/* 方法一的触发方法 */
 void widget::classOver() {
     cout << "触发";
 }
 ```
 
-#### 3、断开信号
+#### 3、断开信号与槽的连接
 
 ``` c++
-Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
-    ui->setupUi(this);
-    // 创建一个按钮
-	QPushButton *btn = new QPushButton;
-	
-    // 触发自己写的函数
-	disconnect(btn, &QPushButton::clicked, this，&widget::classOver);
-}
+// 创建一个按钮
+QPushButton *btn = new QPushButton;
+
+// 触发自己写的函数
+disconnect(btn, &QPushButton::clicked, this，&widget::classOver);
 ```
 
-### 三、自定义信号
+### 三、自定义信号触发自定义方法
 
 #### 1、创建自定义信号
 
@@ -358,11 +367,12 @@ signals:
 }
 ```
 
-#### 2、创建槽函数（信号处理函数）
+#### 2、创建槽函数
 
 ``` c++
 /* 声明 */
-class Student : public QObject{
+class Student : public QObject
+{
 public:
     // 早期槽函数只能放到public slots中，现在直接放到public中即可
     // 返回值必须是void
@@ -382,10 +392,11 @@ void student::treat() {
 #include "student.h"
 #include "Teacher.h"
 
-Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
+Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) 
+{
     Teacher *zt = new Teacher(this);
     student *st = new student(this);
-    // 将信号连接
+    // 将信号连接，zt的hungry信号触发st中的treat方法
     connect(zt, &Teacher::hungry, st, &student::treat);
     
     // 调用hungry函数, 即可触发信号
@@ -482,7 +493,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 }
 ```
 
-## QMainWindows
+## 代码生成
 
 带有菜单栏（menu bar）、任务栏（tool bars）、铆接部件（dock widgets）、状态栏（status bar）、中心部件（central widget）的主窗口程序类，是许多应用程序的基础
 
@@ -594,6 +605,91 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
     QTextEdit *edit = new QTextEdit(this);
     setCentralWidget(edit);
 }
+```
+
+### 五、托盘栏程序
+
+简单使用
+
+``` c++
+#include <QMenu>
+
+/* 创建菜单 */ 
+QMenu *menu = new QMenu(this);
+// 创建菜单相
+QAction *serial = new QAction(QString("串口选择"), this);
+// 退出功能
+QAction *out = new QAction(QString("退出"), this);
+// 创建带图标的功能
+//QAction *serial = new QAction(QIcon(":/res/aaa.jpg"), QString("串口选择"), this);
+menu->addAction(serial);
+menu->addSeparator();//添加分割线
+menu->addAction(out);
+
+/* 创建系统托盘 */
+m_systemtrayi = new QSystemTrayIcon(this);
+// 设置图标,资源文件不对无法显示
+m_systemtrayi->setIcon(QIcon("://res/aaa.jpg"));
+// 设置托盘提示信息
+m_systemtrayi->setToolTip(QString("键盘串口"));
+// 设置托盘菜单
+m_systemtrayi->setContextMenu(menu);
+// 显示托盘
+m_systemtrayi->show();
+
+/* 信号-退出 */ 
+// out是QAction
+// QAction::triggered是点击事件
+connect(out, &QAction::triggered, this, &QApplication::quit);
+```
+
+二级菜单多选使用
+
+``` c++
+// 托盘菜单（主菜单）
+QMenu *menu = new QMenu(this);
+// 创建二级菜单
+QMenu *serial = new QMenu(QString("串口选择"), this);
+// 创建二级菜单的选项
+QAction *serial_on = new QAction(QString("开启"), this);
+// 主菜单添加二级菜单
+menu->addMenu(serial);
+// 二级菜单社会选项
+serial->addAction(serial_on);
+
+// 设置二级菜单项可选
+serial->setCheckable(true);
+// 设置二级菜单项选中
+serial->setChecked(true);
+// 设置没有选中不选中
+serial->setChecked(false);
+```
+
+二级菜单单选使用
+
+``` c++
+// 创建主菜单
+QMenu *menu = new QMenu(this);
+// 创建二级菜单
+QMenu *serial = new QMenu(QString("串口选择"), this);
+// 创建二级菜单项
+QAction *serial_on = new QAction(QString("开启"), this);
+QAction *serial_off = new QAction(QString("关闭"), this);
+
+// 重要：创建团组
+QActionGroup * serial_group  = new QActionGroup(this);
+// 设置团组
+serial_group->addAction(serial_on);
+serial_group->addAction(serial_off);
+
+// 设置选项状态
+serial_on->setCheckable(true);
+serial_off->setCheckable(true);
+serial_off->setChecked(true);
+// 正常添加二级菜单
+menu->addMenu(serial);
+serial->addAction(serial_on);
+serial->addAction(serial_off);
 ```
 
 ## 对话框
@@ -768,6 +864,21 @@ resize(600, 400);
 
 // 设置无边框
 this->setWindowFlag(Qt::FramelessWindowHint);
+/*
+Qt::MSWindowFiredSizeDialogHint:     为Windows系统上的窗口装饰一个窄的对话框边框，通常这个提示用于固定大小的对话框
+Qt::MSWindowOwnDC:                   为Windows系统上的窗口添加自身的显示上下文菜单
+Qt::X11BypassWindowManagerHint:      完全忽视窗口管理器，它的作用是产生一个根本不被管理的无窗口边框的窗口(此时，用户无法使用键盘进行输入，除非手动调用QWidget::activateWindow()函数)
+Qt::FramelessWindowHint:             产生一个无窗口边框的窗口，此时用户无法移动该窗口和改变它的大小
+Qt::CustomizeWindowHint:             关闭默认的窗口标题提示
+Qt::WindowTitleHint：                为窗口装饰一个标题栏
+Qt::WindowSystemMenuHint:            为窗口添加一个窗口系统系统菜单，并尽可能地添加一个关闭按钮
+Qt::WindowMinimizeButtonHint:        为窗口添加一个“最小化”按钮
+Qt::WindowMaximizeButtonHint:        为窗口添加一个“最大化”按钮
+Qt::WindowMinMaxButtonHint:          为窗口添加一个“最小化”按钮 和一个“最大化”按钮
+Qt::WindowContextHelpButtonHint:     为窗口添加一个“上下文帮助”按钮
+Qt::WindowStaysOnTopHint:            置顶窗口
+Qt::WindowType_Mask:                 一个用于提示窗口标识的窗口类型部分的掩码
+*/
 ```
 
 #### 2、设置图标
@@ -1194,7 +1305,7 @@ nameList[1];
 nameList.lenght();
 ```
 
-#### 3、QTStringList
+#### 3、QStringList
 
 ``` c++
 QStringList iconNameList; //字符串数组
@@ -1296,13 +1407,10 @@ net->get(request);
 - pro文件：`QT += core gui network` 
 
 - cmake文件：
-  1. `find_package(Qt6 REQUIRED COMPONENTS Network)` 
+  1. 直接复制：`find_package(Qt6 REQUIRED COMPONENTS Network)` 
   
-      find_package直接复制
+  2. 在 `target_link_libraries` 中添加 `Qt6::Network` 
   
-  2. `target_link_libraries(Qt6::Network)`
-  
-      target_link_libraries删除mytarget
 
 #### 2、设置信号
 
@@ -1585,7 +1693,10 @@ void Dialog::time_run(){
 
 ### 十二、音乐播放
 
-需要在项目目录中添加对应的模块，find_package内容直接复制，target_link_libraries只添加自己需要的类
+Cmake添加：
+
+1. 直接复制：`find_package(Qt6 REQUIRED COMPONENTS Multimedia)` 
+2. 在`target_link_libraries`中添加`Qt6::Multimedia` 
 
 #### 1、QSound-最简单
 
@@ -1593,9 +1704,9 @@ void Dialog::time_run(){
 
 音频文件应先添加进资源
 
-#### 2、QSoundEffect-适合提示音
+#### 2、QSoundEffect-提示音
 
-只能播放wav格式音频
+适合提示音、只能播放wav格式音频
 
 ``` c++
 #include <QSoundEffect>
@@ -1606,9 +1717,9 @@ effect->setVolume(0.25f); //音量  0~1之间
 effect->play();
 ```
 
-#### 3、QMediaPlayer-音乐播放器
+#### 3、QMediaPlayer-播放器
 
-播放wav格式文件
+可以播放音乐mp3、播放wav格式文件
 
 ``` c++
 #include <QMediaPlayer>
@@ -1631,7 +1742,105 @@ player->play();
  player->play();
 ```
 
+### 十三、串口操作
 
+1. 串口头文件添加
+
+    操作串口：`#include <QSerialPort>` 
+
+    串口信息：`#include <QSerialPortInfo>`  
+
+2. Cmake添加
+
+    直接复制：`find_package(Qt6 COMPONENTS SerialPort REQUIRED)`
+    在 `target_link_libraries` 中添加 `Qt6::SerialPort` 
+
+``` c++
+/* 查找可用串口 */
+QStringList m_serialList;
+foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+{
+    QSerialPort serialT;
+    serialT.setPort(info);
+    if(serialT.open(QIODevice::ReadWrite))
+    {
+        m_serialList << info.portName();
+        // 关闭串口
+        serialT.close();
+    }
+    //
+    qDebug()<<"serialPortName:"<<info.portName();
+}
+// 对串口从小到大排序
+std::sort(m_serialList.begin(), m_serialList.end());
+// 打印所有串口
+//for(int i=0; i<m_serialList.size(); i++){
+//    qDebug() << m_serialList[i];
+//}
+
+/* 串口连接 */
+// 打开串口
+m_serialPort = new QSerialPort();
+// 设置串口名，应该是选择串口吧
+m_serialPort->setPortName(m_serialList[0]);
+// 打开串口
+m_serialPort->open(QIODevice::ReadWrite);
+// 设置波特率
+m_serialPort->setBaudRate(QSerialPort::Baud4800);//设置波特率为4800
+m_serialPort->setDataBits(QSerialPort::Data8);//设置数据位8
+m_serialPort->setParity(QSerialPort::NoParity); //无校验位
+m_serialPort->setFlowControl(QSerialPort::NoFlowControl);//设置为无流控制
+m_serialPort->setStopBits(QSerialPort::OneStop);//停止位设置为1
+
+/* 关闭串口 */
+m_serialPort->close();
+```
+
+### 十四、托盘程序
+
+1. 基于`Qt::widgets` 
+2. 需要的其他内 `QMenu` ：用于生成菜单
+
+创建菜单类
+
+``` c++
+/* 创建托盘程序类 */
+// 创建系统托盘
+QSystemTrayIcon *m_systemtrayi = new QSystemTrayIcon(this);
+// 设置图标,资源文件不对无法显示(路径正确、cmake中添加资源文件)
+m_systemtrayi->setIcon(QIcon("://res/aaa.jpg"));
+// 设置托盘提示信息
+m_systemtrayi->setToolTip(QString("键盘串口"));
+// 设置托盘菜单
+m_systemtrayi->setContextMenu(menu);
+// 显示托盘
+m_systemtrayi->show();
+
+/* 托盘程序的菜单，添加后直接右键图标就可显示 */
+// 创建菜单
+QMenu *menu = new QMenu(this);
+// 创建菜单项
+QAction *serial = new QAction(QString("串口选择"), this);
+// 创建带图标的菜单项
+QAction *serial = new QAction(QIcon("://res/aaa.jpg"), QString("串口选择"), this);
+// 添加分割线
+menu->addSeparator();
+// 给菜单添加菜单项
+menu->addAction(serial);
+```
+
+触发的事件
+
+- `&QAction::triggered` ：QAction的点击事件
+
+``` c++
+/* 创造的菜单
+QMenu *menu = new QMenu(this);
+QAction *out = new QAction(QString("退出"), this);
+*/
+// 信号-退出
+connect(out, &QAction::triggered, this, &QApplication::quit);
+```
 
 ## 事件
 
@@ -1642,7 +1851,45 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 }
 ```
 
-### 二、定时器事件
+### 二、键盘事件
+
+#### Ⅰ、普通键盘事件
+
+1. 引入头文件：`#include <QKeyEvent>` 
+2. 重写父类widget中的keyPressEvent函数即可
+3. 父类必须调用.show()才可以有效果
+
+``` c++
+/* .h文件中的定义 */
+#include <QKeyEvent>
+class Widget : public QWidget
+{
+    Q_OBJECT
+public:
+    Widget(QWidget *parent = nullptr);
+    ~Widget();
+private:
+   	// 重写方法、重点
+    void keyPressEvent(QKeyEvent *event);
+};
+
+/* .cpp文件 */
+// 当键盘按下时会自动调用这个方法
+void Widget::keyPressEvent(QKeyEvent* event) {
+    qDebug() << event->key();
+    // 按键比对
+    // Qt::Key_Escape
+    // Qt::Key_Return
+    // Qt::Key_F1
+    // Qt::Key_A
+}
+```
+
+#### Ⅱ、全局键盘事件
+
+查看文档路径 `whiteZe\自定义or应用or框架\D_C++orQT\全局键盘事件` 
+
+### 三、定时器事件
 
 
 
@@ -1736,6 +1983,6 @@ info.created().toString("yyyy-MM-dd hh:mm:ss");
 
 修改 debug 模式到 Release 模式 $\to$ 编译运行 $\to$ 找到Release目录下的exe文件 $\to$ 复制到新文件夹 $\to$ 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
 
-windeployqt也可以通过菜单的qt $\to$ qt(MSVC)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行）
+windeployqt也可以通过菜单的qt $\to$ qt(MinGW)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行，使用什么软件编译的就用什么处理）
 
 2、hm nis edit（第三方打包）
