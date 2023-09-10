@@ -159,8 +159,6 @@ bundle exec jekyll serve --livereload
 |                 |                                     |
 |                 |                                     |
 
-
-
 ### 二、文章分类
 
 1. 给文章（post页面）和根目录下的.markdown文件（page页面）添加头信息，设置类别 

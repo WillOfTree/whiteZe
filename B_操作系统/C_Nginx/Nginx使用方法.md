@@ -16,44 +16,85 @@
 - location / ：访问的是www.avem.top
 - location /lib ：访问的是www.avem.top/lib
 - location /statics：当访问完前avem.top、/lib后匹配/statics路径
-- location ~/statics：访问的是www.avem.top/statics
+- location ~ /statics：访问的是www.avem.top/statics
 
-#### Ⅱ、location正则说明
+#### Ⅱ、location普通匹配
 
-1. 空格：表示从头开始匹配，不单独使用
+优先级：`=`  $\Rightarrow$ `^~` $\Rightarrow$ `~ / ~*` $\Rightarrow$ `匹配不带任意前缀`
 
-2. =：精确匹配，匹配到立刻停止其他匹配
+1. =：普通匹配
+
+    匹配方式：完全一样才匹配，匹配成功立刻返回
 
     ``` nginx
+    # 完全一样才能匹配
     # www.avem.top/adcd 匹配
     # www.avem.top/ad   不匹配
+    # www.avem.top/sss/adcd 不匹配
+    # www.avem.top/adcd/ 不匹配
     location = /abcd {
     	...
     }
     ```
 
-3. ^~：正则匹配，普通字符串匹配
+2. 空格：普通匹配
+
+    匹配方式：以指定字符开头、区分大小写、匹配成功不返回
 
     ``` nginx
+    # www.avem.top/image/ss.png 匹配
+    # www.avem.top/sss/image/ss.png [匹配失败]
+    # http://abc.com/Index  [匹配失败]
+    location /image/ {
+      ...
+    }
+    
+    # www.avem.top/imagessssss [匹配]
+    location /image {
+        
+    }
+    ```
+
+3. ^~：普通匹配
+
+    匹配方式：优先级高于所有正则匹配、匹配成功立刻返回、
+
+    ``` nginx
+    #以 /index 开头的请求，都会匹配上
+    #http://abc.com/index/index.page  [匹配成功]
+    #http://abc.com/error/error.page [匹配失败]
     location ^~ /index {
       .....
     }
-    #以/index 开头的请求，都会匹配上
-    #http://abc.com/index/index.page  [匹配成功]
-    #http://abc.com/error/error.page [匹配失败]
     ```
 
-4. ~：执行正则匹配，区分大小写。
+#### Ⅲ、Location正则匹配
+
+1. 正则匹配配合特殊符合
 
     ``` nginx
+    # 以/ 开头，Abc结尾
+    location ~ ^/Abc$ {
+      .....
+    }
+    ```
+
+2. ~：正则匹配
+
+    匹配方式：区分大小写、任意位置。
+
+    ``` nginx
+    #http://abc.com/Abc/ [匹配成功]
+    #http://abc.com/abc/ [匹配失败]
+    #http://abc.com/ss/Abc [成功]
     location ~ /Abc {
       .....
     }
-    #http://abc.com/Abc/ [匹配成功]
-    #http://abc.com/abc/ [匹配失败]
     ```
 
-5. ~*：正则匹配，忽略大小写
+3. ~*：正则匹配，
+
+    匹配方式：忽略大小写、任意位置
 
     ``` nginx
     location ~* /Abc/ {
@@ -63,19 +104,9 @@
     #http://abc.com/abc/ [匹配成功]
     ```
 
-6. 不加任何规则，默认是大小写敏感匹配
+    ---
 
-    ``` nginx
-    location /index {
-      ......
-    }
-    #http://abc.com/index  [匹配成功]
-    #http://abc.com/index/index.page  [匹配成功]
-    #http://abc.com/test/index  [匹配失败]
-    #http://abc.com/Index  [匹配失败]
-    ```
-
-7. @：nginx内部跳转
+4. @：nginx内部跳转
 
     ``` nginx
     location /index/ {
@@ -89,9 +120,18 @@
 
 #### Ⅲ、location常用方法
 
+图片匹配
+
 ``` nginx
 # 匹配以.gif|jpg|png|js|css结尾的url
 location ~ \.(gif|jpg|png|js|css)$ { }
+
+
+location ~ /assets/(.*)/(.*) {
+        alias /var/www/avem.top/assets/$1/$2;
+        autoindex on;
+}
+
 ```
 
 #### Ⅳ、获取location正则的值
@@ -104,11 +144,14 @@ location ~* /(\d*)/(.*) {
 }
 ```
 
-### 二、全局变量
+### 二、关键字
 
-1. alias：通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
+1. `alias`：通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
+2. `root`：
 
-2. `$query_string` ：get方法中的参数
+### 三、全局变量
+
+1. `$query_string` ：get方法中的参数
 
     ``` nginx
     # http://abc.top/aaa?type=1
@@ -117,22 +160,48 @@ location ~* /(\d*)/(.*) {
     }
     ```
 
-3. `$args`：与`$query_string` 相同
+2. `$args`：与`$query_string` 相同
 
-4. `$document_root`：当前请求的根路径地址
+3. `$document_root`：当前请求的根路径地址
 
-5. `$uri`：当前便令的url地址
+4. `$uri`：当前便令的url地址
 
-### 三、文件参数
+### 四、文件参数
 
 1. `-f` 和 `!-f`：判断是否文件
 2. `-d` 和 `!-d`：判断是否目录
 3. `-e` 和 `!-e`：判断是否存在文件或目录
 4. `-x` 和 `!-x`：判断是否可执行文件
 
+## nginx调试方法
+
+1. 配置nginx
+
+    ``` nginx
+    # 设置响应路径
+    # 访问路径 127.0.0.1/hello
+    location ~ /hello {
+        # 设置响应头-html
+        default_type text/html;
+        return 200 '1';
+        
+        # json
+      	default_type application/json;
+        return 200 '{"status":"success","result":"nginx json"}';
+        
+        # 添加响应头
+        add_header Content-type 'text/html; ssss';
+        add_header 自定义头类型名 '内容'
+        return 200;
+    }
+    ```
+
+2. 直接通过游览器访问即可
+
+
 ## 一般部署
 
-### 基于域名配置（默认方法）
+### 一、基于域名配置（默认方法）
 
 ``` nginx
 # 访问方法 web.testpm.com
@@ -151,7 +220,7 @@ http {
 }
 ```
 
-### 基于ip配置
+### 二、基于ip配置
 
 ``` nginx
 # 访问方法： 10.0.105.199:8080
@@ -179,7 +248,7 @@ http {
 }
 ```
 
-### 静态文件
+### 三、静态文件
 
 ```nginx
 server {
@@ -207,7 +276,7 @@ server {
 
 首先：你应该配置nginx的error_log选项，并将最后一个参数设为debug，这样可以输出更多错误信息，或者请求信息
 
-### 404 not find
+### 一、404 not find
 
 1. 检查 **root参数** ，root 建议放在server里面，因为若是在location中，则只对当前location起效
 
@@ -223,13 +292,13 @@ server {
    } 
    ```
 
-### welcome to nginx 却没有出现项目页面
+### 二、welcome to nginx 却没有出现项目页面
 
 **对于 PHP项目**
 
 1. 检查location中index选项是不是将index.html写在了前面（优先级高），修改为index.php。
 
-### 403 Forbidden
+### 三、403 Forbidden
 
 1. nginx的**index参数**错误
 
@@ -242,12 +311,12 @@ server {
    - 修改目录权限
    - 修改nginx的用户名，将nginx的user参数修改为目录的所有者
 
-### PHP无法解析（File not found）
+### 四、PHP无法解析（File not found）
 
 1. 查看日志文件确定是php-fpm与nginx交互问题
 2. 检查fastcgi_pass 127.0.0.1:9000，确定与php-fpm中的配置相同，php-fpm位置在php的文件夹中。
 
-### 500 服务器错误
+### 五、500 服务器错误
 
 1. 代码有错误
 2. 对于PHP：直接进入php.ini 配置display_error=On显示错误信息，然后修改错误。
@@ -265,7 +334,7 @@ fastcgi_param PHP_ADMIN_VALUE "open_basedir=$document_root/../:/tmp/:/proc/";
 
 ## 实例配置
 
-### 负载均衡
+### 一、负载均衡
 
 ``` nginx
 # 1、配置组
@@ -283,7 +352,7 @@ location /cat {
 }
 ```
 
-### 响应websocket
+### 二、响应websocket
 
 ``` nginx
 # 1、配置组（这不是必须的)
@@ -302,11 +371,11 @@ location /chat {
 }
 ```
 
-### 反向代理
+### 三、反向代理
 
  
 
-### 解析 PHP
+### 四、解析 PHP
 
 ``` nginx
 # 需要libxml2支持
@@ -338,7 +407,7 @@ location ~ *\.php$ {
 }
 ```
 
-### 配置解析url参数
+### 五、配置解析url参数
 
 ``` nginx
 #url：[https://abc.dc.com/image?url=https://vpic.v.com/1641213/p0685fxrwij.png](https://abc.dc.com/image?url=https://vpic.video.qq.com/1641213/p0685fxrwij.png)
@@ -351,7 +420,7 @@ location ~/image {
  }
 ```
 
-### 配置解析ssl
+### 六、配置解析ssl
 
 1. 申请证书，
 
