@@ -17,70 +17,57 @@
 git status # 查看工作状态
 git diff   # 查看修改
 git log    # 日志
-    git log --decorate --all --oneline --graph
+git log --decorate --all --oneline --graph
 ```
 
 ### 一、在github中创建项目
 
-1、New repository（创建新仓库）
-
-2、填写仓库名称（repository name）
-
-3、填写desscription（描述）【可不填】
-
-4、默认选择public（公开），付费可选择private（私有）
-
-5、是否添加readme文件【可不填】
-
-6、Create repository
+1. New repository（创建新仓库）
+2. 填写仓库名称（repository name）
+3. 填写desscription（描述）【可不填】
+4. 默认选择public（公开），付费可选择private（私有）
+5. 是否添加readme文件【可不填】
+6. Create repository
 
 ### 二、克隆远程项目
 
-1、得到项目地址。
-
-2、创建项目文件夹，进入项目文件夹。
-
-3、git clone 项目地址
+1. 得到项目地址。
+2. 创建项目文件夹，进入项目文件夹。
+3. git clone 项目地址
 
 ### 三、本地有项目
 
-1、在本地创建项目文件
-
-2、Git init
-
-3、Git config user.email “邮箱地址”【配置邮箱地址】（也可以一开始就配置）
-
-4、Git add 文件名【添加文件】
-
-5、Git commit -m “记录”【添加日志】
-
-6、git remote add origin  github地址【向github添加文件】
-
-7、Git push origin master
+1. 在本地创建项目文件
+2. Git init
+3. Git config user.email “邮箱地址”【配置邮箱地址】（也可以一开始就配置）
+4. Git add 文件名【添加文件】
+5. Git commit -m “记录”【添加日志】
+6. git remote add origin  github地址【向github添加文件】
+7. Git push origin master
 
 ### 四、上传文件到github
 
-1、Git add README.md【添加readme文件】
+1. Git add README.md【添加readme文件】
 
-2、Git commit -m “xxxx” 【添加备注信息】
+2. Git commit -m “xxxx” 【添加备注信息】
 
-3、git push -u origin master【上传文件】
+3. git push -u origin master【上传文件】
 
--u 是下次不用填写origin master
+    -u 是下次不用填写origin master
 
 ### 五、更新本地
 
-1、普通更新
+``` shell
+#--- 
+# 普通更新
+git pull origin master/develop 
 
-git pull origin master/develop 等等
-
-2、强制跟新本地
-
+#--- 
+# 强制跟新本地
 git fetch --all
-
-//将head指向origin master
-
+# 将head指向origin master
 git reset --hard origin/master
+```
 
 ## 退回
 
@@ -209,17 +196,51 @@ git checkout HEAD~ # 会生成匿名分支，
 
 ## 创建github的个人页面
 
-1、进入项目
+1. 进入项目
+2. Setting【设置】
+3. GitHub Pages【github页面】
+4. Source选项下的master branch选项
+5. Save
+6. Source旁会出现一个github域名的url地址
 
-2、Setting【设置】
+## 使用SSH Key
 
-3、GitHub Pages【github页面】
+1. 生成ssk公钥
 
-4、Source选项下的master branch选项
+    `ssh-keygen -t rsa -C "添加注释，一般为邮箱" -f "指定用来保存密钥的文件名"`
 
-5、Save
+2. 确定密钥保存位置
 
-Source旁会出现一个github域名的url地址
+    ```shell
+    Enter file in which to save the key
+    (/Users/your_user_directory/.ssh/id_rsa): 按回车键
+    ```
+
+3. 输入密码密码
+
+    ``` shell
+    Enter same passphrase again: 再次输入密码
+    shellEnter passphrase (empty for no passphrase): 输入密码(一般不输入密码，直接回车)
+    ```
+
+4. 查看公钥内容
+
+    ``` shell
+    # LINUX
+    cat ~/.ssh/id_rsa.pub
+    
+    # WINDOWS
+    # 直接使用记事本打开
+    ```
+
+5. 测试GIT是否成功
+
+    ```shell
+    # github
+    ssh -T git@github.com
+    # 返回
+    Hi WillOfTree! You've successfully authenticated, but GitHub does not provide shell access.
+    ```
 
 ## 错误信息
 
