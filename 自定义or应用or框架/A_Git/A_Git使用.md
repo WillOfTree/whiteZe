@@ -235,11 +235,24 @@ git checkout HEAD~ # 会生成匿名分支，
 
 5. 测试GIT是否成功
 
-    ```shell
+    ``` shell
     # github
     ssh -T git@github.com
     # 返回
     Hi WillOfTree! You've successfully authenticated, but GitHub does not provide shell access.
+    ```
+
+6. github修改配置文件
+
+    ```shell
+    # 位置：.git 文件夹下 config 中的url
+    [remote "origin"]
+    url = https://github.com/humingx/humingx.github.io.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    # 将https地址修改为ssh的地址
+    [remote "origin"]
+    url = git@github.com:humingx/humingx.github.io.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
     ```
 
 ## 错误信息

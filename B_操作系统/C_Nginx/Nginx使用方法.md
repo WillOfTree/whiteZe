@@ -146,8 +146,39 @@ location ~* /(\d*)/(.*) {
 
 ### 二、关键字
 
-1. `alias`：通过 alias 指令可以将匹配的访问路径重新指定为新定义的文件路径。
-2. `root`：
+1. `alias`：重新定义访问路径，必须是完整的路径
+
+    ``` nginx
+    # url访问路径：www.avem.top/img/123.png
+    # 当nginx匹配url匹配到img时，就会访问/var/www/images/ + URL后面的路径
+    location ~ /img {
+    	# 实际访问路径就是
+        # /var/www/images/123.png
+    	alias /var/www/images/;
+    }
+    ```
+
+2. `root`：基本目录
+
+    ``` nginx
+    # root 有两个位置
+    # 一、server
+    # 	项目的默认目录
+    # URL访问路径：www.avem.top/img/123.png
+    # nginx查找路径：/var/www/static + /img/123.png
+    root /var/www/static;
+    location ~ /img { }
+    
+    # 二、location
+    # 	当前访问URL的目录
+    # URL访问路径：www.avem.top/img/123.png
+    # nginx查找路径：/var/www/static + /img/123.png
+    location ~ /img {
+        root /var/www/static;
+    }
+    ```
+
+3. `autoindex`：开启自动目录
 
 ### 三、全局变量
 
@@ -211,9 +242,10 @@ http {
     server {
         listen       80; # 监听端口
         server_name  web.testpm.com; # 监听域名
+        
+        root   /var/www/nginx/;
         location / {
-            # 这两个必须配置，其他可选
-            root   /var/www/nginx/;
+            
             index  index.html index.htm;
             }
         }
