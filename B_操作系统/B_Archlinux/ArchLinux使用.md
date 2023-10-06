@@ -233,7 +233,7 @@ window:
 		y: 5
 ```
 
-### 二、picom
+### 二、模糊化-picom
 
 默认配置文件位置（默认不会创建）：`~/.config/picom/picom.conf` 
 
@@ -242,7 +242,7 @@ window:
 exec --no-startup-id picom -b
 ```
 
-### 三、状态栏polybar
+### 三、状态栏-polybar
 
 #### 1、配置文件
 
@@ -289,14 +289,14 @@ cd ~/.config/polybar/
   ; 内边距
   padding = 5
 
-### 四、背景feh
+### 四、背景-feh
 
 ``` shell
 # 设置随机壁纸
 exec_always --no-startup-id feh --randomize --bg-scale --bg-fill 图片目录
 ```
 
-### 五、rofi
+### 五、快速启动-rofi
 
 默认配置文件：`~/.config/rofi/config.rasi` 
 
@@ -560,6 +560,15 @@ xprop | grep WM_CLASS
 - 粘贴：ctrl + shift + v
 - 复制：ctrl + shift + c
 
+### 5、修改ROFI桌面程序
+
+桌面程序默认位置（**drun**） ：`/usr/share/applications`下的`.desktop`文件
+
+参数说明：
+
+- Exec：执行的程序命令
+- Name：应用程序名称
+
 ## 运行第三方程序
 
 ### 一、运行windons程序
@@ -635,63 +644,77 @@ qtcreator启动
 
 ### 二、使用代理服务
 
-#### 1、clash for windows
+#### 壹、clash for windows
 
-图像界面，终端中无法使用
+1. 下载
 
-也可以github上的项目进行安装，
+   ``` shell
+   # 安装命令-没有这个库
+   pacman -S clash-for-windows-bin
+   
+   # 方式二、通过github进行下载
+   # 项目名称：clash-for-windows-pfk
+   # 下载64位解压运行cfw即可
+   ```
 
-``` shell
-# 安装命令-没有这个库
-pacman -S clash-for-windows-bin
+2. 配置系统脚本（proxg.sh）
 
-# 方式二、通过github进行下载
-# 项目名称：clash-for-windows-pfk
-# 下载64位解压运行cfw即可
-```
+   ``` shell
+   # 这个应写成proxy.sh脚本文件，方便运行
+   # 设置代理：
+   proxy_set(){
+   	export http_proxy='http://127.0.0.1:7890'
+   	export https_proxy='https://127.0.0.1:7890'
+   	export all_proxy='socks5://127.0.0.1:7890'
+   	# 并不是必须项
+   	export ftp_proxy=""
+   	export no_proxy=""
+   }
+   
+   
+   # 同样写成脚本文件
+   # 取消代理：
+   proxy_off(){
+   	unset http_proxy
+   	unset https_proxy
+   	unset all_proxy
+   }
+   
+   # github设置代理
+   proxy_git_on(){
+   	git config --global http.proxy http://127.0.0.1:7890 
+   	git config --global https.proxy http://127.0.0.1:7890 
+   }
+   
+   proxy_git_off(){
+   	git config --global --unset http.proxy
+   	git config --global --unset https.proxy
+   }
+   
+   # 修改.zshrc文件
+   # 在文件最后添加source ~/sys_files/proxy.sh
+   # 运行文件source .zshrc
+   ```
 
-开启clash后还应开启系统代理服务（终端使用代理）
+3. 验证：使用ping无法验证，使用wget www.google.com 
 
-``` shell
-# 这个应写成proxy.sh脚本文件，方便运行
-# 设置代理：
-proxy_set(){
-	export http_proxy='http://127.0.0.1:7890'
-	export https_proxy='https://127.0.0.1:7890'
-	export all_proxy='socks5://127.0.0.1:7890'
-	# 并不是必须项
-	export ftp_proxy=""
-	export no_proxy=""
-}
+4. 配置游览器
 
+   - google-chrome
 
-# 同样写成脚本文件
-# 取消代理：
-proxy_off(){
-	unset http_proxy
-	unset https_proxy
-	unset all_proxy
-}
+     需要使用参数启动：`--proxy-server="127.0.0.1:7890"`
 
-# github设置代理
-proxy_git_on(){
-	git config --global http.proxy http://127.0.0.1:7890 
-	git config --global https.proxy http://127.0.0.1:7890 
-}
+     如果使用ROFI可以参考“修改ROFI桌面程序”添加启动参数
 
-proxy_git_off(){
-	git config --global --unset http.proxy
-	git config --global --unset https.proxy
-}
+   - edge
 
-# 修改.zshrc文件
-# 在文件最后添加source ~/sys_files/proxy.sh
-# 运行文件source .zshrc
-```
+5. 使用流程
 
-验证：使用ping无法验证，使用wget www.google.com
+   开启google-chrome（ 已经配置代理参数）
 
-#### 2、v2raya
+   开启系统脚本（proxg.sh），运行 proxg_on`命令 
+
+#### 贰、v2raya
 
 ``` shell
 # 安装命令
