@@ -509,9 +509,24 @@ pacman -S firefox-i18n-zh-cn
 ### 三、yay安装
 
 ``` shell
+# 安装方法1
 git clone https://aur.archlinux.org/yay
 cd yay
 makepkg -si
+# 安装方法2
+sudo pacman -S yay
+
+# 常用命令
+# 功能更新
+yay
+# 更新pacman 和yay
+yay -u
+# 打印信息
+yay -P -g
+# 全部选Y
+yay -Y
+# 安装
+yay -S
 
 # go网站无法访问
 export GO111MODULE=on
@@ -527,7 +542,7 @@ export GOPROXY=https://goproxy.cn
 - 基于Blink引擎的google：`pacman -S chromium`
 -  chromium引擎的游览器
   1. edge：`yay -S microsoft-edge-stable-bin`
-  2.  google：`pacman -S google-chrome` 
+  2.  google：`yay -S google-chrome` 
 - 代理：`pacmans -S shadowsocks-qt5` 
 - 下载器：`pacman -S aria2`
 
@@ -568,6 +583,33 @@ xprop | grep WM_CLASS
 
 - Exec：执行的程序命令
 - Name：应用程序名称
+
+### 6、设置系统启动
+
+- 方法一
+
+  位置：`/etc/profile.d` 
+
+  方法：写好.sh脚本，复制到profile.d文件夹下，此文件夹下的脚本都会自动运行
+
+- 方法二
+
+### 7、设置多屏显示
+
+``` shell
+#!/etc/bash
+m_info=`xrand --listmonitors | grep HDMI`
+
+if [[ $m_info != "" ]]
+then 
+	xrandr --output HDMI-1 --primary # 设置HDMI是主输出屏
+	xrandr --output LVSD-1 --off # 设置LVSD-1关闭显示
+fi
+
+# 之后将文件设置为系统启动即可，具体方法参考系统启动
+```
+
+
 
 ## 运行第三方程序
 
@@ -631,12 +673,18 @@ chmod a+x XXXXXX.AppImage
 # 可直接使用
 # 然后选择base、doc包（qt分为qt5、qt6）
 pacman -S qt
+pacman -S qt6  #安装qt6
 
 # 中文汉化，需要在设置中设置 
 pacman -S qt5-translations 
 pacman -S qt6-translations 
 # 安装IDE
 pacman -S qtcreator
+
+# 没有kit套件安装
+pacman -S cmake
+# mingw有可能没有用
+pacman -S mingw-w64-tool
 
 # 启动命令
 qtcreator启动
