@@ -1222,11 +1222,13 @@ int main()
 
 ``` c
 char a[10];
-scanf("%s", a);
+scanf("%s", a); // 不需要&
 
-strcut _a { int a; }
-struct _a BB[100];
-func(BB); // func(struct _a [])
+/* 结构体传递 */
+strcut _a { int b; }
+struct _a BB[100]; // 定义一个结构体变量BB
+func(struct _a temp[]); // 函数定义
+func(BB); // 不需要&（结构体数组），普通结构体推荐传递地址
 ```
 
 ### 一、数组名用途
@@ -1852,7 +1854,7 @@ struct { //这个结构体并没有标明其标签
 // 用typedef重命名，新类型名为Player
 // typedef的简单用法可以看出简单的文本替换
 // typedef声明的结构体，定义变量可以少写struct
-typedef struct{ 
+typedef struct { 
     int a;
 } Player;
 Player p1; // 定义一个Player类型的结构体变量 p1    
@@ -1870,18 +1872,19 @@ struct _Player p2;
 
 
 /* typedef定义结构体指针， */
+// Player 普通结构体
+// p_Player 结构体指针，
 typedef struct {
     int a;
-}Player, *p_Player;
-// 以下2个等价，Player,*p_Player2都是自定义类型
-// 使用p来表明p_Player是一个指针类型
-Player *p;
+}Player, *p_Player; 
+Player p1; // p1与p2，p3不同，p1是在栈中
 /*
-例：因为p_Player是一个指针类型，p自然也是指针类型，虽然没有加*
-	p_Player p = new Player;
-	P_Player p = (p_Player)malloc(sizeof(Player))
+p2、p3分配空间方法：
+	p_Player p = new Player; C++
+	P_Player p = (p_Player)malloc(sizeof(Player))； C
 */
-p_Player p;
+Player *p2; // 只是一个指针，就占4字节
+p_Player p3; // p2等价于p，
 
 
 /* 结构体定义多个 */

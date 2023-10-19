@@ -640,6 +640,16 @@ if( f == NULL) printf("打开失败");
 	失败 / 文章末尾，EOF
 */
 char c = fgetc(f);
+// 读取样例
+while(1)
+{
+    c = fgetc(fp);
+    if( feof(fp) ) //判断读取是否结束
+    {
+        break ;
+    }
+    printf("%c", c);
+}
 ```
 
 ### fgets-读取多个字符
@@ -659,6 +669,11 @@ char c = fgetc(f);
 */
 // 将stream读取的数据放到string中，n表示读取的最大个数
 fgets(str, 8, fp);
+
+/* 使用样例 */
+if( fgets (str, 60, fp)!=NULL ) {
+    // 读取60个字符完成
+}
 ```
 
 ### fputc-写入1个字符
@@ -707,7 +722,25 @@ fscanf(f,"%d %s %f", &a, &b, &c)
 
 ### fread-按块读取
 
+``` c
+// buffer：从fp中读取的数据存放空间地址
+// strlen(c)+1：要读取空间的大小
+fread(buffer, strlen(c)+1, 1, fp);
+```
+
 ### fwrite-按块写入
+
+``` C
+/*
+原型：size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+参数
+    ptr：待写入的字符串
+    size：待写入字符串大小
+    nmemb：填 1
+    stream：fopen指针
+*/
+fwrite(str, sizeof(str) , 1, fp );
+```
 
 ### fseek-随机读取
 
