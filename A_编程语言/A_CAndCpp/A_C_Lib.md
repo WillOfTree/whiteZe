@@ -41,8 +41,9 @@ printf("%s", &a[0]); // &数组名，取出的是数组地址，输出ABC
 - \- 向左对齐（-号数轴左边是负数，正常向右对齐）
   1. 默认：0x10
   2. 向左对齐：0x000010
-- 0 使用0补足位数，其他字符均不能补位，不产生效果
-- \# 输出字符类型的符号（8进制O，16进制Ox）
+- 0 使用 0 补足位数，其他字符均不能补位，不产生效果
+- \# 输出字符类型的符号（8进制0，16进制0x）
+- m.n：m位宽，算上点、负号、小数位，位数不够使用空补充；n小数位
 
 ``` c
 /*
@@ -55,6 +56,9 @@ printf("\n*s1=%-1s*", "ssssss6");// -号失效，直接输出sssss6
 
 // b为负数，输出-0023456，而不是00-23456
 printf("b=%+8ld\n", b);
+
+// 位宽输出
+printf("b=%10.4lf", -12345.6789);
 ```
 
 ### scanf-格式输入
@@ -159,6 +163,9 @@ putchar('\n');
 
 ### strlen-求字符串长度
 
+- strlen会一直数到 ‘\0’ 为止，从而计算字符个数，不包含 \0
+- 没有 ‘\0’ 则不会成功计算字符串的长度
+
 ```c
 /* 头文件 */
 #include <string.h>
@@ -167,8 +174,10 @@ putchar('\n');
 // strlen会一直数到 \0 为止，从而计算字符个数，不包含 \0
 char a[] = "Love";
 printf("%d", strlen(a)); 
+
+//不确定的个数，a中没有 \0 
 char a[] = {'1', '2'};
-printf("%d", strlen(a)); //不确定的个数，a中没有 \0 
+printf("%d", strlen(a)); 
 
 /* 返回 */
 // 无符号整型 unsigned int
@@ -178,13 +187,14 @@ strlen("abc") - strlen("abcde") > 0
 
 ### strcpy-字符串赋值
 
+- strcpy会以 \0 为拷贝的终止，包含‘\0’
+- 没有 ‘\0’ 出错 
+
 ```c
 /* 头文件 */
 #include <string.h>
 
 /* 定义 */
-//strcpy会以 \0 为拷贝的终止
-//会拷贝\0
 //将source指向的字符复制到destination指向的变量
 char *strcpy(char *destination, const char *source)
 
@@ -196,16 +206,15 @@ strcpy(a, "xxxxxx");
 /*错误1*/
 char a[] = {"1", "2"}
 strcpy(b, a);// 错误，a没有结束字符
+
 /*错误*/
 char *a = "xxxxx";
 strcpy(a, "ab");//a是常量不可修改
 ```
 
-#### 错误：C6054
+错误：C6054
 
-详情：可能没有为字符串"XXX"添加字符串零终止符的警告
-
-解决方案：
+> 详情：可能没有为字符串"XXX"添加字符串零终止符的警告
 
 ``` c
 // 方案1,在声明的时候初始化全为0, 
@@ -216,8 +225,6 @@ char B[10];
 scanf_s("%s", B, 10);
 B[9] = 0;
 ```
-
-
 
 ### strcat-字符串追加
 
@@ -484,8 +491,8 @@ void *memcpy(void * destination, const void *source, size_t num)
 // 使用
 int arr1[10] = {1,2,3,4,5,6,7,8}
 int arr2[10] = {0}
-//复制20字节，int 1个数4字节，20字节复制5个int
-memcpy(arr2, arr1, 20)；
+// 将arr1中2个字节的数据复制到arr2中
+memcpy(arr2, arr1, 2)；
 
 //arr中数据为{1,2,1,2,1,2,1,8}
 memcpy(arr+2, arr, 20)
