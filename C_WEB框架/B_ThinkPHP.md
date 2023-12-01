@@ -1,5 +1,7 @@
 # ThinkPHP6
 
+适用版本：ThinkPHP6.x
+
 ## 常用命令
 
 ### 下载安装
