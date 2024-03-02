@@ -164,11 +164,12 @@ git rm <file>
 ### 1、创建
 
 ```shell
+git branch # 查看当前所在分支
 git branch <name>  # 创建分支
 git branch - <name> # 删除分支
 
 git checkout <name> # 切换分支
-    git checkout -b <name> # 创建分支，并切换
+git checkout -b <name> # 创建分支，并切换
 
 git merge <name> # 合并指定分支
 ```
