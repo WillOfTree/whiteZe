@@ -1949,6 +1949,7 @@ struct Player{
     int a;
 };
 struct Player *p2; 
+
 p2->a = 100; //赋值
 printf("%d", p2->a); //访问
 ```
@@ -2208,7 +2209,8 @@ enum Name{
 }
 
 /* 使用 */
-enum Name A  //定义一个枚举变量A，A只能取name内定义的值
+enum Name A;  //定义一个枚举变量A，A只能取name内定义的值
+Name A; //也可这样定义
 A = ADD //正确
 A = 1000 // 错误，没有1000这个值
 //调用时直接用ADD

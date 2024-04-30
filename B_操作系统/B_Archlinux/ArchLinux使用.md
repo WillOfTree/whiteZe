@@ -692,7 +692,7 @@ qtcreator启动
 
 ### 二、使用代理服务
 
-#### 壹、clash for windows
+#### 壹、clash for Linux
 
 1. 下载
 

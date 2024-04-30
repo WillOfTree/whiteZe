@@ -403,11 +403,16 @@ location /chat {
 }
 ```
 
-### 三、反向代理
+### 三、正向代理
 
- 
+1. 客户端$\to$ 代理服务器$\to$ 服务器
 
-### 四、解析 PHP
+### 四、反向代理
+
+1. 服务器$\to$​ 服务器
+2. 负载均衡
+
+### 五、解析 PHP
 
 ``` nginx
 # 需要libxml2支持
@@ -439,7 +444,7 @@ location ~ *\.php$ {
 }
 ```
 
-### 五、配置解析url参数
+### 六、配置解析url参数
 
 ``` nginx
 #url：[https://abc.dc.com/image?url=https://vpic.v.com/1641213/p0685fxrwij.png](https://abc.dc.com/image?url=https://vpic.video.qq.com/1641213/p0685fxrwij.png)
