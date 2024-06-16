@@ -4,36 +4,41 @@
 
 ### 一、windows
 
-1. 安装Ruby；下载地址：[rubyinstaller.org](https://rubyinstaller.org/downloads/) 
+1. 下载安装Ruby：
 
-    ``` shell
-    # 使用默认选项安装后运行命令
-    ridk install
-    # 之后就不用安装RubyGames
-    # 附加选项必选则
-    MSYS2 and MINGW development tool chain
-    ```
+    下载地址1：[rubyinstaller.org](https://rubyinstaller.org/downloads/) 
 
-2. 【非必须】安装RubyGames；下载地址：[Download RubyGems](https://rubygems.org/pages/download) （选择zip下载即可）
+    选择Rudy+Devkit版本（带有MSYS2安装）
 
-    ``` shell
-    # 切换到RubyGames目录下运行命令
-    # 安装
-    ruby setup.rb        
-    ```
+    验证命令：`ruby -v` 
 
-3. 安装Jekyll（任意目录运行命令都可）
+    注意安装路径不能有空格（Program Files）有空格会出错误
 
-    ``` shell
-    # 安装jekyll和bundler
-    gem install jekyll bundler
-    # 查看jekyll版本号
-    jekyll -v    
-    ```
+    > ERROR:  Error installing jekyll:
+    > ERROR: Failed to build gem native extension.
 
-### 二、Linux
+2. 安装完成后，勾选`run Ridk install to setup MSYS2`
 
+    MSYS2选择：` MSYS2 and MINGW development toolchain` 
 
+    > 如果取消安装MSYS2，也可以在之后安装
+
+    - 使用命令：`ridk.cmd install` 
+    - ridk命令位置：`< Rudy >/bin/ridk.cmd` 
+
+3. 安装RubyGems（不知道什么用）
+
+    下载地址2：[Download RubyGems](https://rubygems.org/pages/download) （选择zip下载即可）
+
+4. 切换到RubyGems目录（不知道什么用）
+
+    运行命令：`ruby setup.rb` 
+
+    验证命令：`rubygems ruby -v`
+
+5. 安装Jekyll：`gem install jekyll bundler`
+
+6. 检验安装结果：`jekyll -v` 
 
 ## 使用方式
 
@@ -118,10 +123,10 @@ bundle exec jekyll serve --livereload
 ### 五、常用命令
 
 1. `jekyll build`：生成部署服务器的静态文件（这会使用_config.yml中url参数）
-2. `jekyll clean`：清除所有生成文件
-3. `jekyll new XXXX --blank` ：创建一个空白的 jekyll 站点
-4. `jekyll doctor`：输出配置的相关问题
-5. `bundle install`：在Gemfile中安装依赖
+2. `bundle install`：在Gemfile中安装依赖
+3. `jekyll clean`：清除所有生成文件
+4. `jekyll new XXXX --blank` ：创建一个空白的 jekyll 站点
+5. `jekyll doctor`：输出配置的相关问题
 6. `bundle exec jekyll serve` ：构建站点在本地服务器上（测试开发用）
 
 ## 功能使用
@@ -200,14 +205,19 @@ bundle exec jekyll serve --livereload
 
 ## 错误信息
 
-### cannot load such file – webrick (LoadError)
+> cannot load such file – webrick (LoadError)
 
-原因：我们的Ruby版本太高了，3.0.0以上版本需要运行
+- 原因：我们的Ruby版本太高了，3.0.0以上版本需要运行
+- 解决方法：`bundle add webrick` 
 
-解决方法：`bundle add webrick` 
+> Could not locate Gemfile
 
-### Could not locate Gemfile
+- 原因：缺少Gemfile文件
+- 解决方法：`bundle init`
 
-原因：缺少Gemfile文件
+> check_for_activated_spec!': You have already activated public_suffix 5.0.5, but your Gemfile requires public_suffix 5.0.1. Prepending `bundle exec` to your command may solve this. (Gem::LoadError)
+>
+> 使用`bundle exec jekyll serve` 可以正常启动
 
-解决方法：`bundle init`
+- 原因版本不统一
+- 解决方法：`bundle update` 

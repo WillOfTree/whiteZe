@@ -208,26 +208,38 @@ location ~* /(\d*)/(.*) {
 
 1. 配置nginx
 
-    ``` nginx
-    # 设置响应路径
-    # 访问路径 127.0.0.1/hello
-    location ~ /hello {
-        # 设置响应头-html
-        default_type text/html;
-        return 200 '1';
-        
-        # json
-      	default_type application/json;
-        return 200 '{"status":"success","result":"nginx json"}';
-        
-        # 添加响应头
-        add_header Content-type 'text/html; ssss';
-        add_header 自定义头类型名 '内容'
-        return 200;
-    }
-    ```
-
 2. 直接通过游览器访问即可
+
+``` nginx
+# 设置响应路径
+# 访问路径 127.0.0.1/hello
+location ~ /hello {
+    # 设置响应头-html
+    default_type text/html;
+    return 200 '1';
+}
+
+# 返回JSON文件
+location ~ /hello {
+    # json
+  	default_type application/json;
+    return 200 '{"status":"success","result":"nginx json"}';
+}
+
+# 添加响应头
+location ~ /hello {
+    # 特定格式的响应头
+    # 格式：add_header 格式类型 'text/html; 内容';
+    add_header Content-type 'text/html; TEST';
+    return 200;
+}
+location ~ /(.*).png {
+	# 添加自定义响应头
+    # 格式：add_header 自定义头类型名 '内容'
+    add_header TEST_MY 'CONTENT_$1';
+    return 200;
+}
+```
 
 
 ## 一般部署

@@ -1,0 +1,9 @@
+[configuration]
+# entry_symbol就是register_types.cpp中example_library_init函数名
+entry_symbol = "example_library_init"
+# Godot4.1版本以上必须有的参数
+compatibility_minimum = "4.1"
+    
+[libraries]
+# 步骤5生成的lib路径
+windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"

@@ -11,51 +11,33 @@
 | Repository    | 仓库区（或版本库），就是安全存放数据的位置，这里面有你提交到所有版本的数据。其中 HEAD 指向最新放入仓库的版本 |
 | Remote        | 远程仓库                                                      |
 
+## 分支说明
+
+| 名称    | 说明                |
+| ------- | ------------------- |
+| origin  | 源,远程服务器，默认 |
+| master  | 主分支              |
+| hotfix  | 修补bug             |
+| release | 发放版本            |
+| develop | 开发版本            |
+| feature | 功能版本            |
+
+## 回滚参数说明
+
+| 状态 | 说明              |
+| ---- | ----------------- |
+| HEAD | 最新版本          |
+| ~    | 上一个版本        |
+| ~n   | 上n个版本         |
+| ^    | 步数，一个^，一步 |
+
 ## 常用命令
 
-```shell
-git status # 查看工作状态
-git diff   # 查看修改
-git log    # 日志
-git log --decorate --all --oneline --graph
-```
+<img src="assets/A_Git使用/git操作命令.png"/>
 
-### 一、在github中创建项目
+## 常用功能
 
-1. New repository（创建新仓库）
-2. 填写仓库名称（repository name）
-3. 填写desscription（描述）【可不填】
-4. 默认选择public（公开），付费可选择private（私有）
-5. 是否添加readme文件【可不填】
-6. Create repository
-
-### 二、克隆远程项目
-
-1. 得到项目地址。
-2. 创建项目文件夹，进入项目文件夹。
-3. git clone 项目地址
-
-### 三、本地有项目
-
-1. 在本地创建项目文件
-2. Git init
-3. Git config user.email “邮箱地址”【配置邮箱地址】（也可以一开始就配置）
-4. Git add 文件名【添加文件】
-5. Git commit -m “记录”【添加日志】
-6. git remote add origin  github地址【向github添加文件】
-7. Git push origin master
-
-### 四、上传文件到github
-
-1. Git add README.md【添加readme文件】
-
-2. Git commit -m “xxxx” 【添加备注信息】
-
-3. git push -u origin master【上传文件】
-
-    -u 是下次不用填写origin master
-
-### 五、更新本地
+### 一、强制更新本地
 
 ``` shell
 #--- 
@@ -69,55 +51,11 @@ git fetch --all
 git reset --hard origin/master
 ```
 
-## 退回
+### 二、回滚
 
-### 1、回滚指针
 
-当向前滚动时，可使用 git checkout 将已经删除的文件生成
 
-**命令：**git reset [OPTION] [time]
-
-**参数：**OPTION
-
-```shell
---soft  # 移动 head 指针，不会改变 workspace 和 index 的内容
-
---mixed # 移动 head 指针，不会改变 workspace , 改变 index 内容, 默认
-
---hard  # 当前 head 指针、workspace 和 index 内容全部改变
-```
-
-**参数：**[time]
-
-| 状态   | 说明        |
-| ---- | --------- |
-| HEAD | 最新版本      |
-| \~   | 上一个版本     |
-| \~n  | 上n个版本     |
-| ^    | 步数，一个^，一步 |
-
-**例子**
-
-```shell
-git reset HEAD~ # 退回上一个版本
-git reset 版本号 文件名 # 回滚个别文件
-git reset 版本号 # 回到指定版本，版本号可略写
-```
-
-**回看版本**
-
-```shell
-git reflog
-```
-
-### 2、git checkout [OPTION| file]
-
-```shell
-git checkout .  # 用 index 内容覆盖 workspace 内容
-git checkout -- <file> # 用 index 内容覆盖 workspace 内容
-```
-
-## 版本比较
+### 三、版本比较
 
 命令：git diff [OPTION]
 
@@ -137,72 +75,28 @@ HEAD # workspace 与 Repository
 
 ```
 
-## 修改最后一次提交
+### 四、更新远程分支到本地
 
-```shell
-git commit --amend # 修改提交说明
-git commit --amend -m "xxx" # 修改提交说明
-```
+#### Ⅰ、直接克隆分支
 
-## 删除文件
+1. 克隆项目：`git clone -b <分支名> <项目路径>` 
+2. 查看分支：`git branch -a` 
 
-```shell
-git rm <file>
-```
+#### Ⅱ、通过fetch命令
 
-## 分支命令
+1. 克隆项目：`git clone <项目路径>` 
+2. 切换到项目路径下
+3. 拉取远程分支：`git fetch` 
+4. 切换到目标分支：`git checkout <分支名称>` 
+5.  查看分支：`git branch -a` 
 
-| 名称      | 说明         |
-| ------- | ---------- |
-| origin  | 源,远程服务器，默认 |
-| master  | 主分支        |
-| hotfix  | 修补bug      |
-| release | 发放版本       |
-| develop | 开发版本       |
-| feature | 功能版本       |
+#### Ⅲ、通过checkout命令
 
-### 1、创建
-
-```shell
-git branch # 查看当前所在分支
-git branch <name>  # 创建分支
-git branch - <name> # 删除分支
-
-git checkout <name> # 切换分支
-git checkout -b <name> # 创建分支，并切换
-
-git merge <name> # 合并指定分支
-```
-
-### 2、冲突
-
-git 会给冲突的文件标示冲突的位置
-
-> <<<<<<<<<< HEAD
-> 
-> 文件1冲突内容
-> 
-> ====
-> 文件2冲突内容
-> 
-> \>\>\>\>\>\>feature
-
-### 3、匿名分支
-
-内容不会被保存
-
-```shell
-git checkout HEAD~ # 会生成匿名分支，
-```
-
-## 创建github的个人页面
-
-1. 进入项目
-2. Setting【设置】
-3. GitHub Pages【github页面】
-4. Source选项下的master branch选项
-5. Save
-6. Source旁会出现一个github域名的url地址
+1. 克隆项目：`git clone <项目路径>` 
+2. 切换到项目路径下
+3. 拉取远程分支：`git checkout -b <本地分支名> <origin/远程分支名称>` 
+4. 下载分支代码：`git pull origin <分支名称>` 
+5.  查看分支：`git branch -a` 
 
 ## 使用SSH Key
 

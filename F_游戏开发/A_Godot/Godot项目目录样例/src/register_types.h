@@ -18,7 +18,7 @@ using namespace godot;
  */
 //void initialize_example_module(ModuleInitializationLevel p_level);
 //void uninitialize_example_module(ModuleInitializationLevel p_level);
-void initialize_tree_godot_module(ModuleInitializationLevel p_level);
-void uninitialize_tree_godot_module(ModuleInitializationLevel p_level);
+void initialize_example_module(ModuleInitializationLevel p_level);
+void uninitialize_example_module(ModuleInitializationLevel p_level);
 
 #endif // EXAMPLE_REGISTER_TYPES_H

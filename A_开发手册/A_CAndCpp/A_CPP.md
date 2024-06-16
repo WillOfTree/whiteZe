@@ -9,51 +9,37 @@
 
 ### 一、内存模型
 
-1、代码区：存放函数的二进制代码，由操作系统管理
-
-2、全局区：存放全局变量和静态变量以及常量
-
-- 全局变量、静态变量、常量区、字符串常量、const定义的常量
-
-3、栈区：由编译器自动分配释放，川航函数参数、局部变量
-
-4、堆区：程序员控制，程序结束自动释放
-
-- 使用new运算符
+1. 代码区：存放函数的二进制代码，由操作系统管理
+2. 全局区：存放全局变量和静态变量以及常量
+   - 全局变量、静态变量、常量区、字符串常量、const定义的常量
+3. 栈区：由编译器自动分配释放，川航函数参数、局部变量
+4. 堆区：程序员控制，程序结束自动释放
+   - 使用new运算符
 
 ### 二、引用（&）
 
 #### 1、引用的基本用法
 
-理解：给变量起别名，他们都指向同一块内存。
+- 理解：给变量起别名，他们都指向同一块内存，本质上使用的是指针。
 
-语法：数据类型 &别名 = 原名
+- 语法：数据类型 &别名 = 变量名| 数组名 |函数名
 
-① 普通变量引用
+  `int &a = b`：定义一个引用变量
 
 ``` c++
 int a = 100;
-// 相当于 int *b = &a;
-int &b = a; 
-// 修改b，a的值也修改，他们是同一块内存
-b = 20;
+int &b = a; // 相当于 int *b = &a;
+b = 20;// 修改b，a的值也修改，他们是同一块内存
 
 /* 错误引用 */ 
 // 引用必须是一个合法的空间
 int &b = 100;
-```
 
-② 数组引用
-
-``` c++
+/* 数组引用 */
 int a[10] = {0};
-//给数组起别名,arr指向a的空间
-int (&arr)[10] = a; 
-```
+int (&arr)[10] = a; //给数组起别名,arr指向a的空间
 
-③ 函数引用
-
-``` c++
+/* 函数引用 */
 int &cc = func(); //引用类型的函数
 ```
 
@@ -189,9 +175,9 @@ int main(int argc, const char * argv[]){
 }
 ```
 
-## 作用域
+### 四、作用域
 
-### 一、:: 运算符
+#### Ⅰ、:: 运算符
 
 - 作用域运算符
 - 子类调用父类方法的运算符
@@ -207,7 +193,7 @@ void function()
 }
 ```
 
-### 二、namespace关键字
+#### Ⅱ、namespace关键字
 
 - 使用命名空间，可以省略std::的书写
 - 不建议大面积使用，只在局部使用
@@ -233,7 +219,7 @@ int a; //相当于static int a;
 }
 ```
 
-### 三、using关键字
+#### Ⅲ、using关键字
 
 ``` c++
 //using编译指令
@@ -242,9 +228,9 @@ using namespace name
 using name 
 ```
 
-## 标准输入输出
+### 五、标准输入输出
 
-### 一、键盘输出cout
+#### Ⅰ、键盘输出cout
 
 ``` c++
 // 跳过回车，空格
@@ -271,7 +257,7 @@ cout.unsetf(ios::dec)
 cout.setf(ios::dec)
 ```
 
-### 二、键盘输入cin
+#### Ⅱ、键盘输入cin
 
 ``` c++
 // cin 输入设备，默认为键盘
@@ -297,9 +283,9 @@ char c = cin.get();
 cin.putback(c); 
 ```
 
-## New运算符
+### 六、New运算符
 
-### 一、创建空间
+#### Ⅰ、创建空间
 
 - 返回的是该类型的**指针**
 
@@ -315,7 +301,7 @@ int * func(){}
 int *p = func()
 ```
 
-### 二、删除空间
+#### Ⅱ、释放空间
 
 ```c++
 /* 普通变量 */ 
@@ -332,7 +318,7 @@ delete [] arr;
 delete arr[2];
 ```
 
-## string类型
+### 七、string类型
 
 参考STL $\to$ 二、string-字符串
 
@@ -497,138 +483,6 @@ class WorkManager{ ... }
 
 WorkManager *worker = new WorkManager();
 worker->print_title();
-```
-
-### 一、封装
-
-#### 1、分文件编写类
-
-①、创建类的头文件（NPC.h）
-
-``` c++
-#ifndef __xxx
-#define __xxx
-class NPC 
-{
-    // 构造和析构，必须在public下，或者什么都每没加的地方
-	NPC()；  //构造方法,与类名相同
-	~NPC()； //析构方法
-private:
-protected:
-public:
-    //成员属性
-	int Name；
-    //定义一个方法
-	void move(int a); 
-}
-#endif //宏定义
-```
-
-②、创建类的.cpp文件（NPC.cpp）
-
-``` c++
-// 引入头文件
-#include “NPC.h” 
-
-NPC::NPC(){} //实现构造方法
-NPC::~NPC(){ //析构方法
-	delete this->a; //释放空间a
-} 
-
-//::成员操作符
-void NPC::move(int a){ 
-	std::cout << “1”;
-}
-```
-
-③、在其他文件中使用类
-
-``` c++
-// 引入类的头文件
-#include “NPC.h”
-
-int main() {
-    /* 普通方法 */
-	NPC n1    // 实例化
-	n1.move(1) // 调用NPC类中的方法move
-	
-    /* 使用new方法创建类 */
-	NPC *n2；
-    // 为什么要用指针，因为new返回一个该类型的指针
-	n2 = new NPC() 
-    n2 = &n1     // 可以指向一个已经创建的对象
-        
-	/* 构造函数调用 */
-	NPC n3(1) //调用构造函数
-	NPC * n3 = new NPC(1)
-}
-```
-
-#### 2、类引用第三方类
-
-``` c++
-#ifndef __xxx
-#define __xxx
-// 第三方类
-class Rect{ ... } 
-// 引用的类
-class NPC 
-{
-    //引用另外的类
-	Rect * a; 
-}
-#endif //宏定义
-```
-
-#### 3、类的访问权限
-
-- public
-
-  方法，属性类外类内都可以使用
-
-- protected
-
-  方法、属性类内可以，类外不能访问
-
-  子类可以访问父类的protected方法
-
-- private
-
-  默认权限，方法、属性类内可以，类外不能访问
-
-  子类不可以访问父类的protected方法
-
-另外：静态方法，属性不属于类的对象
-
-``` c++
-class AA(){
-    static int m; //静态成员不属于类
-	static void func3(); //静态成员函数不属于对象
-}
-```
-
-#### 4、结构体和类的区别
-
-主要区别就是默认权限不同，struct默认为公共，class默认权限是私有
-
-#### 5、将成员属性设为私有
-
-优势：可以自己控制读写权限，可以检查数据的有效性
-
-``` c++
-class Person
-{
-// 设置属性权限为私有
-private:
-    string name;
-    int age;
-// 提供修改属性的公共方法
-public:
-    // 修改名称方法，类外调用
-    void fix_name(string a){
-        // 这里可以验证字符串是否符合要求
-    }
-}
 ```
 
 ### 二、对象特性
@@ -1249,31 +1103,109 @@ cout <<p <<p << endl;
 
 #### 6、函数运算符重载
 
-### 五、继承
+### 一、封装
 
-1. 父类子类中同名函数，优先调用父类中的函数
-2. 父类子类中同名函数，父类中是虚函数，则调用子类函数
+1. 类和结构体的区别就是默认权限不同，struct默认为公共，class默认权限是私有
 
-#### 1、基本语法
+#### 1、分文件编写类
 
-①、父类 base.h
+①、创建类的头文件（NPC.h）
 
 ``` c++
-class Base {}
+#ifndef __xxx
+#define __xxx
+class NPC 
+{
+    // 构造和析构，必须在public下，或者什么都每没加的地方
+	NPC()；  //构造方法,与类名相同
+	~NPC()； //析构方法
+private:
+protected:
+public:
+    //成员属性
+	int Name；
+    //定义一个方法
+	void move(int a); 
+}
+#endif //宏定义
 ```
 
-②、子类 
-
-继承方式：
-
-- public：父类的public、protected权限到子类中不变
-- protected：父类的public、protected到子类中都变protected权限
-- private：父类的public、protected到子类中权限都变为private
-- 父类的private权限不允许继承
+②、创建类的.cpp文件（NPC.cpp）
 
 ``` c++
-// 引入要父类的头文件
-#include “base.h” 
+// 引入头文件
+#include “NPC.h” 
+
+NPC::NPC(){} //实现构造方法
+NPC::~NPC(){ //析构方法
+	delete this->a; //释放空间a
+} 
+
+//::成员操作符
+void NPC::move(int a){ 
+	std::cout << “1”;
+}
+```
+
+③、在其他文件中使用类
+
+``` c++
+// 引入类的头文件
+#include “NPC.h”
+
+int main() {
+    /* 普通方法 */
+	NPC n1    // 实例化
+	n1.move(1) // 调用NPC类中的方法move
+	
+    /* 使用new方法创建类 */
+	NPC *n2；
+    // 为什么要用指针，因为new返回一个该类型的指针
+	n2 = new NPC() 
+    n2 = &n1     // 可以指向一个已经创建的对象
+        
+	/* 构造函数调用 */
+	NPC n3(1) //调用构造函数
+	NPC * n3 = new NPC(1)
+}
+```
+
+#### 2、类引用第三方类
+
+``` c++
+#ifndef __xxx
+#define __xxx
+// 第三方类
+class Rect{ ... } 
+// 引用的类
+class NPC 
+{
+    //引用另外的类
+	Rect * a; 
+}
+#endif //宏定义
+```
+
+### 五、继承
+
+1. 父类的private权限不允许继承
+
+   ```c++
+   class Base {
+   private:
+       int a;//不允许继承
+   } 
+   ```
+
+2. 构造先创建父类，再构造子类
+
+3. 析构先析构子类，再析构父类
+
+#### Ⅰ、基本语法
+
+``` c++
+// 父类
+class Base {}
 // 继承base类，默认是private继承
 class chile : Base {} 
 // 继承多个父类,Base、Base2
@@ -1281,46 +1213,34 @@ class chile : Base, Base2 {}
 
 /* 继承方式 */
 // 公众继承
-class chile : public Base {} 
 // Base中的类public protected private不变
-class chile : protected Base {} //保护继承
+class chile : public Base {} 
+
 // Base中的public 变为 protected
-class chile : private Base {} //父类属性变为private
+class chile : protected Base {} //保护继承
+
 // Base中的private protected变为private
+class chile : private Base {} //父类属性变为private
 ```
 
-#### 2、调用父类构造函数
+#### Ⅱ、父类构造函数
 
 ``` c++
 class Base{
-    int s;
-    Base(int a){}
+    Base(){}
 }
-
+// 调用父类构造函数
 class Son:public Base{
-    int s;
-    Son(int a) : Base(a){} //调用父类构造函数
+    Son() : Base(){
+        
+    } 
 }
 ```
 
-#### 3、继承中的对象模型
+#### Ⅲ、同名函数
 
-父类中的所有非静态成员属性都会被子类继承，但private权限的属性被编译器隐藏了
-
-``` shell
-# 查看类的分布图
-# 打开开发人员命令提示工具查看对象模型
-cl /d1 reportSingleClassLayout类名 文件名
-```
-
-#### 3、继承构造析构顺序
-
-- 构造先创建父类，再构造子类
-- 析构先析构子类，再析构父类
-
-#### 4、继承同名函数
-
-- 访问子类同名成员，直接访问即可
+- 函数还是参数都符合就近原则
+- 父类中是虚函数，则调用子类函数
 - 访问父类同名成员，需要添加作用域
 
 ``` c++
@@ -1332,17 +1252,16 @@ class son:public base {
     void func(){ ... }
 }
 
-// 创建一个类
 son s1;
-// 默认调用子类中的属性，
+// 默认调用子类中的属性、方法，
 // 子类会隐藏掉所有的同名函数（父类重载的函数都不会被调用）
-// 要想调用父类的重载函数，需要添加作用域
 s1.func(); 
-// 想调用父类的方法需要添加作用域,调用父类Base中的属性
+
+/* 调用父类的方法需要添加作用域,调用父类Base中的属性 */ 
 s1.Base::func();
 ```
 
-#### 5、同名静态成员
+#### Ⅳ、同名静态成员
 
 ``` c++
 class Base{
@@ -1369,192 +1288,203 @@ son::m_A; //不用初始化对象
 son::Base::m_A //通过子类的父类访问
 ```
 
-#### 6、多继承
+#### Ⅴ、父类存放子类
 
-实际开发中不见时使用多继承，因为会有父类函数重名的危险
+- 使用父类定义对象A，A可以存放其子类变量
 
-``` c++
-class Base1{}
-class Base2{}
-// 多继承写法
-class son: public Base1, public Base2{
-public:
-	static int m_A;    
-}
-```
+  ``` c++
+  class Animal{}; // 父类
+  class A: public Animal{}; // 子类
+  
+  /* 使用指针方式 */
+  // an 可用存放子类A
+  void dospeak(Animal * an){
+      an->speak();
+  }
+  
+  /* 使用引用方式 */
+  // 注意：
+  //    因为使用了&animal定义，可传入地址或变量
+  //    若不满足多态条件，只会调用父类的speak方法
+  void dospeak(Animal & an){
+  	an.speak(); 
+  }
+  ```
 
-#### 7、菱形继承
+- 父类指针被子类对象初始化，反之不对
 
-解决方法：使用作用域
-
-### 六、多态（虚函数）
-
-多态分为2类，一是静态多态和动态多态
-
-- 静态多态：函数重载、运算符重载、函数名复用
-- 动态多态：派生类、虚函数
-
-静态多态和动态多态的区别
-
-- 静态多态的函数地址-编译的时候确定
-- 动态多态的函数地址-运行的时候确定
-
-#### 1、多态的基本语法
-
-多态满足条件：
-
-- 必须有继承关系
-- 子类必须重写父类的虚函数（注意，重写是完全相同）
-
-##### 地址早绑定
-
-无法实现多态，样例
+  即：父类定义的变量，可以存放子类对象
+  
+- 注意：**这种情况只能调用父类中的方法**，调用子类中的方法需要用虚函数
 
 ``` c++
 class Animal {
-	void speak(){ printf("动物在说话") }
+    void set_value();
 }
 
-class A:public Animal{
-    // 重写了父类的speak
-	void speak() { printf("A在说话") }
+class A: public Animal {
+    void set_value();
 }
 
-// 这里是已经与Animal类绑定的，不能修改
-void dospeak(Animal & animal){
-	animal.speak(); 
-}
+/* 调用子类A */
+// An可存放子类A
+Animal *An = new A(); 
+An->set_value(); // 调用Animal中的方法
+Animal *An = new Animal();
+An->set_value(); // 调用Animal中的方法
 
-int main(){
-	A cat;
-    // 这里打印的是,动物在说话
-	dospeak(cat)
-}
+/* 另一种写法 */
+A a;
+Animal *An = &a;
+An->set_value();
+
+/* 错误 */
+A *a = new Animal();
 ```
 
-##### 地址晚绑定
+### 六、多态
 
-多态，样例
+1. 多态分为2类，一是静态多态和动态多态
+   - 静态多态：函数重载、运算符重载、函数名复用
+   - 动态多态：派生类、虚函数 
+
+2. 静态多态和动态多态的区别
+   - 静态多态的函数地址-编译的时候确定
+   - 动态多态的函数地址-运行的时候确定
+
+3. 注意：
+
+   在其他语言中例如python，php中他们的变量并没有类型，从而，天然可以使用多态
+
+   而在C/C++中不同的类需要不同的类定义，即使，而使用多态，就可以实现一个类的定义，可以调用不同类中的同名方法（父类和子类中的同名方法，使用父类定义）
+
+4. 总结：一般规律
+
+   存在virtual关键字：
+
+   `A *p = new B();` p指向的是B类，p调用的方法都是B类的
+
+   不存在virtual关键字：就近原则，看指针类型
+
+   `A *p = new B();` p指向的是A类，P调用的方法都是A类的
+
+#### Ⅰ、虚函数
+
+- 构造函数没有虚函数，析构函数有虚函数
+- **注意：**
+  1. 虚函数中父类虚函数默认方法，需要实现，若不需要实现，可以考虑纯虚函数
 
 ``` c++
-class Animal {
-    // 这个函数就是虚函数
-    // 这个函数可以被其他同名函数替代
-	virtual int speak(){ printf("动物在说话") }
+/* 类的定义 */
+class Animal { // 父类
+	virtual void speak(){ 
+        printf("动物在说话");
+    }
 }
 
-class A:public Animal{
-	int speak(){ printf("A在说话")}
+class A:public Animal{ //子类
+	void speak() { 
+        printf("A在说话");
+    }
 }
 
-// 使用，父类的指针或引用执行子类的对象
-void dospeak(Animal& animal){
-	animal.speak(); 
-}
-
-int main(){
-    // 可以理解为cat是参数
-	A cat;
-    // 调用的是Animal中的speak方法，打印的却是cat中的speak方法
-	dospeak(cat)
-}
+/* 调用方法 */
+// 若父类没有virtual，则只能调用父类中的方法
+Animal *An = new Animal();
+An->speak(); // 调用父类Animal中方法
+Animal *An = new A();
+An->speak(); // 调用子类A中方法
 ```
 
-##### 多态使用，样例三
+#### Ⅱ、父类中调用子类方法
 
 ``` c++
+/* father.h文件中 */
+// 父类中声明子类已定义
+class son;
+class father{}
+
+/* father.cpp文件中*/
+// 引入子类头文件
+#include "son.h"
+```
+
+
+
+#### Ⅲ、抽象类
+
+1. 只要类中含有一个纯虚函数，那么这个类就是抽象类。
+
+2. 父类不能使用`new`出新对象，子类可以使用`new`出新对象
+
+   ``` c++
+   class Animal{}; // 纯虚函数
+   class Cat: public Animal{}; // 子类
+   
+   /* 纯虚函数不能创建对象 */
+   Animal A; //错误
+   Animal *A = new Animal(); //错误
+   ```
+
+3. 抽象类特点：
+   - 无法实例化对象，不能创建对象，但可以创建类指针 
+   - 子类必须重写抽象类中的纯虚函数，否则子类也是抽象类
+   - 抽象类只用`.h`文件即可，不需要`.cpp`文件
+   - 特点：必须有 `virtual`与`=0` 
+
+``` c++
+/* 类的定义 */
+// 纯虚函数的类，简单理解为接口文件（Animal接口类）
 class Animal {
-	virtual int speak()=0;
+	virtual int speak()=0; // 纯虚函数
 }
 
 class cat:public Animal{
 	int speak(){ printf("A在说话") }
 }
 
-int main(){
-    Animal *A = new cat();
-    // 打印的都是cat中的方法
-    A->speak();
-}
+/* 纯虚函数调用-接口 */
+Animal *A  = new cat();
+A->speak();
+// 其他调用
+cat c;
+c.speak();
 ```
 
-#### 2、多态的原理
+#### Ⅲ、虚析构
 
-待补充
-
-#### 3、抽象类（纯虚函数）
-
-只要类中含有一个纯虚函数，那么这个类就是抽象类。抽象类特点
-
-- 无法实例化对象
-- 子类必须重写抽象类中的纯虚函数，否则子类也是抽象类
-- 抽象类只用.h文件即可，不需要.cpp文件
-- 特点：必须有 virtual与=0
-
-##### 多文件结构
-
-纯虚函数定义.h文件，不需要.cpp文件
+- 在使用多态的时候，父类指针无法调用子类的的析构函数
+- 父类指针被子类初始化，调用析构方法时只会调用父类析构函数
+- 使用虚析构函数，就可解决没有调用子类析构函数的问题
 
 ``` c++
-class NPC {
-    // 纯虚函数，子类必须实现
-    virtual void fire(int a) =0; 
-}
-```
+/* 虚析构的定义 */
+class Animal {
+    virtual ~Animal(){ ... }
+} 
 
-继承虚函数，其他.cpp文件
-
-``` c++
-#include "func.h"
-// One.h 文件
-class One:public NPC {
-    // 重写虚函数，virtual可以写也可以不写
-    /*
-    void fire(int a); 等价于virtual void fire(int a);
-    */ 
-    virtual void fire(int a);
-    
-}    
-// One.cpp文件，实现虚函数
-virtual One::fire(){
-    ...
+/* 使用虚构函数 */
+class Cat:public Animal {
+    // 使用了虚析构，子类父类的析构函数都会被调用
+	~Cat()
 }
 
-/* 调用 */
-One o1;
-o1.fire(1);
+/* 
+发生问题原因：
+创建的是父类的指针animal,释放的也是父类animal,而我们则是利用多态创建的子类cat，调用的也是子类cat中的speak方法，而没有释放掉子类cat中的堆空间
+*/
+Animal * animal = new Cat(); 
+delete animal; 
 ```
 
-##### 单文件结构
-
-``` c++
-class One:public NPC {
-    // 使用，必须重写类中的纯虚函数
-    void fire(int a){
-        ....
-    }
-}
-
-/* 调用 */
-One o1;
-o1.fire(1);
-```
-
-#### 4、虚析构和纯虚析构
-
-在使用多态的时候，父类指针无法调用子类的的析构函数
+#### Ⅳ、纯析构函数
 
 ``` c++
 /* 纯虚析构的定义 */
 class Animal {
-    // 方式一、虚析构必须实现
-    // virtual ~Animal(){ ... }
-    
-    // 方式二、必须定义，定义虚构函数后，让子类重写
+    // 必须定义，定义虚构函数后，让子类重写
     // 这样子类析构的时候，就会调用子类的析构函数
 	virtual ~Animal() = 0;
-    // 父类虚函数，不重要
-    virtual void speak()=0;
 } 
 
 // 纯虚析构，需要在内中声明，在类外实现
@@ -1590,15 +1520,32 @@ Animal->speak();
 delete animal;
 ```
 
-#### 5、多态的应用
+#### Ⅴ、override和final
 
-（1）、将不同类型的指针放到同一个数组中（使用父类的指针，子类是不同的）
+- override：说明重写父类方法，若父类没有此虚函数，则会报错
+- final：最终方法，无法被继承
 
-![](assets/3_C++语言程序设计/231503.png)
+``` c++
+/* final */
+class A final { //类无法被继承
+    virtual void fun();
+}
 
-使用时需要二级指针：`worker **k = new worker *[5]` 
+class A { //类无法被继承
+    void fun() final; // 方法无法被继承
+}
 
-- 注意这里与数组指针的意思不同不能混淆，这里是创建5个worker\*指针类型的数组。
+/* override */
+class A {
+    virtual void fun();
+}
+class B:public A{
+    virtual void cc() override; //错误，父类没有此方法
+    virtual void fun() override; //正确
+}
+```
+
+
 
 ## 文件操作
 
