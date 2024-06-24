@@ -3,11 +3,14 @@
 ## 概述
 
 - 版本：4.21
+- 基于C++
 - GDExtension不支持Godot4以下的版本
 
-### 一、C++环境配置
+## 开发环境配置
 
-windows版本的dll文件生成：
+### 一、win-SCons配置
+
+#### Ⅰ、环境配置
 
 1. 下载Godot可执行文件
 
@@ -21,124 +24,141 @@ windows版本的dll文件生成：
 
 4. 使用python安装SCons
 
-    SCons是由python编写的自动化构建工具
+    > SCons是由python编写的自动化构建工具
 
-    `pip install SCons` 
+    安装命令：`pip install SCons`  
+    
+5. 下载C++编译环境
 
-5. 创建windows静态链接库（.lib）
+#### Ⅱ、新建项目目录
 
-    1. 切换到Godot-cpp源代码目录下运行cmd
+```shell
+# 项目根目录
+ ├─ demo `Godot项目目录`
+ │  └─bin `dll文件目录` 
+ │     └─example.gdextension #扩展启动文件
+ |
+ ├─Godot-cpp `Godot源码目录`
+ ├─src `C++代码目录` 
+ │  ├─register_types.cpp # 注册文件
+ │  ├─register_types.h   # 注册文件
+ │  ├─test.cpp # 开发代码
+ │  └─test.h   # 开发代码
+ └─SConstruct  # SCons构建脚本
+```
 
-    2. 运行命令
+#### Ⅲ、生成静态链接库（.lib）
 
-        ``` shell
-        # 默认去寻找VS的编译环境，找不到会寻找MinGW的编译环境
-        scons platform=windows  
-        # 多线程编译-推荐编译的快-6是6核应与CPU核心相同
-        scons -j6 platform=windows  
-        scons -j6
-        
-        #-- 用不到的命令
-        # 强制使用mingw编译
-        scons platform=windows use_mingw=yes 
-        # 软件是64位还是32位置，bits=64 或者 bits=32
-        scons platform=windows bits=32        
-        ```
+1. PASS，不需要静态链接库，只需要动态链接库即可
 
-    3. 生成的文件目录为：Godot-cpp/bin/
+2. 切换到 `Godot-cpp目录` 
 
-6. 新建项目目录：
+3. 运行`cmd` 
 
-    - `Test`：项目根目录
-    - `Test/gdextension` 
-    - `Test/libgodot.debug.x86_64.lib`：步骤5生成的静态连接库
-    - `Test/gdextension/godot-cpp`：Godot源码
-    - `Test/gdextension/SConstruct`：SCons构建脚本
-    - `Test/gdextension/src`：自定义编写的c++代码位置
-    - `Test/gdextension/src/register_types.h`：复制Godot/test/src/register_types.h文件
-    - `Test/gdextension/src/register_types.cpp`：复制Godot/test/src/register_types.cpp文件
+4. 运行命令
 
-7. 编写SCons脚本：参考SConstruct注释
+   默认生成的文件目录为：`Godot-cpp/bin/xxxxxx.lib` 
 
-    默认dll生成位置为SConstruct文件的上级目录
+``` shell
+# 推荐
+# 多线程编译-6是6核应与CPU核心相同
+SCons -j6 platform=windows  
 
-8. 编写C++代码：
+# 默认去寻找VS的编译环境，找不到会寻找MinGW的编译环境
+scons platform=windows  
+
+#-- 用不到的命令
+# 强制使用mingw编译
+scons platform=windows use_mingw=yes 
+# 软件是64位还是32位置，bits=64 或者 bits=32
+scons platform=windows bits=32        
+```
+
+#### Ⅳ、生成动态链接库（.dll）
+
+1. 编写SCons脚本：参考SConstruct注释
+
+2. 编写C++代码：
 
     可参考：代码编写 $\to$ 一、C++ $\to$  Ⅰ、Hello world
 
-9. 注册C++代码：
+3. 注册C++代码：
 
     参考register_types.h与register_types.cpp注释
 
-10. 使用SCons编译，生成共享库 .dll 文件：
+4. 使用SCons编译，生成共享库 .dll 文件：
 
-     切换到目录：`Test/gdextension` <SConstruct文件所在目录>
+     切换到目录：SConstruct文件所在目录
 
-     运行命令：`SCons -Q` 
+     运行命令：`SCons -j6 -Q platform=windows`  
 
-11. 使用Godot创建新工程A
+#### Ⅴ、修改.gdextension
 
-12. 在A新工程根目录下创建example.gdextension文件：
+1. 复制生成的.dll文件到example.gdextension文件指定的位置
+2. example.gdextension名字可以修改；后缀.gdextension不可修改
+3. 可参考文件：
+   - `godot-cpp/test/example.gdextension` 
+   - `godot-cpp/test/project/example.gdextension` 
 
-     example.gdextension名字可以修改；.gdextension不可修改
+``` shell
+[configuration]
+# entry_symbol就是register_types.cpp中example_library_init函数名
+entry_symbol = "example_library_init"
+# Godot4.1版本以上必须有的参数
+compatibility_minimum = "4.1"
 
-     可参考文件：
+[libraries]
+# 步骤5生成的lib路径
+windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
+```
 
-     - `Test/gdextension/godot-cpp/test/example.gdextension` 
-     - `Test/gdextension/godot-cpp/test/project/example.gdextension` 
+### 二、win-cmake
 
-     ``` shell
-     [configuration]
-     # entry_symbol就是register_types.cpp中example_library_init函数名
-     entry_symbol = "example_library_init"
-     # Godot4.1版本以上必须有的参数
-     compatibility_minimum = "4.1"
-         
-     [libraries]
-     # 步骤5生成的lib路径
-     windows.debug.x86_64 = "res://libgodot.debug.x86_64.dll"
-     ```
+#### Ⅰ、环境配置
+1. 下载Godot可执行文件
 
-13. 复制“步骤11”生成的.dll文件到example.gdextension文件指定的位置
+   注意：Godot可执行文件版本要与godot-cpp版本相同
 
-14. 使用Godot$\to$​ 创建node 即可找到test节点
+2. 下载Godot-cpp源文件：[godot-cpp](https://github.com/godotengine/godot-cpp) 
 
-### 二、extension配置
+   注意：godot-cpp版本要与Godot可执行文件版本相同
+
+3. 下载Visual Studio，安装
+
+   因为Visual Studio自带编译环境，简单容易
+
+#### Ⅱ、新建项目目录
+
+```shell
+# 项目根目录
+ ├─ demo `Godot项目目录`
+ │   └─bin `dll文件目录` 
+ │     └─example.gdextension #扩展启动文件
+ |
+ ├─ Godot-cpp `Godot源码目录`
+ ├─ src `C++代码目录` 
+ |   ├─ CMakeLists.txt  # CMake构建文件
+ │   ├─ register_types.cpp # 注册文件
+ │   ├─ register_types.h   # 注册文件
+ │   ├─ test.cpp # 开发代码
+ │   └─ test.h   # 开发代码
+ └─ CMakeLists.txt  # CMake构建文件
+```
+
+### 三、extension配置
 
 1. `.gdextension`与`.dll`文件是一一对应关系
 2. c++语言的注册文件中，函数名应是在项目中独一无二的
 
-### 三、vscode配置
-
-#### Ⅰ、目录结构
-
-根目录 （官方推荐结构）
-├─.vscode `VScode配置文件目录`
-├─demo `Godot项目目录`
-│  └─bin `dll文件目录` 
-│         └─example.gdextension
-├─godot-cpp `Godot源码目录`
-├─src `C++代码目录` 
-│    ├─register_types.cpp
-│    ├─register_types.h
-│    ├─test.cpp
-│    └─test.h
-└─SConstruct
-
-#### Ⅱ、修改配置文件
-
-1. 安装插件：codeLLDB
-2. 查看launch.json、task.json
-
-#### Ⅲ、配置
+### 四、vscode配置
 
 1. 安装vscode的C/C++扩展
 
-2. 安装GCC编译器（配置编译器路径，若是没有提示）
+2. 安装LLDB扩展（CodeLLDB）
 
-   [Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases)
+3. 安装GCC编译器（配置编译器路径，若是没有提示）
 
-3. 安装LLDB扩展（CodeLLDB）
+   [Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
 
 4. 创建task.json文件
 
@@ -185,29 +205,7 @@ windows版本的dll文件生成：
 
 6. 下断点，调试项目
 
-### 四、像素游戏配置
-
-1. 画面放大3倍
-
-    - 设置窗口
-
-      视口高度：1152/3=384
-
-      视口宽度：648/3=216
-
-    - 打开高级模式
-
-      窗口宽度覆盖：1152
-
-      窗口高度覆盖：648
-
-2. 拉伸模式：canvas_items
-
-3. 画面模糊
-
-    $项目\to 通用(General)\to Rendering\to Default Texture Filter:Nearest$ 
-
-### 五、常见错误
+## 常见错误 
 
 > register_types.windows.template_debug.x86_64.obj : error LNK2019: 无法解析的外部符号 "private: \_\_cdecl Test::Test(void)" (??0Test@@AEAA@XZ)，函数 "private: static void * \_\_cdecl godot::ClassDB::_create_instance_func<class Test>(void *)" (??$_create_instance_func@VTest@@@ClassDB@godot@@CAPEAXPEAX@Z) 中引用了该符号
 > demo\bin\libcpp.dll : fatal error LNK1120: 1 个无法解析的外部命令
@@ -236,6 +234,39 @@ windows版本的dll文件生成：
 - 安装GCC ，[Win7 / Win10 下 msys64 安装 MinGW-w64 工具链 - Milton - 博客园 (cnblogs.com)](https://www.cnblogs.com/milton/p/11808091.html)
 
 - 验证GCC，gcc -v
+
+### 常见错误
+
+> error C2504: “\*\*\*\*”: 未定义基类
+
+- 
+
+> 父类：father.h；子类:child.h；
+
+1. 在father.h文件中声明`class child;`
+2. 在father.cpp中引入头文件：`#include "child.h"` 
+
+> 成功编译，但编译后子类不存在节点中
+
+- `register.cpp`中要保证，父类在子类前面进行注册
+
+> error LNK2001: 无法解析的外部符号 "public: virtual void __cdecl TFSC::initiazlie(void)" (?initiazlie@TFSC@@UEAAXXZ)
+
+- 若是在使用多态的时候出现错误，父类虚函数没有默认方法
+
+> error C2039: "speak": 不是 "TMOVESTATE" 的成员
+
+- 子类不能写virtual关键字
+
+> 节点未找到
+
+- 由于Godot的节点加载顺序
+
+> error C2065: “TFSCINTERFACE”: 未声明的标识符
+>
+> error C2027: 使用了未定义类型“TMOVESTATE”
+
+- 检测头文件的引用顺序
 
 ## 游戏框架设计
 
@@ -304,12 +335,90 @@ windows版本的dll文件生成：
 
 ```
 
+### 像素游戏配置
 
+1. 画面放大3倍
+
+    - 设置窗口
+
+      视口高度：1152/3=384
+
+      视口宽度：648/3=216
+
+    - 打开高级模式
+
+      窗口宽度覆盖：1152
+
+      窗口高度覆盖：648
+
+2. 拉伸模式：canvas_items
+
+3. 画面模糊
+
+   $项目\to 通用(General)\to Rendering\to Default Texture Filter:Nearest$ 
 
 ## 生命周期
 
 1. `_ready`方法，优先初始化子类，再初始化父类
 2. 其他生命周期方法，都是优先运行父类再运行子类
+
+1. C++的方法与GD脚本的方法函数名相同
+2. 方法写在public下
+
+``` c++
+public:
+/* 节点添加到节点树时调用
+ * 每一个节点加入树都会调用
+ */ 
+void _EnterTree();
+
+/* 所有节点加载完成后调用
+ * 从最后一个节点的Ready方法依次调用
+ * 初始化一般写在这里
+ */
+void _Ready(); 
+
+/* 每一帧都调用这个方法
+ * delta：帧与帧间隔的时间
+ */ 
+void _Process(double delta); 
+
+/* 物理计算一次调用
+ * 一般调用物理引擎时使用
+ */
+void _physicProcess(double delta);
+void _exitTree(); //节点销毁调用
+/* 只要键盘或鼠标按动，就触发当前方法 */
+void _input(const Ref<InputEvent> &event);//输入按键调用
+```
+
+
+
+- Node节点的方法
+
+- 选哟虚拟键位的映射
+
+- _process每一帧都运行；delta = 1/帧数
+
+  移动距离$\times$delta可以使移动距离与帧率无关；1$\times$delta可以简单理解为每秒移动1像素
+
+``` c++
+void T_AudioStreamPlayer::_input(const Ref<InputEvent> &event){
+    //UtilityFunctions::print("_input");
+	// 判断p是否按下
+    if(event->is_action_pressed("p")){
+        UtilityFunctions::print("stop");
+    }  
+    //C++示例方法，转换inputevent
+    const InputEventKey *key_event = Object::cast_to<const InputEventKey>(*event);
+    
+}
+
+/* _unhandled_key_input */
+void T_CharacterBody2D::_unhandled_key_input(const Ref<InputEvent> &event){}
+```
+
+
 
 ## 特殊节点说明
 
@@ -328,10 +437,10 @@ windows版本的dll文件生成：
 1. Ref<>类可以直接使用
 
 ``` c++
+
 ```
 
-
-
+## 节点说明
 1. Sprited2D：主要用于图片显示
 2. Node：可以用于代码逻辑编写
 3. AnimatedSprite2D：用于动画播放，简单物品动画
@@ -642,6 +751,8 @@ float y = r->randf_range(-1, 1);
 2. 遮罩（Collision/Mask）：碰撞层级（物理碰撞）
 
 ``` c++
+ // Array[Area2D] get_overlapping_areas()
+ // Array[Node2D] get_overlapping_bodies()
 ```
 
 攻击框
@@ -672,30 +783,44 @@ UtilityFunctions::type_convert(const Variant &variant, int64_t type);
 
 ### 十二、Node
 
-1. 大部分节点的父节点，Node的方法一般可用直接使用
+1. Node节点是大部分节点的父节点，所以Node的方法一般可用直接使用
 
 2. 注意：
 
-    节点操作都应在_ready之后的生命周期使用
+    - 节点操作都应在_ready之后的生命周期使用
 
-    get_node()中必须是“”，若是‘’，则会发生未知错误
+    - `get_node()`中必须是`“”`，若是`‘’`，则会发生未知错误
+
+#### Ⅰ、获取向量
 
 ``` c++
 /* 设置位置坐标 */ 
-// 获取当前位置
+// 获取当前位置，相对与父节点
 // Node中的方法
 Vector2 p = get_position();
 /* 获取当前向量速度 */ 
 vector2 a = get_velocity();
 
-/* 查找节点 */
+// 全局节点
+Vector2 p = get_global_position();
+```
+
+#### Ⅱ、查找结点
+
+1. 使用 `%` 标注场景内唯一节点，可以不写路径就可查找到节点（只写节点名即可）
+2. 函数方法：get_node<节点类型>(" 路径"); 
+
+``` c++
+/* 获取子节点 */
 // 只能获取子节点,不能得到父节点
 get_node<Node>("xx");
 // 通过相对路径，可以获取子节点的子节点
-get_node<Node>("xxx/vvv");  
-// 获取父节点
+get_node<Node>("xxx/vvv"); 
+
+/* 获取父节点 */ 
 get_node<Node>("..");
 get_parent();
+
 // find_child会对节点进行遍历，太多节点会影响速度
 Node *c0 = find_child("Test");
 
@@ -712,6 +837,16 @@ get_child("节点序号");
 c0->queue_free();
 ```
 
+Ⅲ、节点其他操作
+
+``` c++
+// 旋转该节点，使其指向 point，该点应使用全局坐标。
+// point:vector2类型
+void look_at(point)
+
+
+```
+
 ### 十三、SceneTree
 
 1. 头节点：`#include <godot_cpp/classes/scene_tree.hpp>`
@@ -725,7 +860,7 @@ Node *root = Node::get_tree()->get_current_scene();
 // 方法2
 SceneTree *r = Node::get_tree();
 Node *root = r->get_current_scene();
-//
+// 方法3
 SceneTree::get_singleton()->initialize();
 ```
 
@@ -877,63 +1012,6 @@ Test::Test(){
 Test::~Test(){
     UtilityFunctions::print("bye");
 }
-```
-
-### 二、生命周期
-
-- 不好用
-
-- Node节点的方法
-
-- 选哟虚拟键位的映射
-
-- _process每一帧都运行；delta = 1/帧数
-
-  移动距离$\times$delta可以使移动距离与帧率无关；1$\times$delta可以简单理解为每秒移动1像素
-
-``` c++
-void T_AudioStreamPlayer::_input(const Ref<InputEvent> &event){
-    //UtilityFunctions::print("_input");
-	// 判断p是否按下
-    if(event->is_action_pressed("p")){
-        UtilityFunctions::print("stop");
-    }  
-    //C++示例方法，转换inputevent
-    const InputEventKey *key_event = Object::cast_to<const InputEventKey>(*event);
-    
-}
-
-/* _unhandled_key_input */
-void T_CharacterBody2D::_unhandled_key_input(const Ref<InputEvent> &event){}
-```
-
-
-
-- 本身是Node节点的属性
-
-``` c++
-public:
-// C++的方法与GD脚本的方法函数名相同
-/* 节点添加到节点树时调用
- * 每一个节点加入树都会调用
- */ 
-void _EnterTree();
-/* 所有节点加载完成后调用
- * 从最后一个节点的Ready方法依次调用
- * 初始化一般写在这里
- */
-void _Ready(); 
-/* 每一帧都调用这个方法
- * delta：帧与帧间隔的时间
- */ 
-void _Process(double delta); 
-/* 物理计算一次调用
- * 一般调用物理引擎时使用
- */
-void _physicProcess(double delta);
-void _exitTree(); //节点销毁调用
-/* 只要键盘或鼠标按动，就触发当前方法 */
-void _input(const Ref<InputEvent> &event);//输入按键调用
 ```
 
 ### 三、绑定方法
@@ -1517,39 +1595,6 @@ _player = get_node<Player>("Player");
 _player->set_movement_limit(_scene_size);
 
 ```
-
-### 常见错误
-
-> error C2504: “\*\*\*\*”: 未定义基类
-
-- 
-
-> 父类：father.h；子类:child.h；
-
-1. 在father.h文件中声明`class child;`
-2. 在father.cpp中引入头文件：`#include "child.h"` 
-
-> 成功编译，但编译后子类不存在节点中
-
-- `register.cpp`中要保证，父类在子类前面进行注册
-
-> error LNK2001: 无法解析的外部符号 "public: virtual void __cdecl TFSC::initiazlie(void)" (?initiazlie@TFSC@@UEAAXXZ)
-
-- 若是在使用多态的时候出现错误，父类虚函数没有默认方法
-
-> error C2039: "speak": 不是 "TMOVESTATE" 的成员
-
-- 子类不能写virtual关键字
-
-> 节点未找到
-
-- 由于Godot的节点加载顺序
-
-> error C2065: “TFSCINTERFACE”: 未声明的标识符
->
-> error C2027: 使用了未定义类型“TMOVESTATE”
-
-- 检测头文件的引用顺序
 
 ### 场景继承
 
