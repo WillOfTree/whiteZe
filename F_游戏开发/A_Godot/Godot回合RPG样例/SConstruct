@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+import os
+import sys
+
+# 导入SConstruct环境
+env = SConscript("godot-cpp/SConstruct")
+# 添加Cpp文件夹路径
+env.Append(CPPPATH=[
+    "src/",
+    "src/test/",
+    #"src/main_tscn/",
+    "src/fsc/",
+   # "src/input_handler/"
+    "src/scene_manager/",
+    "src/common_methods/"
+])
+# 获取Cpp文件夹下的所有cpp文件
+# sources = env.Glob("src/cpp/*.cpp")
+sources = [
+    Glob("src/*.cpp"),
+    Glob("src/test/*.cpp"),
+   # Glob("src/main_tscn/*.cpp"),
+    Glob("src/fsc/*.cpp"),
+    #Glob("src/input_handler/*.cpp"),
+    Glob("src/scene_manager/*.cpp"),
+    Glob("src/common_methods/*.cpp"),
+]
+
+
+# 跨平台编译设置
+if env["platform"] == "macos":
+    library = env.SharedLibrary(
+        "demo/bin/libgdexample.{}.{}.framework/libgdexample.{}.{}".format(
+            env["platform"], env["target"], env["platform"], env["target"]
+        ),
+        source=sources,
+    )
+
+# windows
+elif env["platform"] == "windows":
+    # 设置生成库的文件路径
+    libpath = "./demo/bin/libcpp{}{}".format(env['suffix'], env['SHLIBSUFFIX'])
+    sharedlib = env.SharedLibrary(libpath, sources)
+    # 设置scons默认编译的文件
+    env.Default(sharedlib)
+    pass
+
+# Linux
+elif env["platform"] == "linux":
+    pass
+
+# andio
+elif env["platform"] == "android":
+    pass
+
+#env.Default(library)

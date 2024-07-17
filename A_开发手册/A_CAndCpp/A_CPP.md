@@ -1290,32 +1290,21 @@ son::Base::m_A //通过子类的父类访问
 
 #### Ⅴ、父类存放子类
 
-- 使用父类定义对象A，A可以存放其子类变量
+1. 使用父类定义对象A，A可以存放其子类变量，
+
+   （自能存放，但要调用子类方法，需要虚函数）
 
   ``` c++
   class Animal{}; // 父类
   class A: public Animal{}; // 子类
   
-  /* 使用指针方式 */
-  // an 可用存放子类A
-  void dospeak(Animal * an){
-      an->speak();
-  }
-  
-  /* 使用引用方式 */
-  // 注意：
-  //    因为使用了&animal定义，可传入地址或变量
-  //    若不满足多态条件，只会调用父类的speak方法
-  void dospeak(Animal & an){
-  	an.speak(); 
-  }
+  Animal *p  = new A(); //正确，父类可以存放子类
   ```
 
-- 父类指针被子类对象初始化，反之不对
+2. 父类指针被子类对象初始化，反之不对
 
-  即：父类定义的变量，可以存放子类对象
-  
-- 注意：**这种情况只能调用父类中的方法**，调用子类中的方法需要用虚函数
+   即：父类定义的变量，可以存放子类对象
+3. 注意：**这种情况只能调用父类中的方法**，调用子类中的方法需要用虚函数
 
 ``` c++
 class Animal {
@@ -1340,6 +1329,27 @@ An->set_value();
 
 /* 错误 */
 A *a = new Animal();
+```
+
+#### Ⅵ、多继承
+
+- 不管是怎么继承方式，只要没有虚函数，就调用定义类中的方法
+- 只要父类包含`virtual`关键字，优先调用子类中方法
+
+``` c++
+/* 多继承 */
+class A {}
+class B {}
+class C: public B, public A {}
+
+/* 树形继承 */
+class A {}
+class B: public A {}
+class C: public B {}
+
+A *p = new A(); // 调用class A中方法
+B *p = new B(); // 调用class B中方法
+C *p = new C(); // 调用class C中方法
 ```
 
 ### 六、多态
@@ -1408,8 +1418,6 @@ class father{}
 // 引入子类头文件
 #include "son.h"
 ```
-
-
 
 #### Ⅲ、抽象类
 
@@ -1525,17 +1533,37 @@ delete animal;
 - override：说明重写父类方法，若父类没有此虚函数，则会报错
 - final：最终方法，无法被继承
 
+无法被继承的类
+
 ``` c++
 /* final */
 class A final { //类无法被继承
     virtual void fun();
 }
 
+/* 错误 */
+class B: public A{}
+```
+
+无法被继承的函数
+
+- 其子函数，不能出现被final定义的函数，其类可以被继承
+
+``` c++
 class A { //类无法被继承
     void fun() final; // 方法无法被继承
 }
+class B:public A{
+    void fun(); // 错误，fun被final定义，无法被重写
+    void zfun(); // 正确，可以被调用
+}
+```
 
-/* override */
+override重写方法
+
+- 指出重写父类方法，若父类没有此方法，错误
+
+``` c++
 class A {
     virtual void fun();
 }
@@ -1544,8 +1572,6 @@ class B:public A{
     virtual void fun() override; //正确
 }
 ```
-
-
 
 ## 文件操作
 

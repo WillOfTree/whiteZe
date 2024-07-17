@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://dai5sklwj7lvn"]
+
+[ext_resource type="Texture2D" uid="uid://lmxdcbdoxnwa" path="res://assets/player/char_blue_1.png" id="1_0yma5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ge6c7"]
+
+[node name="Player_two" type="CharacterBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ge6c7")
+
+[node name="temp" type="Sprite2D" parent="."]
+texture = ExtResource("1_0yma5")
+region_enabled = true
+region_rect = Rect2(168, 448, 48, 64)

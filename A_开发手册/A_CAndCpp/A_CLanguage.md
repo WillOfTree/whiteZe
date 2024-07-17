@@ -182,6 +182,8 @@ copy file1.c file2.c //argv[0]= copy; argv[1]=file1.c
 int main(int argc, char *argv[]){}
 ```
 
+## 头文件引入规则
+
 ## 基本数据类型
 
 ### 一、单位

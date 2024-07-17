@@ -1,7 +1,6 @@
-# STL（标准模板库）
+# STL标准模板库
 
-基本全部使用了模板类或者模板函数
-
+- 基本全部使用了模板类或者模板函数
 - 容器：各种数据结构，vector、list、map等
     1. 序列容器：强调值得排序，每个元素有固定位置
     2. 关联容器：二叉树结构，元素之间没有严格得物理顺序关系
@@ -18,14 +17,16 @@
 - 适配器：一种用来修饰容器或者仿函数的策略
 - 空间配置器：负责空间的配置和管理
 
-## 一、vector-动态数组-单端
+## 容器
+
+### 一、vector-动态数组-单端
 
 - vector与数组不同的地方在于，vector是可以动态扩展的数组，vector的迭代器支持随机访问
 - 支持随机访问、他的空间是连续的
 - vector在尾部添加移动数据非常快
 - 多用于访问，多插入删除使用list
 
-### 1、构造方法
+#### Ⅰ、构造方法
 
 ``` c++
 // 必须包含头文件
@@ -46,7 +47,7 @@ vector<int> v3(10, 100)
 vector<int> v4(v3)
 ```
 
-### 2、vector赋值
+#### Ⅱ、vector赋值
 
 重载了=号
 
@@ -70,7 +71,7 @@ v3.assign(v1.begin(), v1.end());
 v3.assign(10, 'a');
 ```
 
-### 3、迭代器说明
+#### Ⅲ、迭代器说明
 
 ``` c++
 /* 容器起始位置 */
@@ -86,7 +87,7 @@ vector<int>::iterator itBegin = v.begin();
 vector<int>::iterator itEnd = v.end();
 ```
 
-### 4、vector数据存取
+#### Ⅳ、vector数据存取
 
 普通操作
 
@@ -130,7 +131,7 @@ int myPrint(){
 for_each(v.begin(), v.end(), myPrint);
 ```
 
-### 4、存放自定义数据类型
+#### Ⅴ、存放自定义数据类型
 
 ``` c++
 #include <vector>
@@ -158,7 +159,7 @@ for (vector<Person>::iterator it=v.begin(); it!=v.end();it++){\
 }
 ```
 
-### 5、存放指针
+#### Ⅵ、存放指针
 
 ``` c++
 #include <vector>
@@ -191,7 +192,7 @@ for (vector<Person*>::iterator it=v.begin(); it!=v.end();it++){\
 }
 ```
 
-### 6、vector嵌套
+#### Ⅶ、vector嵌套
 
 ``` c++
 #include <vector>
@@ -212,7 +213,7 @@ for (vector< vector<int>>::iterator it=v.begin(); it!=v.end();it++){
 }
 ```
 
-### 7、容量方法
+#### Ⅷ、容量方法
 
 ``` c++
 /* 获取容器的容量 */
@@ -234,7 +235,7 @@ v.resize(int num);
 v.resize(int num, int n)
 ```
 
-### 8、插入和删除
+#### Ⅸ、插入和删除
 
 ``` c++
 /* 尾插 */ 
@@ -261,7 +262,7 @@ v.erase(v.begin(), v.end())
 v.clear()
 ```
 
-### 9、互换容器
+#### Ⅹ、互换容器
 
 - 利用互换容器可以收缩内存空间
 
@@ -282,7 +283,7 @@ v1.swap(v2);
 vector<int>(v1).swap(v1)
 ```
 
-### 10、预留空间
+#### ⅩⅠ、预留空间
 
 因为vector是动态开辟空间，使用预留空间可以减少vector重新开辟空间的次数
 
@@ -292,7 +293,588 @@ vector<int> v;
 v.reserve(10000000)
 ```
 
-## 二、string-字符串
+### 二、deque-动态数组-双端
+
+- 支持随机存取
+- 在头部和尾部插入删除非常快
+
+#### Ⅰ、构造函数
+
+``` c++
+#include<deque>
+
+// 定义方式与vector相同
+deque<int> d;
+deque<int> v2(v1.begin(), v1.end());
+// 创造10个100元素
+deque<int> v3(10, 100);
+/* 拷贝构造 */
+deque<int> v4(v3);
+```
+
+#### Ⅱ、赋值操作
+
+与vector容器操作类似
+
+``` c++
+// 重载了=号
+deque<int> v1;
+// 向容器中存储数据
+v1.push_back(a);
+
+// deque与deque之间的赋值方式
+deque<int> v2;
+v2 = v1;
+
+/* 使用assign */
+deque<int> v3;
+v3.assign(v1.begin(), v1.end());
+// 使用10个a赋值
+v3.assign(10, 'a');
+```
+
+#### Ⅲ、容量方法
+
+``` c++
+/* 返回容器中元素的个数 */ 
+v.size();
+    
+/* 判断容器是否为空 */
+// 空返回true
+v.empty();
+    
+/* 重新指定容器长度为 */
+// 重新指定容器长度为num，
+// 若容器变长则以默认值（0）填充
+v.resize(int num);
+// 使用指定值(n)填充
+v.resize(int num, int n);
+```
+
+#### Ⅳ、插入删除
+
+#### 两端插入删除
+
+``` c++
+#include<deque>
+deque<int> v;
+
+/* 插入 */
+// 尾插：向容器中插入数据10
+v.push_back(10);
+// 头插
+v.push_front(10);
+
+/* 删除 */
+// 尾部删除一个元素
+v.pop_back();
+// 头删
+v.pop_front();
+```
+
+#### 插入元素
+
+``` c++
+#include<deque>
+deque<int> v;
+
+/* 头部插入元素 */
+// 注意：第一个元素是deque的迭代器
+// 在v的头部添加数据
+v.insert(v.begin(), 10);
+// 在头部插入2个1000元素
+v.insert(v.begin(), 2, 1000);
+// 在一个区间插入元素
+// 在v容器中开始位置，插入v2的开始元素到v2的end
+v.insert(v.begin(), v2.begin(), v2.end());
+```
+
+#### 删除元素
+
+``` c++
+ #include<deque>
+deque<int> v;
+
+/* 删除 */
+// 注意：第一个元素是vector的迭代器
+v.erase(v.begin())
+// 从begin删除到end
+v.erase(v.begin(), v.end())
+
+/* 删除所有元素 */
+v.clear()
+```
+
+#### Ⅴ、迭代器
+
+- 普通迭代器：iterator
+- 逆序迭代器：reverse_iterator
+- 只读迭代器：const_iterator
+
+``` c++
+// deque迭代器
+deque<int>::iterator it = d.begin();
+// 不可修改的迭代器,常量迭代器
+deque<int>::const_iterator it = d.begin();
+```
+
+#### Ⅵ、数据存取
+
+``` c++
+deque<int> v;
+/* 返回索引idx所指的对象 */
+// 使用[]，和数组使用方法一样
+int a = v[1];
+// 使用at
+int b = v.at(1);
+
+/* 返回容器中的第一个元素 */
+v.front()
+/* 返回容器中的最后一个元素 */
+v.back()
+```
+
+#### Ⅶ、数据排序
+
+利用了排序算法sort
+
+``` c++
+#include<deque>
+#include<algorithm>
+deque<int> d;
+// 默认从小到大
+// 只要支持随机访问，即可使用sort排序
+sort(d.begin(), d.end())
+```
+
+### 三、map-散列表
+
+- map不允许右重复的key元素，multimap允许有重复的key值
+- map中存储的是pair类型数据
+- pair第一个元素为key，第二个元素为value
+- 所有元素都会根据键值自动排序
+- **根据key快速找到value值**
+
+#### Ⅰ、构造方法
+
+``` c++
+#include <map>
+
+// 第一元素key，第二个value
+map<int, int> m;
+// 拷贝构造
+map<int, int> m1(m);
+
+// 插入,一个匿名pair元素
+m.insert(pair<int, int>(1, 10))
+```
+
+#### Ⅱ、大小交换
+
+``` c++
+#include <map>
+map<int, int> s1;
+
+// 返回容器中元素的数目
+s1.size();
+// 判断是否为空
+s1.empty();
+// 交换容器
+s1.swap(s2);
+```
+
+#### Ⅲ、插入删除
+
+``` c++
+map<int, int> m;
+
+/* 插入元素 */
+// 第一种
+m.insert(pair<int, int>(1, 1111));
+// 第二种插入函数    
+m.insert(make_pair(2, 20));
+m.insert(map<int, int>::value_type(3,20));
+// map重写了[], 如果没有会自动创建，多用于访问
+m[4] = 40;
+         
+// 清空所有元素
+m.clear();
+
+// 删除值为key的元素，可传值
+m.erase(key); 
+
+// 删除pos迭代器所指的对象
+// s1.erase(s.begin())
+m.erase(pos);
+// 删除区间内的所有元素
+m.erase(beg, end);
+```
+
+#### Ⅳ、查找和统计
+
+``` c++
+map<int, int> m;
+map<int, int> m2;
+m.insert(pair<int, int>(1, 1111));
+
+// 获取一个元素
+int a = m[1];
+// 使用find
+map<int, int>iterator pos = m.find(1);
+if (pos != m.end()) cout << "NO";
+
+// 统计元素个数,对map而言意义不大（结果只能为1或0）
+s1.count(30);
+```
+
+
+
+## 七、set/multiset容器-红黑树
+
+- set不允许有重复数据，multiset允许重复元素
+- 会自动排序
+
+### 1、构造赋值
+
+``` c++
+#include <set>
+
+// 声明
+set<int> s1;
+// 拷贝构造
+set<int> s2(s1);
+```
+
+### 2、大小交换
+
+``` c++
+#include <set>
+set<int> s1;
+
+// 返回容器中元素的数目
+s1.size();
+// 判断是否为空
+s1.empty();
+// 交换容器
+s1.swap(s2);
+```
+
+### 3、插入删除
+
+``` c++
+set<int> s1;
+
+// 插入值,只有1种插入方式
+s1.insert(elem); 
+
+// 清空所有元素
+s1.clear();
+
+// 删除值为elem的元素，可传值
+s1.erase(elem); 
+
+// 删除pos迭代器所指的对象
+// s1.erase(s.begin())
+s1.erase(pos);
+// 删除区间内的所有元素
+s1.erase(beg, end);
+```
+
+### 4、查找和统计
+
+``` c++
+/* 
+return：成功返回当前元素迭代器，失败返回end()
+判断是否找到：if(pos != s1.end()){}
+*/
+// 使用迭代器接收位置
+set<int>::iterator pos = s1.find(elem);
+// 获取元素
+*pos;
+
+// 统计元素个数,对set而言意义不大（结果只能为1或0）
+s1.count(30);
+```
+
+### 5、排序
+
+set存放内置数据类型
+
+``` c++
+class MyCompare {
+public:
+    // 重载了（）运算符
+    bool operator() (int v1, int v2) {
+        // 由大到小排序
+		return v1 > v2;
+    }
+}
+
+// 指定排序规则，set默认升序排序
+set<int, mycompare> s1;
+```
+
+修改自定义数据类型
+
+``` c++
+class Person {
+public:
+    // 初始值
+    string name;
+    int age;
+    Person(sting name, int age){
+        this->name = name;
+        this->age = age;
+    }
+}
+
+class MyCompare {
+public:
+    // 重载了（）运算符
+    bool operator() (const Person v1, const Person v2) {
+        // 按Person元素的age排序
+		return v1.age > v2.age;
+    }
+}
+// 指定排序规则，set默认升序排序
+set<Person, MyCompare> s1;
+
+// 创建person对象
+Person p1("xx", 30);
+// 插入容器
+s1.insert(p1);
+```
+
+#### 迭代器
+
+``` c++
+// set<int>::iterator it=s.begin()
+set<int>::iterator it;
+
+```
+
+
+
+## 六、list-双向循环链表
+
+- 动态分配（**不会造成内存浪费和溢出**）-提供双向迭代器（只支持后移和前进）
+- 不支持随机访问
+- 可以在任意位置快速插入删除
+
+### 1、构造方法
+
+``` c++
+#include <list>
+
+// 构造方法
+list<int> m; 
+// 赋值m的数据
+list<int> m1(m.begin()， m.end());
+list<int> m2(m);
+// 创建10个1000
+list<int> m3(10, 1000);
+```
+
+#### assign方法
+
+``` c++
+list<int> L;
+list<int> L2;
+
+// 将beg，end区间的数据拷贝给L2
+L2.assign(L.begin(), L.end())
+//将10个aaa拷贝给L2
+L2.assign(10, 'aaa')
+//重载等号操作
+L2 = L;
+// 交换L与L2
+L2.swap(L);
+```
+
+### 2、添加删除数据
+
+``` c++
+#include<list>
+list<int> m;
+
+/* 添加元素 */
+// 尾插
+m.push_back(elem);
+// 头插
+m.push_front(elem); 
+
+/* 删除元素 */
+// 删除元素，开头
+m.pop_front(elem); 
+// 删除元素，尾
+m.pop_back(elem);
+// 清空数据
+m.clear();
+// 删除list区间元素
+m.arase(m.begin(), m.end());
+// 删除pos位置元素,返回下一个元素
+m.arase(pos);
+// 删除与elem匹配的元素
+m.remove(elem);
+
+/* 插入元素 */ 
+// 在pos位置添加元素，返回元素位置
+m.insert(pos, elem);
+// 在pos位置添加n个elem元素，无返回
+m.insert(pos, n, elem);
+// 在pos位置添加list迭代器元素
+m.insert(pos, L.begin(), L.end());
+```
+
+### 3、list大小操作
+
+``` c++
+list<int> L;
+
+// 返回容器中的元素个数
+L.size();
+// 判断是否为空
+L.empty();
+
+/* 重新指定容器长度，容器变短会删除元素 */
+// 重新指定容器长度为num
+L.resize(num);
+// 重新指定容器长度为num，容器变长使用elem填充
+L.resize(num, elem)
+```
+
+### 4、数据存取
+
+链表不支持随机访问，没有[]访问方式
+
+``` c++
+list<int> L;
+
+// 访问链表的第一个元素
+L.front();
+// 访问链表最后一个元素
+L.back()
+```
+
+### 5、反转和排序
+
+sort只支持随机访问的容器
+
+``` c++
+list<int> L;
+
+/* 反转排序 */
+L.reverse();
+
+/* 排序 */
+// 默认从小到大，升序
+L.sort();
+```
+
+自定义类型排序
+
+``` c++
+list<int> L;
+
+// 自定义排序规则
+L.sort(my_compare);
+// int是可修改的
+bool my_compare(int v1, int v2){
+    // 降序：v1>v2，升序：v2>v1;
+    return v1 > v2;
+}
+```
+
+### 迭代器
+
+``` c++
+// 普通迭代器
+list<int>iterator it;
+// 不可修改的迭代器，const list<int> L
+list<int>::const_iterator it;
+
+list<int> L;
+// 起始迭代器
+L.begin();
+// 结束迭代器
+L.end();
+
+/* 验证迭代器支持随机访问 */
+list<int>::iterator it = L.begin();
+// 双向访问
+it++;
+it--;
+// 随机访问
+it = it + 1;
+```
+
+### 5、排序
+
+map存放内置数据类型（使用关系仿函数更简单）
+
+``` c++
+class MyCompare {
+public:
+    // 重载了（）运算符
+    bool operator() (int v1, int v2) {
+        // 由大到小排序
+		return v1 > v2;
+    }
+}
+
+// 指定排序规则，set默认升序排序
+map<int, int, mycompare> m1;
+// 使用关系仿函数
+map<int, int, less<int>()> m1;
+```
+
+修改自定义数据类型
+
+``` c++
+class Person {
+public:
+    // 初始值
+    string name;
+    int age;
+    Person(sting name, int age){
+        this->name = name;
+        this->age = age;
+    }
+}
+
+class MyCompare {
+public:
+    // 重载了（）运算符
+    bool operator() (const Person v1, const Person v2) {
+        // 按Person元素的age排序
+		return v1.age > v2.age;
+    }
+}
+// 指定排序规则，set默认升序排序
+map<Person, Person, MyCompare> s1;
+
+// 创建person对象
+Person p1("xx", 30);
+// 插入容器
+s1.insert(pair<int, Person>(1,p1));
+```
+
+### 迭代器
+
+``` c++
+for(
+	map<int, int>::iterator it = m.begin();
+    it != m.end();
+    it ++
+){
+   	cout<< "key=" (*it).first;
+    cout<< "value=" it->second;
+}
+```
+
+
+
+## string-字符串
 
 C风格字符串太过复杂，不适合大程序开发； string封装了很多实用成员方法，不用考虑内存释放和越界
 
@@ -524,160 +1106,6 @@ int pos = str.find("@");
 string name = str.substr(0, pos)
 ```
 
-## 三、deque-动态数组-双端
-
-- 支持随机存取
-- 在头部和尾部插入删除非常快
-
-### 1、构造函数
-
-``` c++
-#include<deque>
-
-// 定义方式与vector相同
-deque<int> d;
-deque<int> v2(v1.begin(), v1.end());
-// 创造10个100元素
-deque<int> v3(10, 100);
-/* 拷贝构造 */
-deque<int> v4(v3);
-```
-
-### 2、赋值操作
-
-与vector容器操作类似
-
-``` c++
-// 重载了=号
-deque<int> v1;
-// 向容器中存储数据
-v1.push_back(a);
-
-// deque与deque之间的赋值方式
-deque<int> v2;
-v2 = v1;
-
-/* 使用assign */
-deque<int> v3;
-v3.assign(v1.begin(), v1.end());
-// 使用10个a赋值
-v3.assign(10, 'a');
-```
-
-### 3、容量方法
-
-``` c++
-/* 返回容器中元素的个数 */ 
-v.size();
-    
-/* 判断容器是否为空 */
-// 空返回true
-v.empty();
-    
-/* 重新指定容器长度为 */
-// 重新指定容器长度为num，
-// 若容器变长则以默认值（0）填充
-v.resize(int num);
-// 使用指定值(n)填充
-v.resize(int num, int n);
-```
-
-### 4、插入删除
-
-#### 两端插入删除
-
-``` c++
-#include<deque>
-deque<int> v;
-
-/* 插入 */
-// 尾插：向容器中插入数据10
-v.push_back(10);
-// 头插
-v.push_front(10);
-
-/* 删除 */
-// 尾部删除一个元素
-v.pop_back();
-// 头删
-v.pop_front();
-```
-
-#### 插入元素
-
-``` c++
-#include<deque>
-deque<int> v;
-
-/* 头部插入元素 */
-// 注意：第一个元素是deque的迭代器
-// 在v的头部添加数据
-v.insert(v.begin(), 10);
-// 在头部插入2个1000元素
-v.insert(v.begin(), 2, 1000);
-// 在一个区间插入元素
-// 在v容器中开始位置，插入v2的开始元素到v2的end
-v.insert(v.begin(), v2.begin(), v2.end());
-```
-
-#### 删除元素
-
-``` c++
- #include<deque>
-deque<int> v;
-
-/* 删除 */
-// 注意：第一个元素是vector的迭代器
-v.erase(v.begin())
-// 从begin删除到end
-v.erase(v.begin(), v.end())
-
-/* 删除所有元素 */
-v.clear()
-```
-
-### 5、迭代器
-
-- 普通迭代器：iterator
-- 逆序迭代器：reverse_iterator
-- 只读迭代器：const_iterator
-
-``` c++
-// deque迭代器
-deque<int>::iterator it = d.begin();
-// 不可修改的迭代器,常量迭代器
-deque<int>::const_iterator it = d.begin();
-```
-
-### 6、数据存取
-
-``` c++
-deque<int> v;
-/* 返回索引idx所指的对象 */
-// 使用[]，和数组使用方法一样
-int a = v[1];
-// 使用at
-int b = v.at(1);
-
-/* 返回容器中的第一个元素 */
-v.front()
-/* 返回容器中的最后一个元素 */
-v.back()
-```
-
-### 7、数据排序
-
-利用了排序算法sort
-
-``` c++
-#include<deque>
-#include<algorithm>
-deque<int> d;
-// 默认从小到大
-// 只要支持随机访问，即可使用sort排序
-sort(d.begin(), d.end())
-```
-
 ## 四、stack-栈
 
 - 先进后出的容器（**不允许有遍历行为**）-没有迭代器
@@ -714,437 +1142,16 @@ a.empty();
 queue<int> a;
 
 // 队尾添加元素
-a. push(10);
+a.push(10);
 // 对头弹出
-a. pop();
+a.pop();
 
 // 判断是否为空
-a. empty();
+a.empty();
 // 查看队头元素
-a. front();
+a.front();
 // 查看队尾元素
-a. back();
-```
-
-## 六、list-双向循环链表
-
-- 动态分配（**不会造成内存浪费和溢出**）-提供双向迭代器（只支持后移和前进）
-- 不支持随机访问
-- 可以在任意位置快速插入删除
-
-### 1、构造方法
-
-``` c++
-#include <list>
-
-// 构造方法
-list<int> m; 
-// 赋值m的数据
-list<int> m1(m.begin()， m.end());
-list<int> m2(m);
-// 创建10个1000
-list<int> m3(10, 1000);
-```
-
-#### assign方法
-
-``` c++
-list<int> L;
-list<int> L2;
-
-// 将beg，end区间的数据拷贝给L2
-L2.assign(L.begin(), L.end())
-//将10个aaa拷贝给L2
-L2.assign(10, 'aaa')
-//重载等号操作
-L2 = L;
-// 交换L与L2
-L2.swap(L);
-```
-
-### 2、添加删除数据
-
-``` c++
-#include<list>
-list<int> m;
-
-/* 添加元素 */
-// 尾插
-m.push_back(elem);
-// 头插
-m.push_front(elem); 
-
-/* 删除元素 */
-// 删除元素，开头
-m.pop_front(elem); 
-// 删除元素，尾
-m.pop_back(elem);
-// 清空数据
-m.clear();
-// 删除list区间元素
-m.arase(m.begin(), m.end());
-// 删除pos位置元素,返回下一个元素
-m.arase(pos);
-// 删除与elem匹配的元素
-m.remove(elem);
-
-/* 插入元素 */ 
-// 在pos位置添加元素，返回元素位置
-m.insert(pos, elem);
-// 在pos位置添加n个elem元素，无返回
-m.insert(pos, n, elem);
-// 在pos位置添加list迭代器元素
-m.insert(pos, L.begin(), L.end());
-```
-
-### 3、list大小操作
-
-``` c++
-list<int> L;
-
-// 返回容器中的元素个数
-L.size();
-// 判断是否为空
-L.empty();
-
-/* 重新指定容器长度，容器变短会删除元素 */
-// 重新指定容器长度为num
-L.resize(num);
-// 重新指定容器长度为num，容器变长使用elem填充
-L.resize(num, elem)
-```
-
-### 4、数据存取
-
-链表不支持随机访问，没有[]访问方式
-
-``` c++
-list<int> L;
-
-// 访问链表的第一个元素
-L.front();
-// 访问链表最后一个元素
-L.back()
-```
-
-### 5、反转和排序
-
-sort只支持随机访问的容器
-
-``` c++
-list<int> L;
-
-/* 反转排序 */
-L.reverse();
-
-/* 排序 */
-// 默认从小到大，升序
-L.sort();
-```
-
-自定义类型排序
-
-``` c++
-list<int> L;
-
-// 自定义排序规则
-L.sort(my_compare);
-// int是可修改的
-bool my_compare(int v1, int v2){
-    // 降序：v1>v2，升序：v2>v1;
-    return v1 > v2;
-}
-```
-
-### 迭代器
-
-``` c++
-// 普通迭代器
-list<int>iterator it;
-// 不可修改的迭代器，const list<int> L
-list<int>::const_iterator it;
-
-list<int> L;
-// 起始迭代器
-L.begin();
-// 结束迭代器
-L.end();
-
-/* 验证迭代器支持随机访问 */
-list<int>::iterator it = L.begin();
-// 双向访问
-it++;
-it--;
-// 随机访问
-it = it + 1;
-```
-
-## 七、set/multiset容器-红黑树
-
-- 会自动排序
-- set不允许有重复数据，multiset允许重复元素
-
-### 1、构造赋值
-
-``` c++
-#include <set>
-
-// 声明
-set<int> s1;
-// 拷贝构造
-set<int> s2(s1);
-```
-
-### 2、大小交换
-
-``` c++
-#include <set>
-set<int> s1;
-
-// 返回容器中元素的数目
-s1.size();
-// 判断是否为空
-s1.empty();
-// 交换容器
-s1.swap(s2);
-```
-
-### 3、插入删除
-
-``` c++
-set<int> s1;
-
-// 插入值,只有1种插入方式
-s1.insert(elem); 
-
-// 清空所有元素
-s1.clear();
-
-// 删除值为elem的元素，可传值
-s1.erase(elem); 
-
-// 删除pos迭代器所指的对象
-// s1.erase(s.begin())
-s1.erase(pos);
-// 删除区间内的所有元素
-s1.erase(beg, end);
-```
-
-### 4、查找和统计
-
-``` c++
-/* 
-return：成功返回当前元素迭代器，失败返回end()
-判断是否找到：if(pos != s1.end()){}
-*/
-// 使用迭代器接收位置
-set<int>::iterator pos = s1.find(elem);
-// 获取元素
-*pos;
-
-// 统计元素个数,对set而言意义不大（结果只能为1或0）
-s1.count(30);
-```
-
-### 5、排序
-
-set存放内置数据类型
-
-``` c++
-class MyCompare {
-public:
-    // 重载了（）运算符
-    bool operator() (int v1, int v2) {
-        // 由大到小排序
-		return v1 > v2;
-    }
-}
-
-// 指定排序规则，set默认升序排序
-set<int, mycompare> s1;
-```
-
-修改自定义数据类型
-
-``` c++
-class Person {
-public:
-    // 初始值
-    string name;
-    int age;
-    Person(sting name, int age){
-        this->name = name;
-        this->age = age;
-    }
-}
-
-class MyCompare {
-public:
-    // 重载了（）运算符
-    bool operator() (const Person v1, const Person v2) {
-        // 按Person元素的age排序
-		return v1.age > v2.age;
-    }
-}
-// 指定排序规则，set默认升序排序
-set<Person, MyCompare> s1;
-
-// 创建person对象
-Person p1("xx", 30);
-// 插入容器
-s1.insert(p1);
-```
-
-#### 迭代器
-
-``` c++
-// set<int>::iterator it=s.begin()
-set<int>::iterator it;
-
-```
-
-## 八、map/multiset-散列表
-
-- map中存储的是pair类型数据
-- pair第一个元素为key，第二个元素为value
-- 所有元素都会根据键值自动排序
-- map不允许右重复的key元素，multimap允许有重复的key值
-- **根据key快速找到value值**
-
-### 1、构造方法
-
-``` c++
-#include <map>
-
-// 第一元素key，第二个value
-map<int, int> m;
-// 拷贝构造
-map<int, int> m1(m);
-
-// 插入,一个匿名pair元素
-m.insert(pair<int, int>(1, 10))
-```
-
-### 2、大小交换
-
-``` c++
-#include <map>
-map<int, int> s1;
-
-// 返回容器中元素的数目
-s1.size();
-// 判断是否为空
-s1.empty();
-// 交换容器
-s1.swap(s2);
-```
-
-### 3、插入删除
-
-``` c++
-map<int, int> m;
-
-/* 插入元素 */
-// 第一种
-m.insert(pair<int, int>(1, 1111));
-// 第二种插入函数    
-m.insert(make_pair(2, 20));
-m.insert(map<int, int>::value_type(3,20));
-// map重写了[], 如果没有会自动创建，多用于访问
-m[4] = 40;
-         
-// 清空所有元素
-m.clear();
-
-// 删除值为key的元素，可传值
-m.erase(key); 
-
-// 删除pos迭代器所指的对象
-// s1.erase(s.begin())
-m.erase(pos);
-// 删除区间内的所有元素
-m.erase(beg, end);
-```
-
-### 4、查找和统计
-
-``` c++
-map<int, int> m;
-map<int, int> m2;
-m.insert(pair<int, int>(1, 1111));
-
-// 获取一个元素
-int a = m[1];
-// 使用find
-map<int, int>iterator pos = m.find(1);
-if (pos != m.end()) cout << "NO";
-
-// 统计元素个数,对map而言意义不大（结果只能为1或0）
-s1.count(30);
-```
-
-### 5、排序
-
-map存放内置数据类型（使用关系仿函数更简单）
-
-``` c++
-class MyCompare {
-public:
-    // 重载了（）运算符
-    bool operator() (int v1, int v2) {
-        // 由大到小排序
-		return v1 > v2;
-    }
-}
-
-// 指定排序规则，set默认升序排序
-map<int, int, mycompare> m1;
-// 使用关系仿函数
-map<int, int, less<int>()> m1;
-```
-
-修改自定义数据类型
-
-``` c++
-class Person {
-public:
-    // 初始值
-    string name;
-    int age;
-    Person(sting name, int age){
-        this->name = name;
-        this->age = age;
-    }
-}
-
-class MyCompare {
-public:
-    // 重载了（）运算符
-    bool operator() (const Person v1, const Person v2) {
-        // 按Person元素的age排序
-		return v1.age > v2.age;
-    }
-}
-// 指定排序规则，set默认升序排序
-map<Person, Person, MyCompare> s1;
-
-// 创建person对象
-Person p1("xx", 30);
-// 插入容器
-s1.insert(pair<int, Person>(1,p1));
-```
-
-### 迭代器
-
-``` c++
-for(
-	map<int, int>::iterator it = m.begin();
-    it != m.end();
-    it ++
-){
-   	cout<< "key=" (*it).first;
-    cout<< "value=" it->second;
-}
+a.back();
 ```
 
 ## 九、pair对数组

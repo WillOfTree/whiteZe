@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "lldb",
+            "preLaunchTask":"build",// 执行上一步的操作task.json
+            "request": "launch",
+            // Godot可执行文件的位置，C:\\User\\Godot.exe
+            "program": "D:\\Program Files (x86)\\Godot_4.2\\Godot_v4.2-stable_win64.exe",
+            // 要编译的项目目录
+            "args": ["--path","D:\\A_CodeItems\\A_immortal_hero_world\\demo"],
+            "cwd": "${workspaceFolder}",
+            // "externalConsole": true
+         }
+    ]
+}

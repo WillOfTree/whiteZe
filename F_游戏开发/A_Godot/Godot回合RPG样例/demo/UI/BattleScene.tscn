@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3 uid="uid://do2x3oof7pkgu"]
+
+[ext_resource type="Texture2D" uid="uid://hcoect5lo7yk" path="res://icon.svg" id="1_tjspg"]
+
+[node name="BattleWindow" type="CanvasLayer"]
+layer = 20
+
+[node name="BG" type="Sprite2D" parent="."]
+position = Vector2(309.5, 247)
+scale = Vector2(4.82031, 3.84375)
+texture = ExtResource("1_tjspg")
+
+[node name="UI" type="Node2D" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = 505.0
+offset_right = 60.0
+offset_bottom = 648.0
+grow_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="attack" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "攻击"
+
+[node name="magic" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "魔法"
+
+[node name="item" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "道具
+"
+
+[node name="PositionPlayer" type="Node2D" parent="."]
+
+[node name="p_one" type="Marker2D" parent="PositionPlayer"]
+position = Vector2(940, 406)
+
+[node name="p_two" type="Marker2D" parent="PositionPlayer"]
+position = Vector2(1075, 363)
+
+[node name="p_three" type="Marker2D" parent="PositionPlayer"]
+position = Vector2(947, 566)
+
+[node name="PositionEnemy" type="Node2D" parent="."]
+
+[node name="e_one" type="Marker2D" parent="PositionEnemy"]
+position = Vector2(439, 59)
+
+[node name="e_two" type="Marker2D" parent="PositionEnemy"]
+position = Vector2(74, 280)
+
+[node name="e_three" type="Marker2D" parent="PositionEnemy"]
+position = Vector2(254, 206)
+
+[node name="test_out" type="Button" parent="."]
+offset_left = 921.0
+offset_top = 90.0
+offset_right = 1031.0
+offset_bottom = 121.0
+text = "测试-战斗退出"

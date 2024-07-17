@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://d34i6lu1dqf1x"]
+
+[ext_resource type="Script" path="res://script/System.gd" id="1_r5agw"]
+
+[node name="System" type="Node"]
+script = ExtResource("1_r5agw")
+
+[node name="TCommonMethod" type="TCommonMethod" parent="."]
+
+[node name="TSceneManger" type="TSceneManger" parent="."]
+
+[node name="TFSC" type="TFSC" parent="."]
+
+[node name="TIdleState" type="TIdleState" parent="TFSC"]
+
+[node name="TMoveState" type="TMoveState" parent="TFSC"]
+
+[node name="TBatState" type="TBatState" parent="TFSC"]
+
+[node name="TItemState" type="TItemState" parent="TFSC"]
+
+[node name="TLoadState" type="TLoadState" parent="TFSC"]

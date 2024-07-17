@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6a1bgfjf8ccb"]
+
+[ext_resource type="Texture2D" uid="uid://cgn7460lohosn" path="res://assets/wolf-idle.png" id="1_0o3x4"]
+
+[node name="Wolf" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_0o3x4")
+region_enabled = true
+region_rect = Rect2(0, 0, 64, 64)

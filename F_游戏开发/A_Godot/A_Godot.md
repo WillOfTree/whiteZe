@@ -18,17 +18,35 @@
 
 2. 下载Godot-cpp源文件：[godot-cpp](https://github.com/godotengine/godot-cpp) 
 
+    **《是Godot-CPP项目，不是Godot的源码》**
+
     注意：godot-cpp版本要与Godot可执行文件版本相同
 
-3. 下载安装python
+3. 下载安装python（不建议使用微软商店安装）
 
-4. 使用python安装SCons
+    设置环境变量
+
+4. 使用python安装SCons 
 
     > SCons是由python编写的自动化构建工具
 
     安装命令：`pip install SCons`  
-    
-5. 下载C++编译环境
+
+    测试命令：`scons -v` 
+
+5. 下载安装MSYS2
+
+    下载路径：[Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
+
+6. 运行`MSYS2 MSYS` 
+
+    更新：`pacman -Syu`
+
+    安装GCC和make：`pacman -S --needed base-devel mingw-w64-x86_64-toolchain` 
+
+    设置环境变量，GCC位置：`msys64\mingw64\bin` 
+
+    验证命令：`gcc -v` 
 
 #### Ⅱ、新建项目目录
 
@@ -47,22 +65,31 @@
  └─SConstruct  # SCons构建脚本
 ```
 
-#### Ⅲ、生成静态链接库（.lib）
+#### Ⅲ、编写SCons
 
-1. PASS，不需要静态链接库，只需要动态链接库即可
+参考SConstruct注释：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\SConstruct`
 
-2. 切换到 `Godot-cpp目录` 
+#### Ⅳ、编写C++代码
 
-3. 运行`cmd` 
+1. 编写C++代码：
 
-4. 运行命令
+   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\t_example.cpp`
 
-   默认生成的文件目录为：`Godot-cpp/bin/xxxxxx.lib` 
+2. 注册C++代码：
+
+   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\register_types.h`
+
+   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\register_types.cpp`
+
+#### Ⅴ、生成动态链接库（.dll）
+
+1. 切换到目录：SConstruct文件所在目录
+2. 运行命令：`SCons -j6 -Q platform=windows`  
 
 ``` shell
 # 推荐
 # 多线程编译-6是6核应与CPU核心相同
-SCons -j6 platform=windows  
+SCons -j12 platform=windows  
 
 # 默认去寻找VS的编译环境，找不到会寻找MinGW的编译环境
 scons platform=windows  
@@ -71,31 +98,21 @@ scons platform=windows
 # 强制使用mingw编译
 scons platform=windows use_mingw=yes 
 # 软件是64位还是32位置，bits=64 或者 bits=32
-scons platform=windows bits=32        
+scons platform=windows bits=32 
 ```
-
-#### Ⅳ、生成动态链接库（.dll）
-
-1. 编写SCons脚本：参考SConstruct注释
-
-2. 编写C++代码：
-
-    可参考：代码编写 $\to$ 一、C++ $\to$  Ⅰ、Hello world
-
-3. 注册C++代码：
-
-    参考register_types.h与register_types.cpp注释
-
-4. 使用SCons编译，生成共享库 .dll 文件：
-
-     切换到目录：SConstruct文件所在目录
-
-     运行命令：`SCons -j6 -Q platform=windows`  
 
 #### Ⅴ、修改.gdextension
 
 1. 复制生成的.dll文件到example.gdextension文件指定的位置
-2. example.gdextension名字可以修改；后缀.gdextension不可修改
+
+   若SConstruct中已经设置好路径，则不用复制
+
+2. example.gdextension
+
+   example名字可以修改
+
+   .gdextension不可修改
+
 3. 可参考文件：
    - `godot-cpp/test/example.gdextension` 
    - `godot-cpp/test/project/example.gdextension` 
@@ -112,7 +129,7 @@ compatibility_minimum = "4.1"
 windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 ```
 
-### 二、win-cmake
+### 二、win-cmake配置
 
 #### Ⅰ、环境配置
 1. 下载Godot可执行文件
@@ -137,20 +154,73 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
  |
  ├─ Godot-cpp `Godot源码目录`
  ├─ src `C++代码目录` 
- |   ├─ CMakeLists.txt  # CMake构建文件
- │   ├─ register_types.cpp # 注册文件
- │   ├─ register_types.h   # 注册文件
- │   ├─ test.cpp # 开发代码
- │   └─ test.h   # 开发代码
+ |   ├─ CMakeLists.txt  # CMake构建文件001
+ |	 ├─ src
+ |	 |	├─ register_types.cpp # 注册文件
+ |	 |	├─ test.cpp # 开发代码
+ |	 └─ include
+ │   	├─ register_types.h   # 注册文件
+ │   	└─ test.h   # 开发代码
  └─ CMakeLists.txt  # CMake构建文件
 ```
+
+#### Ⅲ、生成VS解决方案
+
+1. 
+
+#### cmake文件001
+
+``` cmake
+project(gdextension)
+
+# Automatically pick up files added to src
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+# Add a dynamic library called gameplay - this builds gameplay.dll
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_link_libraries(${PROJECT_NAME} PUBLIC godot::cpp)
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX src FILES ${SOURCES})
+```
+
+#### Ⅳ、cmake文件002
+
+``` cmake
+cmake_minimum_required(VERSION 3.19)
+project(gdextension-tree)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+include(FetchContent)
+
+FetchContent_Declare(
+        GDExtension
+        GIT_REPOSITORY https://github.com/godotengine/godot-cpp.git
+        GIT_TAG godot-4.0-stable
+)
+
+FetchContent_MakeAvailable(GDExtension)
+
+add_subdirectory(gdextension)
+```
+
+
 
 ### 三、extension配置
 
 1. `.gdextension`与`.dll`文件是一一对应关系
 2. c++语言的注册文件中，函数名应是在项目中独一无二的
 
-### 四、vscode配置
+### 四、编辑器配置
+
+#### Ⅰ、vscode-scons
 
 1. 安装vscode的C/C++扩展
 
@@ -158,7 +228,9 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 
 3. 安装GCC编译器（配置编译器路径，若是没有提示）
 
-   [Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
+   下载路径：[Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
+
+   验证命令：`gcc --version` 
 
 4. 创建task.json文件
 
@@ -196,16 +268,50 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
                // Godot可执行文件的位置，C:\\User\\Godot.exe
                "program": "${workspaceFolder}/<executable file>",
                // 要编译的项目目录
-               "args": ["--path","C:\\user\\demo"],
+               "args": ["--editor","--path","C:\\user\\demo"],
                "cwd": "${workspaceFolder}"
             }
        ]
    }
    ```
 
-6. 下断点，调试项目
+6. 设置Godot主场景
+
+7. 下断点，调试项目
+
+#### Ⅱ、VisualStudio-scons
+
+1. 使用vs打开项目（自动创建.vs目录）
+2. 进入.vs目录，创建文件`launch.vs.json` 
+
+``` json
+{
+    "version": "0.2.1",
+    "defaults": {},
+    "configurations": [
+        {
+            "type": "default",
+            "name": "Godot Debug", //debug名称
+            "project": "Godot可执行文件位置.exe",
+            "args":["--path", "Godot项目目录"]
+        }
+    ]
+}
+```
+
+
 
 ## 常见错误 
+
+> 各种空指针错误
+
+- `TIdleState * m_state_idle = NULL;` 指针初始化一定要指向空，防止一些不可名状的错误
+
+> AttributeError: 'NoneType' object has no attribute 'Append':
+>   File "D:\A_CodeItems\A_immortal_hero_world\SConstruct", line 8:
+>     env.Append(CPPPATH=["src/include/"])
+
+- 有可能是godot-cpp版本问题，建议换个源码版本
 
 > register_types.windows.template_debug.x86_64.obj : error LNK2019: 无法解析的外部符号 "private: \_\_cdecl Test::Test(void)" (??0Test@@AEAA@XZ)，函数 "private: static void * \_\_cdecl godot::ClassDB::_create_instance_func<class Test>(void *)" (??$_create_instance_func@VTest@@@ClassDB@godot@@CAPEAXPEAX@Z) 中引用了该符号
 > demo\bin\libcpp.dll : fatal error LNK1120: 1 个无法解析的外部命令
@@ -217,29 +323,7 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 > Failed loading resource: res://bin/a.gdextension. Make sure resources have been imported by opening the project in the editor at least once.
 
 - 若确定.lib文件存在，则可能是编译环境错误，Godot的提示并不准确
-
-- scons
-
-- 需要编译godot-cpp文件
-
-- 没有gcc编译环境
-
-- [为 Windows 平台编译 — Godot Engine (4.x) 简体中文文档](https://docs.godotengine.org/zh-cn/4.x/contributing/development/compiling/compiling_for_windows.html)
-
-- ```
-  pacman -S mingw-w64-x86_64-python3-pip mingw-w64-x86_64-gcc  \
-      mingw-w64-i686-python3-pip mingw-w64-i686-gcc make
-  ```
-
-- 安装GCC ，[Win7 / Win10 下 msys64 安装 MinGW-w64 工具链 - Milton - 博客园 (cnblogs.com)](https://www.cnblogs.com/milton/p/11808091.html)
-
 - 验证GCC，gcc -v
-
-### 常见错误
-
-> error C2504: “\*\*\*\*”: 未定义基类
-
-- 
 
 > 父类：father.h；子类:child.h；
 
@@ -276,17 +360,17 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 
   类名使用大驼峰命名法
 
-### 一、游戏目录
+### 一、项目目录说明
 
 ``` shell
 # 项目目录
 ├─assets # 存放外部原始资源，图像、声音、字体等等
 |   ├─textures # 图像，纹理
 |   └─fonts    # 文件字体
-├─entites # 实体，游戏场景中所有可见对象
-|   ├─characters # 
+├─entites # 实体（.tscn)，游戏场景中所有可见对象
+|   ├─characters 
 |   |   ├─enemies
-|   |   └─player
+|   |   └─player # ts
 |   └─pickable_object # 可拾取对象
 |       ├─equipments
 |       └─items
@@ -298,42 +382,56 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 |   ├─input_handler # 输入处理器，
 |   ├─map_manager # 地图管理器，自动生成地图等
 │   └─assets
-├─scenes # 游戏场景
-|   ├─scens_two
-│   └─scenes_one
+├─scenes # 游戏场景（.tscn)
+|   ├─One.tscn # 游戏场景一
+|   └─twe.tscn # 游戏场景二
+|
 ├─UI # 游戏UI相关
-|   ├─inventory_window # 背包窗口
-|   └─attribute_panel # 属性面板
+|	├─InventoryWindow.tscn # 背包窗口
+|   ├─BattleScene.tscn # 战斗场景
+|   └─AttributePanel.tscn # 属性面板  
+|
 └─resources # 所有继承godot resource的资源
+    ├─character_date # 角色属性
+    |	├─enemy_date # 敌人数据
+    |   |	├─enemydate.c++ #
+    |	├─player_date # 用户数据
+    |	└─character_date.c++ # 父类节点数据
     ├─map_date # 地图数据
     ├─tile_set # 瓦片集目录
     └─characters # 角色数据
 ```
 
-### 二、状态机
+### 二、场景结构说明
 
-#### Ⅰ、虚函数状态机
+1. 正常游戏节点
 
-- 使用虚函数实现
+   ``` shell
+   main # 主循环
+   ├─ System # 系统节点
+   ├─ Player # 玩家节点
+   ├─ Enemy # 敌人节点
+   ├─ Window # 一些常用窗口
+   |	├─InventoryWindow # 装备界面
+   |	└─BattleWindow # 战斗界面 
+   └─ World # 世界节点 
+   ```
 
-``` c++
-/*
-*
-*/
-// fsc.h
+2. System节点
 
-// state_move.h
-```
+   ``` shell
+   System
+   ├─Fsm # 状态机
+   |  ├─StartState # 开始状态
+   |  ├─MoveState # 移动状态 
+   |  ├─ItemState # 动作状态
+   |  └─CombatState # 战斗状态
+   |
+   ├─TSceneManager # 场景管理器，用于切换场景，加载玩家，加载敌人等等
+   └─TCommonMethod # 公用方法节点
+   ```
 
-
-
-#### Ⅱ、纯虚函数状态机
-
-- 使用纯虚函数实现
-
-``` c++
-
-```
+   
 
 ### 像素游戏配置
 
@@ -359,51 +457,41 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 
 ## 生命周期
 
-1. `_ready`方法，优先初始化子类，再初始化父类
-2. 其他生命周期方法，都是优先运行父类再运行子类
+1. 生命周期方法，初始化顺序是从上到下
 
-1. C++的方法与GD脚本的方法函数名相同
-2. 方法写在public下
+2. C++的方法与GD脚本的方法函数名相同
+3. 生命周期方法需要写在public下
+
+#### Ⅰ、enterTree
+
+1. 节点添加到节点树时调用，每一个节点加入树都会调用
+
+#### Ⅱ、ready
+
+1. `_ready`方法，优先初始化子类，再初始化父类（子类顺序是由上到下初始化）
+
+#### Ⅲ、process
+
+1. _process每一帧都运行；delta = 1/帧数
+2. 移动距离$\times$delta可以使移动距离与帧率无关；1$\times$delta可以简单理解为每秒移动1像素
+
+#### Ⅳ、physic_process
+
+1. 物理计算一次调用，一般调用物理引擎时使用
+
+#### Ⅴ、exitTree
+
+1. 节点销毁调用
+
+#### Ⅵ、input
+
+1. 有安静输入时调用
 
 ``` c++
-public:
-/* 节点添加到节点树时调用
- * 每一个节点加入树都会调用
- */ 
-void _EnterTree();
-
-/* 所有节点加载完成后调用
- * 从最后一个节点的Ready方法依次调用
- * 初始化一般写在这里
- */
-void _Ready(); 
-
-/* 每一帧都调用这个方法
- * delta：帧与帧间隔的时间
- */ 
-void _Process(double delta); 
-
-/* 物理计算一次调用
- * 一般调用物理引擎时使用
- */
-void _physicProcess(double delta);
-void _exitTree(); //节点销毁调用
 /* 只要键盘或鼠标按动，就触发当前方法 */
 void _input(const Ref<InputEvent> &event);//输入按键调用
-```
 
-
-
-- Node节点的方法
-
-- 选哟虚拟键位的映射
-
-- _process每一帧都运行；delta = 1/帧数
-
-  移动距离$\times$delta可以使移动距离与帧率无关；1$\times$delta可以简单理解为每秒移动1像素
-
-``` c++
-void T_AudioStreamPlayer::_input(const Ref<InputEvent> &event){
+void T::_input(const Ref<InputEvent> &event){
     //UtilityFunctions::print("_input");
 	// 判断p是否按下
     if(event->is_action_pressed("p")){
@@ -415,53 +503,20 @@ void T_AudioStreamPlayer::_input(const Ref<InputEvent> &event){
 }
 
 /* _unhandled_key_input */
-void T_CharacterBody2D::_unhandled_key_input(const Ref<InputEvent> &event){}
+void T::_unhandled_key_input(const Ref<InputEvent> &event){}
 ```
-
-
-
-## 特殊节点说明
-
-## 一、NodePath
-
-1. NodePath节点是一个特殊的节点
-
-``` c++
-
-```
-
-
-
-## 二、Ref<>类
-
-1. Ref<>类可以直接使用
-
-``` c++
-
-```
-
-## 节点说明
-1. Sprited2D：主要用于图片显示
-2. Node：可以用于代码逻辑编写
-3. AnimatedSprite2D：用于动画播放，简单物品动画
-4. AnimationPlay：Godot所有元素都可以使用它来生成动画，包括场景中来回移动的物体，怪物等
-5. collisionShape2D：碰撞体积
-6. Area2D：能够检测其他节点的进入和退出，不与其他节点封装
-    - worldBoundaryShape2D：可以在一个方向上无线延长的节点
-7. RayCast2D：根据设置的箭头进行碰撞检测
-    - is_colliding()碰撞检测
-8. HboxContainer：横向排列的容器，用于制作角色血条等
-9. panelcontainer：为图像提供背景
-10. Progressbar：进度条，软件常用
-11. TextureProgressbar：进度条，游戏常用，可设置背景
-12. canvasLayer：可根据屏幕位置显示
-13. marker2d：
 
 
 
 ## 基本的数据类型
 
 - 不用引用文件，直接使用即可
+
+- 优先使用GODOT容器，其他情况优先使用C++容器
+
+  将容器字段序列化，导出到引擎编辑器窗口 时
+
+  需要将容器作为参数或其他方式提供给GODOT API
 
 ### 一、Variant
 
@@ -488,6 +543,8 @@ Dictionary a{
 Dictionary datetime;
 datetime[YEAR_KEY] = 2014;
 datetime[MONTH_KEY] = 2;
+
+Dictionary<int, string> aa;
 ```
 
 ### 三、数组
@@ -574,9 +631,77 @@ c.get("name", NULL));
    
 ```
 
-## 对象类
+## GDScript
 
-### 一、Sprited2D
+## 2D游戏类
+
+### 一、Node
+
+1. Node节点是大部分节点的父节点，所以Node的方法一般可用直接使用
+2. 节点操作都应在_ready之后的生命周期使用
+
+
+#### Ⅰ、获取向量
+
+``` c++
+/* 设置位置坐标 */ 
+// 获取当前位置，相对与父节点
+// Node中的方法
+Vector2 p = get_position();
+/* 获取当前向量速度 */ 
+vector2 a = get_velocity();
+
+// 全局节点
+Vector2 p = get_global_position();
+```
+
+#### Ⅱ、Get_node
+
+1. 使用 `%` 标注场景内唯一节点，可以获取场景内任意位置的 `%` 标注的节点
+
+   `get_node<Node>("%sprite"); // 必须携带%标注全局查找` 
+
+2. `get_node()`中必须是`“”`，若是`‘’`，则会发生未知错误
+
+3. 函数方法：get_node<节点类型>(" 路径"); 
+
+``` c++
+/* 获取子节点 */
+// 只能获取子节点,不能得到父节点
+get_node<Node>("xx");
+// 通过相对路径，可以获取子节点的子节点
+get_node<Node>("xxx/vvv"); 
+
+/* 获取父节点 */ 
+get_node<Node>("..");
+get_parent();
+
+// find_child会对节点进行遍历，太多节点会影响速度
+Node *c0 = find_child("Test");
+
+/*得到当前所有子节点*/ 
+Array b = get_children();
+UtilityFunctions::print(b[0].get_type());
+
+/* 获取节点 */
+// 获取所有节点数量
+get_child_count();
+get_child("节点序号");
+
+/* 删除节点 */
+c0->queue_free();
+```
+
+#### Ⅲ、节点其他操作
+
+``` c++
+is_inside_tree(); // 验证节点是否在树中
+
+```
+
+### 二、Sprited2D
+
+- 主要用于图片显示
 
 ``` c++
 // 获取要修改的节点
@@ -591,9 +716,11 @@ Vector2 p = Vector2(100, 100);
 root11->set_offset(p);
 ```
 
-### 三、AnimatedSprite2D
+### 三、动画类
 
-- 动画播放类
+#### Ⅰ、AnimatedSprite2D
+
+- 用于动画播放，简单物品动画
 - 在Godot添加自定义动画类，设置动画效果
 
 ``` c++
@@ -606,12 +733,11 @@ a_s->stop();//停止
 a_s->is_playing();//状态
 ```
 
-### 四、AnimationPlay
+#### Ⅱ、AnimationPlay
 
-- 通过单张png，生成动画
-- AnimationPlay下添加sprite2d节点
+- Godot所有元素都可以使用它来生成动画，包括场景中来回移动的物体，怪物等
 
-### 五、AnimationTree
+#### Ⅲ、AnimationTree
 
 - 头文件
 
@@ -659,7 +785,7 @@ m_animationState->travel("run");
 
 
 
-### 六、AudioStreamPlayer
+### 四、AudioStreamPlayer
 
 - 音频流播放器
 - AudioStreamPlayer2D具有距离属性的音效
@@ -682,7 +808,7 @@ a->set_stream_paused(false);
 a->set_stream_paused(true);
 ```
 
-### 七、Vector2
+### 五、Vector2
 
 - 头文件：不需要引用
 
@@ -706,7 +832,8 @@ a.is_zero_approx();
 a.normalized();
 
 /* 设置a走向B的向量 */ 
-// 向量（方向和大小），每帧的增量
+// B：向量（方向和大小），
+// C：每帧的增量
 a.move_toward(B, C);
 
 /* 在一个范围内 */ 
@@ -718,7 +845,7 @@ direction_to(to: Vector2) const
 distance_to(to: Vector2);
 ```
 
-### 八、CharacterBody2D
+### 六、CharacterBody2D
 
 ``` c++
 // 设置当前向量
@@ -728,7 +855,7 @@ set_velocity(a);
 move_and_slide();// 可以沿着墙滑动
 ```
 
-### 九、Random
+### 七、Random
 
 - 头文件：`#include <godot_cpp/classes/random_number_generator.hpp>` 
 - 文件utility_functions同样包含随机方法的静态方法
@@ -745,10 +872,12 @@ float y = r->randf_range(-1, 1);
 
 
 
-### 十、Area2D
+### 八、Area2D
 
-1. 层（Collision/Layer）：隶属层级（显示图像、遮盖等效果）
-2. 遮罩（Collision/Mask）：碰撞层级（物理碰撞）
+1. 能够检测其他节点的进入和退出，不与其他节点封装
+2. worldBoundaryShape2D：可以在一个方向上无线延长的节点
+3. 层（Collision/Layer）：隶属层级（显示图像、遮盖等效果）
+4. 遮罩（Collision/Mask）：碰撞层级（物理碰撞）
 
 ``` c++
  // Array[Area2D] get_overlapping_areas()
@@ -760,7 +889,7 @@ float y = r->randf_range(-1, 1);
 - 都是继承的Area2D节点，Hurtbox,
 - 需要定义图层
 
-### 十一、utility_functions
+### 九、utility_functions
 
 - 包含很多常用方法
 - 头文件：`#include <godot_cpp/variant/utility_functions.hpp>`
@@ -781,433 +910,50 @@ UtilityFunctions::randfn(double mean, double deviation);
 UtilityFunctions::type_convert(const Variant &variant, int64_t type);
 ```
 
-### 十二、Node
 
-1. Node节点是大部分节点的父节点，所以Node的方法一般可用直接使用
 
-2. 注意：
+### 十、SceneTree
 
-    - 节点操作都应在_ready之后的生命周期使用
-
-    - `get_node()`中必须是`“”`，若是`‘’`，则会发生未知错误
-
-#### Ⅰ、获取向量
+1. 头节点：`#include <godot_cpp/classes/scene_tree.hpp>` 
 
 ``` c++
-/* 设置位置坐标 */ 
-// 获取当前位置，相对与父节点
-// Node中的方法
-Vector2 p = get_position();
-/* 获取当前向量速度 */ 
-vector2 a = get_velocity();
+// 获取场景树
+SceneTree *tree = Node::get_tree();
 
-// 全局节点
-Vector2 p = get_global_position();
-```
-
-#### Ⅱ、查找结点
-
-1. 使用 `%` 标注场景内唯一节点，可以不写路径就可查找到节点（只写节点名即可）
-2. 函数方法：get_node<节点类型>(" 路径"); 
-
-``` c++
-/* 获取子节点 */
-// 只能获取子节点,不能得到父节点
-get_node<Node>("xx");
-// 通过相对路径，可以获取子节点的子节点
-get_node<Node>("xxx/vvv"); 
-
-/* 获取父节点 */ 
-get_node<Node>("..");
-get_parent();
-
-// find_child会对节点进行遍历，太多节点会影响速度
-Node *c0 = find_child("Test");
-
-/*得到当前所有子节点*/ 
-Array b = get_children();
-UtilityFunctions::print(b[0].get_type());
-
-/* 获取节点 */
-// 获取所有节点数量
-get_child_count();
-get_child("节点序号");
-
-/* 删除节点 */
-c0->queue_free();
-```
-
-Ⅲ、节点其他操作
-
-``` c++
-// 旋转该节点，使其指向 point，该点应使用全局坐标。
-// point:vector2类型
-void look_at(point)
-
-
-```
-
-### 十三、SceneTree
-
-1. 头节点：`#include <godot_cpp/classes/scene_tree.hpp>`
-
-获取整个节点数：
-
-``` c++
-/* 获取整个节点树 */
-// 方法1
-Node *root = Node::get_tree()->get_current_scene();
-// 方法2
-SceneTree *r = Node::get_tree();
-Node *root = r->get_current_scene();
-// 方法3
+// get_current_scene():获取当前场景的根节点
+Node *root = tree->get_current_scene();
+// 获取
 SceneTree::get_singleton()->initialize();
 ```
 
-场景切换
+#### Ⅰ、场景切换
+
+- 只能用于游戏场景切换，因为他会释放所有节点，再新建节点，
+- 场景切换要进程场景初始化操作，加载
+- 头文件：scene_tree()
 
 ``` c
 // 获取场景树
 SceneTree *t = Node::get_tree();
-// 切换场景
+// 切换场景，使用路径
 t->change_scene_to_file("res://game2.tscn");
+// 使用pack，节点对象
+t->change_scene_to_packed(Node);
+// 切换场景方法
+t->call_deferred("change_scene_to_file", "res://bat2.tscn");
 ```
 
-
-
-### 十五、Object
-
-1. 所以类的基类，这意味Object中的方法可以直接调用
-
-``` c
-Object *obj = memnew(Object);
-INFO(obj);
-
-/* 连接方法
-connect("信号名称", Callable(类, "触发方法"));
-*/ 
-connect("game_stop", Callable(this, "game_stop_met"));
-// get_parent父类方法
-connect("enemy_default_weapon_attack", Callable(get_parent(), "enemy_bee_attack"));
-```
-
-### 十六、Path2D
-
-- 使用PATH2d在地图上画出路径
-- 创建Pathfollow2d节点，pathfollow2d节点会根据path2d设置的路径行走
-
-``` c
-PathFollow2D *p = get_node<PathFollow2D>("/root/Node2D/Path2D/PathFollow2D");
-// 设置移动距离，单位像素
-p->set_progress(500);
-
-// 获取当前移动坐标
-Vector2 v = p->get_position();
-Sprite2D *s = get_node<Sprite2D>("/root/Node2D/Sprite2D");
-// 将坐标设置给精灵
-s->set_position(v);
-```
-
-### 十七、RayCast2D
-
-- 射线投射节点，用于检测碰撞不可见射线
+#### Ⅱ、分组
 
 ``` c++
-is_colliding(); //检测是否发生碰撞
-```
+SceneTree * t = get_tree();
+t->add_to_group("组名"); // 添加进分组
+t->call_group("组名", "方法名"); // 调用组名中方法
+t->remove_from_group(); //山粗分组
 
-### Engine
-
-- 头文件：`#include <godot_cpp/classes/engine.hpp>` 
-
-#### Ⅰ、设置进程模式
-
-- 设置这个，会解决按键bug
-- 注意：不能在CharacterBody2D节点中使用
-
-``` c++
-#include <godot_cpp/classes/engine.hpp>
-Test::Test(){
-    if(Engine::get_singleton()->is_editor_hint()) {
-        // 在编辑器中，禁用_process函数
-        set_process_mode(
-            Node::ProcessMode::PROCESS_MODE_DISABLED);
-
-        UtilityFunctions::print("set ok");
-    }
-}
-
-```
-
-#### Ⅱ、从项目中读取配置
-
-- 可以解决 this inputmap 不存在bug
-
-``` c++
-#include <godot_cpp/classes/input.hpp>
-// 从Godot中的设置加载设置
-InputMap* map = InputMap::get_singleton();  
-map->load_from_project_settings();
-```
-
-#### Ⅲ、获取重力速度
-
-``` c++
-#include <godot_cpp/classes/project_settings.hpp>
-// 获取重力加速度
-Variant g = ProjectSettings::get_singleton()->get_setting("physics/2d/default_gravity");
-// 保持重力速度
-this->m_gravity = (float)g;
-```
-
-#### Ⅳ、减速状态
-
-``` c++
-#include <godot_cpp/classes/engine.hpp>
-# 获取Engine实例，Engine::get_singleton()  
-// Engine::get_singleton()->set_time_scale(0.5);
-Engine *e = Engine::get_singleton();
-e->set_time_scale(3);
-```
-
-
-
-## 功能实现
-
-### 一、Hello world
-
-头文件
-
-``` c++
-#ifndef TEST_H
-#define TEST_H
-
-#include <godot_cpp/classes/sprite2d.hpp>
-using namespace godot;
-class Test: public Sprite2D {
-    /*
-    * 定义一个宏，
-    * 	Test：当前你的类名
-    * 	Node3D：当前类继承的类名
-    */ 
-    GDCLASS (Test, Sprite2D);
-    Test();
-    ~Test();
-    // 防止出现意外bug，定义一个方法
-    protected:
-    	static void _bind_methods();
-}
-#endif
-```
-
-.cpp文件
-
-``` c++
-#include "test.h"
-#include <godot_cpp/variant/utility_functions.hpp>
-void Test::_bind_methods(){}
-Test::Test(){
-    UtilityFunctions::print("hello world");
-}
-Test::~Test(){
-    UtilityFunctions::print("bye");
-}
-```
-
-### 三、绑定方法
-
-#### Ⅰ、自定义节点属性
-
-- 需要重新打开Godot，才能显示属性
-- 中文会乱码
-
-设置自定义节点属性名称
-
-``` c++
-/* ClassDB::add_property("类名",
- *     PropertyInfo(Variant::FLOAT, "属性名称"),
- *     "触发的设置方法名",
- *     "触发的获取方法名");
- * PropertyInfo有额外的参数
- *     PropertyInfo(Variant::FLOAT, 
- *     		"属性名称",
- *          PROPERTY_HINT_RANGE,// 限定范围
- *			"最小值, 最大值, 步长")
- */
-void Test::_bind_methods(){
-    ClassDB::add_property("Test",
-        PropertyInfo(Variant::FLOAT, "radius")),
-        "set_radius",// Radius属性触发的set方法
-    	"get_radius");// Radius属性触发的get方法
-}
-```
-
-绑定自定义属性的触发方法
-
-``` c++
-void Test::_bind_methods(){
-    ClassDB::bind_methond(
-        D_METHOD("set_radius","radius"), 
-        &Test::set_radius); // set_radius触发Test中的方法
-}
-```
-
-设置属性修改逻辑
-
-``` c++
-/* .h文件 */ 
-public:
-	void set_radius(double radius);
-	double get_radius() const;
-private:
-	double radius;
-	
-/* .cpp */
-Test::Test(){
-    radius = 10; //在构造方法中初始化
-}
-// 设置radius属性值
-void Test::set_radius(double radius) {
-    // radius是从godot界面获取的值
-    this->radius = radius;
-}
-// 获取属性
-double Test::get_radius() const {
-    return this->radius;
-}
-```
-
-#### Ⅲ、为属性添加分组
-
-
-
-### 五、人物移动
-
-#### Ⅰ、键盘设置
-
-1. 虚拟映射设置
-
-2. 需要配置虚拟按键，不然会出现错误
-
-3. 菜单栏$\to$ 项目$\to$ 项目设置$\to$ 输入映射$\to$​ 添加键位映射
-
-4. 虚拟按键不支持中文
-
-#### Ⅱ、常用函数
-
-1. 头文件：
-
-    `#include <godot_cpp/classes/input.hpp>` 
-
-2. Input实例化
-
-    方法一
-
-    ``` c++
-    // Input::get_singletion()是一个Input类型的地址
-    Input &inputsign = *Input::get_singleton();
-    // 判断按键d是否被按下
-    inputsign.is_action_pressed("d");
-    ```
-
-    方法二
-
-    ``` c++
-    Input *ii = Input::get_singleton();
-    ii->is_action_pressed("d");
-    ```
-
-    方法三
-
-    ``` c++
-    Input::get_singleton()->is_action_pressed("d");
-    ```
-
-``` c++
-// 按下d键，触发多次
-ii->is_action_pressed("d");
-// 按下按键，触发1次
-ii->is_action_just_pressed("d"));
-// 松开D键
-ii->is_action_just_released("d"));
-/* 获取按下s的力量 */
-float s = ii->get_action_strength("s");
-/* 获取x，y轴 */
-// 左-1，右1
-float h = ii->get_axis("左", "右");
-/* 获取向量 */
-Vector2 dir = ii->get_Vector("左","右","上","下");
-dir.x !=0; // x轴
-dir.y !=0; // y轴
-```
-
-#### Ⅲ、移动样例
-
-``` c++
-Input m_ii = Input::get_singleton();
-// 当前键盘输入，方向
-Vector2 aoix = m_ii->get_vector("left", "right", "up", "down");
-// 向量归一化
-aoix = aoix.normalized();
-// 当前向量值,get_velocity
-Vector2 currentAoix = get_velocity();
-// 判断是否向量aoix是否为0
-if(!aoix.is_zero_approx()){
-    /*实现加速度, 方法一
-    */ 
-    // currentAoix += aoix * 100 * delta;
-    // // 限制最大速度
-    // // limit_length限制向量最大长度
-    // currentAoix = currentAoix.limit_length(10000 * delta);
-
-    /* 加速度实现，方法二*/
-    // 向第一个向量移动固定的detla，不会超过最大值
-    // move_toward（目标数值，每帧的增量）
-    currentAoix = currentAoix.move_toward(aoix * 200, 200* delta) ;
-} else {
-    currentAoix = currentAoix.move_toward(Vector2(0,0), 400 * delta);
-}
-set_velocity(currentAoix);
-// move_and_collide不能沿着墙滑动
-move_and_slide();// 可以沿着墙滑动
-```
-
-### 鼠标设置
-
-``` c++
-#include <godot_cpp/classes/input.hpp>
-Test::Test() {
-	// 这里可以通过ctrl查看input类
-    Input *I = new Input();
-    // MOUSE_MODE_HIDDEN：鼠标移入程序隐藏鼠标，同时在编辑器中也会隐藏
-    I->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
-};
-```
-
-### 六、分组操作
-
-#### Ⅲ、删除分组
-
-- 通过Godot创建分组
-
-``` c++
-/*获取场景树*/ 
-SceneTree *t = get_tree();
-/*获取场景中的组empy*/ 
-// TypedArray类型继承于Array
-// TypedArray<Node> tg = t->get_nodes_in_group("empy");
-// empy是分组名，在Godot界面中设置
-Array tg = t->get_nodes_in_group("empy");
-
-// is_empty,数组为空时返回true
-while (!tg.is_empty())
-{
-    // 弹出一个节点，注意是Variant类型
-    Variant temp = tg.pop_back();
-    // 转换类型到Node
-    Node *t = cast_to<Node>(temp);
-    t->queue_free();
-}
+/* 获取一个分组，获取分组中的节点 */
+Array a = t->get_node_in_group("组名"); // 返回一个分配给给定组的所有节点的列表
+Node * ab = cast_to<Node>(a[0]); // 转换节点，调用a[0]
 ```
 
 #### Ⅲ、分组操作
@@ -1226,49 +972,162 @@ Sprite2D *root1 = get_node<Sprite2D>
 root1->add_to_group("empy");
 ```
 
-### 七、预设资源
+### 十一、Object
 
-- load是直接加载
-- preload是使用时加载
+1. 所以类的基类，这意味Object中的方法可以直接调用
 
-方式一：（简单命令）
+#### Ⅰ、connect
+
+1. 连接默认是连接当前类的当前方法
+2. 要连接其他类，需要使用其他节点
+3. `connect("信号名称", Callable(类, "触发方法"));`
+
+``` c
+/* 默认连接当前类 */ 
+// game_stop：信号或自定义信号
+// Callable(this, "game_stop_met")：调用方法
+connect("game_stop", Callable(this, "game_stop_met"));
+
+/* 在类中连接其他类中的其他方法 */
+get_node<Area2D>("Area2D") // 获取节点
+    ->connect("area_entered", Callable(ba_s, "change_state_parameter"));
+```
+
+### 十二、Path2D
+
+- 使用PATH2d在地图上画出路径
+- 创建Pathfollow2d节点，pathfollow2d节点会根据path2d设置的路径行走
+
+``` c
+PathFollow2D *p = get_node<PathFollow2D>("/root/Node2D/Path2D/PathFollow2D");
+// 设置移动距离，单位像素
+p->set_progress(500);
+
+// 获取当前移动坐标
+Vector2 v = p->get_position();
+Sprite2D *s = get_node<Sprite2D>("/root/Node2D/Sprite2D");
+// 将坐标设置给精灵
+s->set_position(v);
+```
+
+### 十三、RayCast2D
+
+- 射线投射节点，用于检测碰撞不可见射线，根据设置的箭头进行碰撞检测
 
 ``` c++
-#include <godot_cpp/classes/resource_loader.hpp>
-// 资源加载
+is_colliding(); //检测是否发生碰撞
+```
+
+### 十四、Input
+
+1. 虚拟映射设置
+
+2. 需要配置虚拟按键，不然会出现错误
+
+3. 菜单栏$\to$ 项目$\to$ 项目设置$\to$ 输入映射$\to$​ 添加键位映射
+
+4. 虚拟按键不支持中文
+
+#### Ⅰ、Input
+
+- 头文件：`#include <godot_cpp/classes/input.hpp>`
+
+``` c++
+// 获取Input静态实例
+Input *ii = Input::get_singleton(); 
+
+ii->is_action_pressed("d");// 按下d键，触发多次
+ii->is_action_just_pressed("d"));// 按下按键，触发1次
+ii->is_action_just_released("d"));// 松开D键
+ii->is_anything_pressed();// 任意键按下
+
+/* 获取按下s的力量 */
+float s = ii->get_action_strength("s");
+
+/* 获取x，y轴 */
+// 左-1，右1
+float h = ii->get_axis("左", "右");
+
+/* 获取向量 */
+// 位置一定对应，不然方向会出错
+Vector2 dir = ii->get_Vector("左","右","上","下");
+dir.x !=0; // x轴
+dir.y !=0; // y轴
+```
+
+#### Ⅱ、InputMap
+
+- 头文件：`#include <godot_cpp/classes/input_map.hpp>`
+- 可以解决 this inputmap 不存在bug
+
+``` c++
+// 从Godot中的设置加载设置
+InputMap* map = InputMap::get_singleton();  
+map->load_from_project_settings();
+```
+
+### 十五、ResourceLoader
+
+#### Ⅰ、游戏资源加载
+
+1. 头文件：`#include <godot_cpp/classes/resource_loader.hpp>` 
+
+2. 类型头文件：
+
+   场景资源：`#include <godot_cpp/classes/packed_scene.hpp>`
+
+3. 类型：
+
+   PackedScene：场景资源（.tscn）
+   Texture2D：图片纹理，图片资源
+
+``` c++
+/* 方法一
+preload(); // 预加载
+load("路径","类型"); // 加载
+*/ 
 ResourceLoader *R = new ResourceLoader();
-Ref<PackedScene> scene = R->load(
-    "res://game2.tscn","PackedScene");
-        
-if (scene.is_valid()) {
-    // 实例化资源
-    Node *n = scene->instantiate();
-    // 实例化的资源n添加进当前场景
-    Node::get_tree()->get_current_scene()->add_child(n);
-    UtilityFunctions::print("y");
-}
+Ref<PackedScene> scene = R->load("res://game2.tscn","PackedScene");
+// 判断节点是否加载成功
+scene.is_valid()
+// 把资源初始化，然后就可以调用了
+Node *b = scene->instantiate();
+// 将b节点，添加到主场景即可显示
+Node *a = get_node<Node>("%node");
+a->add_child(b);
 ```
 
-方式二：
+#### Ⅱ、文本资源加载
+
+1. 头文件：`#include <godot_cpp/classes/file_access.hpp>`
 
 ``` c++
-ResourceLoader *R2 = new ResourceLoader();
-Ref<Resource> res = R2->load("res://game2.tscn");
-// will simply become NULL if not a PackedScene.
-Ref<PackedScene> scene = res; 
-if (scene.is_valid()) {
-    Node *n = scene->instantiate();
-    Node::get_tree()->get_current_scene()->add_child(n);
-    UtilityFunctions::print("y");
+FileAccess *f = new FileAccess();
+String a = f->open("res://workdiloge/work.json", FileAccess::READ)->get_as_text();
+```
+
+#### Ⅲ、游戏资源
+
+- 头文件：`#include <godot_cpp/classes/Resource>` 
+- 通过创建新资源，继承自定义资源类，进行资源文件tres文件
+
+``` c++
+class TResource: public Resource {
+public:
+    // 注意类型
+    String description;
+    Texture prop_texture:
 }
 ```
 
-### 八、设置
+### 十六、Engine
+
+- 头文件：`#include <godot_cpp/classes/engine.hpp>` 
 
 #### Ⅰ、设置进程模式
 
-- 设置这个，会解决按键bug
-- 注意：不能在CharacterBody2D节点中使用
+- 建议使用GDScript进行update调用
+- 注意：不能在CharacterBody2D节点中使用，有些版本会有BUG，编译完成后，需要重新添加节点才有效果
 
 ``` c++
 #include <godot_cpp/classes/engine.hpp>
@@ -1284,18 +1143,7 @@ Test::Test(){
 
 ```
 
-#### Ⅱ、从项目中读取配置
-
-- 可以解决 this inputmap 不存在bug
-
-``` c++
-#include <godot_cpp/classes/input.hpp>
-// 从Godot中的设置加载设置
-InputMap* map = InputMap::get_singleton();  
-map->load_from_project_settings();
-```
-
-#### Ⅲ、获取重力速度
+#### Ⅱ、获取重力速度
 
 ``` c++
 #include <godot_cpp/classes/project_settings.hpp>
@@ -1305,7 +1153,7 @@ Variant g = ProjectSettings::get_singleton()->get_setting("physics/2d/default_gr
 this->m_gravity = (float)g;
 ```
 
-#### Ⅳ、减速状态
+#### Ⅲ、减速状态
 
 ``` c++
 #include <godot_cpp/classes/engine.hpp>
@@ -1315,17 +1163,96 @@ Engine *e = Engine::get_singleton();
 e->set_time_scale(3);
 ```
 
+#### Ⅳ、暂停游戏
 
+``` c++
+set_physics_process(false);
+get_tree()->paused = true;
+// 设置节点属性，Node->pause->mode-> process 设置当前节点和主场景节点不是继承关系
+```
 
-### 九、信号
+#### Ⅴ、注册实例
 
-#### Ⅰ、ADD_SIGNAL
+``` c++
+Engine::get_singleton()
+    ->add_singleton(Engine::Singleton("YTween", YTween::get_singleton()));
+```
 
-1. 发射信号方法
+#### Ⅶ、程序暂停
+
+``` c++
+set_process(FAILED); // 暂停
+
+```
+
+### TileMap
+
+- 5生成地牢-25分
+- 设置战争迷雾
+
+``` c++
+set_cells_terrain_connect
+```
+
+### AStarGrid2D
+
+- AI算法，9期移动AI-05分 
+
+### FileAccess
+
+``` c++
+savefileforread = FileAccess.Open(path, write); // 打开
+savefileforread.dispose(); //关闭句柄
+```
+
+## 软件开发控件
+
+### 一、画布类
+
+1. canvasLayer：新的画布，其属性独立于其他节点
+2. NinePatchRect：背景图层，显示图片纹理
+3. ColorRect：颜色控件
+4. panelcontainer：为图像提供背景
+
+#### Ⅰ、canvasLayer
+
+- 头节点：`#include <godot_cpp/classes/canvas_layer.hpp>`
+- 可以用于进程场景切换
+
+``` c++
+// 获取
+CanvasLayer * cl = get_node<CanvasLayer>("%InventoryWindow");
+cl->set_visible(TRUE); // 设置是否可见
+cl->is_visible(); // 当前是否打开
+cl->hide();  // 隐藏
+cl->show(); // 显示
+```
+
+### 二、容器类
+
+1. MarginContainer：边框容器，可以选居中，向左靠齐，向右靠齐，边框大小等等
+   - HboxContainer：横向排列的容器，用于制作角色血条等
+   - VBoxContainer：纵向排列容器
+2. ViewportContainer：小窗口容器
+
+### 三、功能类
+
+1. Progressbar：进度条，软件常用
+2. TextureProgressbar：进度条，游戏常用，可设置背景
+3. Button：按钮
+4. Label：标签
+
+## 常用功能实现
+
+### 一、_bind_methods方法
+
+#### Ⅰ、自定义信号
+
+1. 发射信号
 2. Variant::STRING类型可参考Variant
 3. 这能在Godot面板中的信号设置信号发出
 
-不带参数的信号
+不带参数的信号：
 
 ``` c++
 void Test::_bind_methods(){
@@ -1338,15 +1265,15 @@ void Test::xxx(String world){
 }
 ```
 
-调用发射信号
+带参数的信号：
 
 ``` c++
 void Test::_bind_methods(){
     // 携带参数的信号
     ADD_SIGNAL(MethodInfo(
-        "hello_signal"，//信号名称
-        PropertyInfo(Variant::STRING, "data"))//信号参数
-    )
+        "hello_signal",//信号名称
+        PropertyInfo(Variant::STRING, "data")
+    ));//信号参数
 }
 void Test::xxx(String world){
     // 发射信号，hello_singal
@@ -1354,79 +1281,31 @@ void Test::xxx(String world){
 }
 ```
 
+#### Ⅱ、信号的接收方法
+
+1. 代码方法参考：Ⅳ、方法绑定
+3. 操作方法：连接信号方法$\to$ 连接到脚本（选中自定义类）$\to$​ 接受方法旁的“选取”
+
+<img src="assets/111183620.png" style="zoom:55%;" />
 
 
 
+#### Ⅲ、自定义节点属性
 
-``` 
-#include "Enemy.h"
-void cast_damage(Enemy * target);
-
-ClassDB::bind_method(
-			D_METHOD("cast_damage_met", "target"), &DefaultBullet::cast_damage);
-void DefaultBullet::cast_damage(Enemy * target) {
-	target->being_attacked(damage);
-	emit_signal("default_bullet_hit", get_position());
-	queue_free();
-}
-
-```
-
-
-
-#### Ⅱ、bind_method
-
-- 信号的接收方法
-
-- 操作方法
-
-    连接信号方法$\to$ 连接到脚本（选中自定义类）$\to$​ 接受方法旁的“选取”
-
-    <img src="assets/111183620.png" style="zoom:55%;" />
-
-不带参数的方法
-
-``` c++
-void Test::_bind_methods(){
-    /* ClassDB::bind_methond(D_METHOD("函数名"), 方法地址) */
-    ClassDB::bind_method(D_METHOD("start_test"), &Test::start_test);
-}
-```
-
-带参数的方法
-
-1. Godot一些发射的信号带有参数，接收函数使用Variant
-
-``` c++
-void Test::_bind_methods(){
-    /***
-     * ClassDB::bind_methond(D_METHOD("函数名", "参数1", "参数2"), 方法地址)
-     */
-    ClassDB::bind_method(D_METHOD("start_test", "a", "b"), &Test::start_test);
-}
-
-// 带有参数的接收函数
-void Test::start_test(Variant a, Variant b){
-   	// 使用cast_to转换为适合类型 
-    // cast_to<类型>(要转换的变量);
-	Area2D *t = cast_to<Area2D>(a);
-}
-```
-
-#### Ⅲ、添加属性
-
-- 注意：ClassDB::bind_method方法一定要在 ClassDB::add_property之前
+- 注意：`ClassDB::bind_method `方法一定要在 `ClassDB::add_property` 之前
+- 需要重新打开Godot，才能显示属性
+- 中文会乱码
 
 基本用法：
 
 ``` c++
 void Test::_bind_methods(){
-    /* 将Godot界面属性与C++方法绑定 */
+    /* 2.将Godot界面属性与C++方法绑定 */
     // 要先定义绑定方法
-    ClassDB::bind_method(D_METHOD("set_radius", "r"), &Test::set_radius);
+    ClassDB::bind_method(D_METHOD("set_radius", "a"), &Test::set_radius);
     ClassDB::bind_method(D_METHOD("get_radius"), &Test::get_radius);
     
-    /* 添加界面接口
+    /* 1.添加界面接口
     ClassDB::add_property("类名",
     	PropertyInfo(参数类型, "参数名称"),
         "参数设置方法", 
@@ -1437,7 +1316,8 @@ void Test::_bind_methods(){
         "set_radius",
         "get_radius");
 }
-/* 设置get_radius、set_radius方法 */
+
+/* 3.设置get_radius、set_radius方法 */
 double Test::get_radius(){
     return radius;
 }
@@ -1464,6 +1344,238 @@ ClassDB::add_property("Test",
     PropertyInfo(Variant::FLOAT, "first_second_xxxxx"),
     "set_radius",
     "get_radius");
+```
+
+#### Ⅳ、方法绑定
+
+- 使用方法绑定，可以让GDScript调用C++函数
+
+- 同时也可以变成信号接收方法，若没有相关信号，需要重启Godot
+
+- 方法可以放到 private 中，若Godot不能识别C++方法，应检查参数类型是不是`Variant`，参数不对应也不会显示C++方法
+
+- 调用方法：
+
+  ``` python
+  # 使用 New 方法
+  # 此方法会开创一个新节点，此节点不在节点树中
+  # 不用引入节点，需要new对象使用
+  var a = Test.new();
+  a.start_test();
+  
+  # 使用 @onready 方法 《推荐》
+  # 拖拽节点，形成对节点的引用
+  # @onready会等节点树加载完毕，防止出现不在节点树错误
+  @onready var tfsc = $TFSC
+  ```
+
+不带参数的接收方法
+
+``` c++
+void Test::_bind_methods(){
+    /* ClassDB::bind_methond(D_METHOD("函数名"), 方法地址) */
+    ClassDB::bind_method(D_METHOD("start_test"), &Test::start_test);
+}
+
+// 不带参数的接收函数
+void Test::start_test(){}
+```
+
+带参数的接收方法
+
+``` c++
+void Test::_bind_methods(){
+    /***
+     * ClassDB::bind_methond(D_METHOD("调用的函数名", "参数1", "参数2"), 方法地址)
+     */
+    ClassDB::bind_method(D_METHOD("start_test", "a", "b"), &Test::start_test);
+}
+
+// 带有参数的接收函数
+// 参数类型，一般都使用Variant类型
+void Test::start_test(Variant a, Variant b){
+   	// 使用cast_to转换为适合类型 
+    // cast_to<类型>(要转换的变量);
+	Area2D *t = cast_to<Area2D>(a);
+}
+```
+
+### 二、人物移动
+
+``` c++
+/**
+ * 角色移动
+ */
+Vector2 temp_v = m_inputHandler
+    ->get_vector("G_LEFT", "G_RIGHT", "G_UP", "G_DOWN").normalized();
+temp_v = temp_v.move_toward(temp_v * 1000, external_move_speed * delta) ;
+
+m_player->set_velocity(temp_v);
+m_player->move_and_slide();
+```
+
+### 三、物品相关
+
+#### Ⅰ、物品创建
+
+1. 基于场景创建，继承关系
+
+   物品：`PickableObject -> Item -> SmallPotion ` 
+
+   装备：`PickableObject -> equipment -> Armour ` 
+
+2. 结构
+
+   ``` shell
+   SmallPotion  # 物品名称，小血瓶,Node2D
+   ├─Sprite2D # 物品图像
+   ├─Area2D # 碰撞体积
+   |  └─CollisionShape2D # 形状
+   └─CombatManager # 
+   ```
+   
+
+#### Ⅱ、背包系统
+
+1. 节点构成
+
+   ``` shell
+   CanvasLayer
+   └─MarginContainer
+   	├─ColorRect # 遮盖层，纯黑色等
+   	└─HBoxContainer # 水平排列子节点
+   		├─Panel2 # 左侧面板
+   		|	└─MarginContainer #
+   		|		└─ScrollContainer # 滚动窗口
+   		|			└─VBoxContainer # 背包物品显示单元
+   		└─Panel2 # 右侧面板
+   			└─MarginContainer
+   				└─Label # 物品信息
+   ```
+
+2.  创建UI脚本
+
+
+
+#### Ⅲ、物品掉落
+
+
+
+#### Ⅳ、物品拾取
+
+#### Ⅴ、物品逻辑
+
+1. 主动使用物品
+2. 被动效果
+
+### 四、补间动画
+
+- C++使用没有效果，只进行记录
+
+  ```c++
+  #include <godot_cpp/classes/tween.hpp>
+  #include <godot_cpp/classes/property_tweener.hpp>
+  
+  Ref<Tween> tw = Node::create_tween()->set_loops();
+  bool b = tw->is_valid();// 验证是否存活
+  bool a = tw->is_running();// 验证是否运行
+  
+  Sprite2D *sp01 = get_node<Sprite2D>("../sp2");
+  // 属性补间
+  tw->tween_property(cr, NodePath("color:a"), 255.0, 4.0);
+  ```
+
+- 使用GD脚本编写
+
+  `.set_delay(x)`：延迟x秒执行补间动画
+
+  `.set_loop()`：设置补间动画循环
+
+  `.from_current(x)`：从x状态执行到目标状态
+
+  `.set_ease()`：设置变化曲线
+
+  `.set_trans()`：带有物理属性
+
+``` python
+# 获取节点，4.0以上版本需要使用@字符
+@onready var ax = $sp2
+# 创建一个补间动画
+var tween = create_tween()
+# 创建属性补间动画
+# ax:欲添加补间动画的对象
+# "position"：初始状态
+# Vector2(1000, 500)：目标状态
+# 5：持续时间
+tween.tween_property(ax, "position",Vector2(1000, 500), 5)
+tween.interval(1.0); # 循环的补间动画的间隔
+```
+
+### 五、场景管理器
+
+- 方法一：使用change_scens_to_file方法，将用户 资源等等传递给下一个场景，将系统场景设置为全局场景，场景切换，只能用于
+- 方法二：直接使用add_child方法，将节点添加进当前节点
+- 方法三：同一场景中的镜头切换，直接关闭相机，`camera.enabled = false`; 
+- 方法四：背包等一些功能图层，直接使用
+
+``` c++
+```
+
+
+
+### 六、资源创建
+
+### 七、碰撞检测
+
+1. 检测碰撞需要 `Area2D` 节点，被碰物体（敌人）与碰撞物体（玩家）都需要添加 `Area2D` 节点
+2. 使用玩家（敌人）的信号 `area_entered` 进行碰撞后代码运行
+
+本例是玩家 `CharacterBody2D` 中的 `Area2D` 发出信号
+
+``` shell
+# Player节点构造
+Player # CharacterBody2D 类型
+├─ CollisionShape2D `碰撞结构`
+├─ temp # 其他节点
+└─ Area2D `碰撞体检测节点` 
+	└─ CollisionShape2D `碰撞结构`
+```
+
+多场景使用C++步骤流程
+
+1. 接收信号类（对信号进行处理），暴露信号方法
+
+   ``` c++
+   ClassDB::bind_method(
+       // change_state_parameter：信号
+       // &TBatState::change_state_parameter：信号触发方法
+       D_METHOD("change_state_parameter", "a"), &TBatState::change_state_parameter
+   );
+   ```
+
+2. 连接信号
+
+   ``` c++
+   // 任意类，获取到指定 Area2D 节点，进行信号连接
+   Player
+       ->get_node<Area2D>("Area2D")
+       // area_entered：区域进入信号Godot官方信号
+       // ba_s：类，战斗节点
+       // change_state_parameter：ba_s中的方法
+       // 注意：这里链接的是 Area2d 节点中area_entered信号
+       ->connect("area_entered", Callable(ba_s, "change_state_parameter"));
+   ```
+
+### 鼠标设置
+
+``` c++
+#include <godot_cpp/classes/input.hpp>
+Test::Test() {
+	// 这里可以通过ctrl查看input类
+    Input *I = new Input();
+    // MOUSE_MODE_HIDDEN：鼠标移入程序隐藏鼠标，同时在编辑器中也会隐藏
+    I->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
+};
 ```
 
 ### 十、相机
@@ -1506,46 +1618,6 @@ add_text(); // 添加文本
 ```
 
 
-
-### 资源加载
-
-#### Ⅰ、游戏资源加载
-
-1. 头文件：`#include <godot_cpp/classes/resource_loader.hpp>` 
-
-2. 类型头文件：
-
-    场景资源：`#include <godot_cpp/classes/packed_scene.hpp>`
-
-``` c++
-/* 方法一 */ 
-// PackedScene：场景资源
-// Texture2D：图片纹理，图片资源
-ResourceLoader *R = new ResourceLoader();
-Ref<PackedScene> scene = R->load(
-    "res://game2.tscn","PackedScene");
-// 把资源初始化，然后就可以调用了
-Node *b = scene->instantiate();
-
-/* 方法二 */
-ResourceLoader *R2 = new ResourceLoader();
-Ref<Resource> res = R2->load("res://game2.tscn");
-// 转换资源类型
-// Ref<PackedScene>：场景资源
-// Ref<Texture2D>：图片资源
-Ref<PackedScene> scene = res; 
-// 把资源初始化，然后就可以调用了
-Node *b = scene->instantiate();
-```
-
-#### Ⅱ、文本资源加载
-
-1. 头文件：`#include <godot_cpp/classes/file_access.hpp>`
-
-``` c++
-FileAccess *f = new FileAccess();
-String a = f->open("res://workdiloge/work.json", FileAccess::READ)->get_as_text();
-```
 
 ### 实现黑夜透镜效果
 
@@ -1596,12 +1668,6 @@ _player->set_movement_limit(_scene_size);
 
 ```
 
-### 场景继承
-
-### UI设置
-
-### Gdextension说明文档
-
 ### 平台跳跃移动
 
 ``` c++
@@ -1616,55 +1682,6 @@ if not  is_on_floor():
 
 if input.is_action_just_pressed("ui_accept") and is_on_floor():
 	velocity.y = JUMP_VELOCITY
-```
-
-### 注册实例
-
-``` c++
-Engine::get_singleton()->add_singleton(Engine::Singleton("YTween", YTween::get_singleton()));
-```
-
-### 补间动画
-
-- C++使用没有效果，只进行记录
-
-  ```c++
-  #include <godot_cpp/classes/tween.hpp>
-  #include <godot_cpp/classes/property_tweener.hpp>
-  
-  Ref<Tween> tw = Node::create_tween()->set_loops();
-  bool b = tw->is_valid();// 验证是否存活
-  bool a = tw->is_running();// 验证是否运行
-  
-  Sprite2D *sp01 = get_node<Sprite2D>("../sp2");
-  // 属性补间
-  tw->tween_property(cr, NodePath("color:a"), 255.0, 4.0);
-  ```
-
-- 使用GD脚本编写
-
-  `.set_delay(x)`：延迟x秒执行补间动画
-
-  `.set_loop()`：设置补间动画循环
-
-  `.from_current(x)`：从x状态执行到目标状态
-
-  `.set_ease()`：设置变化曲线
-
-  `.set_trans()`：带有物理属性
-
-``` python
-# 获取节点，4.0以上版本需要使用@字符
-@onready var ax = $sp2
-# 创建一个补间动画
-var tween = create_tween()
-# 创建属性补间动画
-# ax:欲添加补间动画的对象
-# "position"：初始状态
-# Vector2(1000, 500)：目标状态
-# 5：持续时间
-tween.tween_property(ax, "position",Vector2(1000, 500), 5)
-tween.interval(1.0); # 循环的补间动画的间隔
 ```
 
 ### 动画播放实现场景移动
@@ -1690,4 +1707,6 @@ class TMOVESTATE : public TFSC {
     GDCLASS(TMOVESTATE, TFSC);
 }
 ```
+
+
 

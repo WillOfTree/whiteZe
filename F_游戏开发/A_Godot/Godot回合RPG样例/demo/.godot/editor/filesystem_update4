@@ -1,0 +1,5 @@
+res://scene/mountains_seas_village.tscn
+res://main.tscn
+res://entites/characters/player/protagonist.tscn
+res://managers/System.tscn
+res://UI/BattleScene.tscn

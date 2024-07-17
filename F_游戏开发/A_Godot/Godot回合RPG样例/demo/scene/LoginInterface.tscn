@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://dddd8ylfg7l2s"]
+
+[ext_resource type="Script" path="res://script/LoginInterface.gd" id="1_anoui"]
+
+[node name="LoginInterface" type="Node2D"]
+script = ExtResource("1_anoui")
+
+[node name="Start" type="Button" parent="."]
+offset_left = 27.0
+offset_top = 60.0
+offset_right = 227.0
+offset_bottom = 128.0
+text = "go to moon"
+
+[node name="Exit" type="Button" parent="."]
+offset_left = 27.0
+offset_top = 149.0
+offset_right = 230.0
+offset_bottom = 225.0
+text = "加载游戏
+"
+
+[connection signal="button_down" from="Start" to="." method="start_game"]
