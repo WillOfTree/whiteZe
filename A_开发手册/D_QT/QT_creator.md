@@ -1,6 +1,16 @@
 # QT/QT_create
 
-1、支持平台windows、Unix/X11、MAC OS 、Embedded
+1. 支持平台windows、Unix/X11、MAC OS 、Embedded
+
+## 打包发布
+
+### qt打包方式
+
+修改 debug 模式到 Release 模式 $\to$ 编译运行 $\to$ 找到Release目录下的exe文件 $\to$ 复制到新文件夹 $\to$ 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
+
+windeployqt也可以通过菜单的qt $\to$ qt(MinGW)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行，使用什么软件编译的就用什么处理）
+
+### hm nis edit（第三方打包）
 
 ## 基本功能
 
@@ -278,11 +288,8 @@ connect(d, &Dialog::send, this, &Dialog_main::show);
 
 ## 信号
 
-### 说明
-
-使用观察者模式实现，`connect` 必须继承`QObject`
-
-`connect(信号发送者，发送的信号，信号的接收者，处理的槽函数 )` 
+1. 使用观察者模式实现，`connect` 必须继承`QObject` 
+2. ``connect(信号发送者，发送的信号，信号的接收者，处理的槽函数 )` 
 
 ### 一、系统槽（处理方法）
 
@@ -1977,12 +1984,3 @@ info.created().toString("yyyy-MM-dd hh:mm:ss");
 
 #### 2、数据量大
 
-## 打包发布
-
-1、qt打包方式
-
-修改 debug 模式到 Release 模式 $\to$ 编译运行 $\to$ 找到Release目录下的exe文件 $\to$ 复制到新文件夹 $\to$ 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
-
-windeployqt也可以通过菜单的qt $\to$ qt(MinGW)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行，使用什么软件编译的就用什么处理）
-
-2、hm nis edit（第三方打包）

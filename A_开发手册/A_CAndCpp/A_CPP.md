@@ -318,9 +318,38 @@ delete [] arr;
 delete arr[2];
 ```
 
-### 七、string类型
+### 七、for auto
 
-参考STL $\to$ 二、string-字符串
+#### Ⅰ、遍历Vector容器
+
+1. 要使用vector的下标，需要最朴素的for遍历方法
+2. for auto不能获取下标
+
+``` c++
+std::vector<int> i; //定义一个vector容器
+
+// 修改你正在迭代的容器的值，或者你想避免拷贝大的对象
+for(auto &it : num) {
+    cout << it << endl;
+}
+// it 用于捕获vector里面的值
+for(auto it :num) {
+    cout << it << endl;
+}
+```
+
+#### Ⅱ、遍历map容器
+
+``` c++
+map<int, int> num_map;      
+num_map[2] = 4;
+num_map[4] = 5;
+
+for(auto &it : num_map) {       
+    cout << it.first << endl; // 输出key
+    cout << it.second << endl;// 输出value
+}
+```
 
 ## 函数高级
 
@@ -449,7 +478,7 @@ func(A);
 
 ## 类和对象
 
-### 类的调用方法集合
+### 一、类的调用方法集合
 
 1.  **应当使用带括号的构造方式**（`AA *a = new AA();`）
 
@@ -1288,11 +1317,13 @@ son::m_A; //不用初始化对象
 son::Base::m_A //通过子类的父类访问
 ```
 
-#### Ⅴ、父类存放子类
+#### Ⅴ、泛化
+
+1. 父类可以存放子类对象，就叫泛化
 
 1. 使用父类定义对象A，A可以存放其子类变量，
 
-   （自能存放，但要调用子类方法，需要虚函数）
+   （只能存放，但要调用子类方法，需要虚函数）
 
   ``` c++
   class Animal{}; // 父类
@@ -1315,10 +1346,11 @@ class A: public Animal {
     void set_value();
 }
 
-/* 调用子类A */
+/* 调用-只能调用父类方法 */
 // An可存放子类A
 Animal *An = new A(); 
 An->set_value(); // 调用Animal中的方法
+// An存放父类Animal
 Animal *An = new Animal();
 An->set_value(); // 调用Animal中的方法
 
@@ -1352,6 +1384,16 @@ B *p = new B(); // 调用class B中方法
 C *p = new C(); // 调用class C中方法
 ```
 
+#### Ⅶ、虚继承
+
+``` c++
+/* 虚继承 */
+class A {};
+class B {};
+// B,A只会实例化1次
+class C: virtual public B, virtual public A {}
+```
+
 ### 六、多态
 
 1. 多态分为2类，一是静态多态和动态多态
@@ -1381,8 +1423,17 @@ C *p = new C(); // 调用class C中方法
 #### Ⅰ、虚函数
 
 - 构造函数没有虚函数，析构函数有虚函数
+
 - **注意：**
-  1. 虚函数中父类虚函数默认方法，需要实现，若不需要实现，可以考虑纯虚函数
+  1. 父类的虚函必须实现，若不需要实现，可以考虑纯虚函数
+  
+  2. 父类的虚函数（函数名：speak）实现后，其所有子类孙子类的speak方法都是虚函数
+  
+  3. 其子类孙子类可以重写speak方法、也可不写，
+  
+     没有重写父类方法的子类，会调用父类方法
+  
+     重写了父类方法的子类，调用子类方法
 
 ``` c++
 /* 类的定义 */
@@ -1393,7 +1444,7 @@ class Animal { // 父类
 }
 
 class A:public Animal{ //子类
-	void speak() { 
+	void speak() override{ 
         printf("A在说话");
     }
 }
@@ -1423,18 +1474,22 @@ class father{}
 
 1. 只要类中含有一个纯虚函数，那么这个类就是抽象类。
 
-2. 父类不能使用`new`出新对象，子类可以使用`new`出新对象
+2. 抽象类（纯虚函数）只能是父类（继承最顶级才行），子类不能有`=0` 
+
+3. 父类不能使用`new`出新对象，子类可以使用`new`出新对象
 
    ``` c++
-   class Animal{}; // 纯虚函数
+   class Animal{}; // 设Animal为纯虚函数
    class Cat: public Animal{}; // 子类
    
    /* 纯虚函数不能创建对象 */
    Animal A; //错误
    Animal *A = new Animal(); //错误
+   /* 虽然不能初始化抽象类，但可以存放其子类 */
+   Animal *A = new Cat();
    ```
 
-3. 抽象类特点：
+4. 抽象类特点：
    - 无法实例化对象，不能创建对象，但可以创建类指针 
    - 子类必须重写抽象类中的纯虚函数，否则子类也是抽象类
    - 抽象类只用`.h`文件即可，不需要`.cpp`文件
@@ -1447,17 +1502,68 @@ class Animal {
 	virtual int speak()=0; // 纯虚函数
 }
 
+// 注意一定写public或private或protection
 class cat:public Animal{
-	int speak(){ printf("A在说话") }
+	int speak() override{ printf("A在说话") }
 }
 
 /* 纯虚函数调用-接口 */
 Animal *A  = new cat();
 A->speak();
-// 其他调用
-cat c;
-c.speak();
 ```
+
+#### Ⅳ、抽象类多级继承
+
+- 只要有一个子类重写了纯虚函数即可
+
+  ``` c++
+  class Animal {
+  	virtual void speak()=0; // 纯虚函数
+  }
+  class land_animal:public Animal{ // 这里重写了虚函数，即可
+  	void speak(){ printf("land_animal在说话") }
+  }
+  class cat:public land_animal {} // 其孙子类没有重写也没问题 
+  ```
+
+普通继承方式
+
+``` c++
+/* 所有子类都重写 */
+class Animal {
+	virtual void speak()=0; // 纯虚函数
+}
+class land_animal:public Animal{
+	void speak() override{ printf("land_animal在说话") }
+}
+class cat:public land_animal {
+    void speak() override{ printf("cat在说话")}
+}
+Animal *A = new cat();
+A->speak(); // 打印cat在说话
+Animal *A = new land_animal();
+A->speak(); // 打印land_animal在说话
+
+/* 只重写一部分 */
+class Animal {
+	virtual void speak()=0; // 纯虚函数
+}
+class land_animal:public Animal{
+	void speak(){ printf("land_animal在说话") }
+}
+class cat:public land_animal {}
+Animal *A = new cat();
+A->speak(); // 打印land_animal在说话
+Animal *A = new land_animal();
+A->speak(); // 打印land_animal在说话
+```
+
+虚继承方法
+
+``` c++
+```
+
+
 
 #### Ⅲ、虚析构
 
@@ -1715,12 +1821,13 @@ C++使用模板实现范式编程，模板的目的是提高程序的复用性�
 
 ### 一、模板基本语法
 
+- template 声明创建一个模板
+- typename 表明这是一个数据类型，可以使用class代替
+- T 通用的数据类型，名称可以替换，通常为大写字母
+
 ``` c++
-// template 声明创建一个模板
-// typename 表明这是一个数据类型，可以使用class代替
-// T 通用的数据类型，名称可以替换，通常为大写字母
+// 函数声明或定义
 template <typename T>
-函数声明或定义
 
 // class与typename没有区别
 template <class T>
