@@ -5,6 +5,22 @@
 - 官网地址：www.wireshark.org
 - 网络模拟eNSP：
 
+## 说明
+
+### Packet Details Pane(数据包详细信息)
+
+在数据包列表中选择[指定数据包](https://zhida.zhihu.com/search?content_id=233475982&content_type=Article&match_order=1&q=指定数据包&zhida_source=entity)，在数据包详细信息中会显示数据包的所有详细信息内容。数据包详细信息面板是最重要的，用来查看协议中的每一个字段。各行信息分别为
+
+（1）Frame:物理层的[数据帧](https://zhida.zhihu.com/search?content_id=233475982&content_type=Article&match_order=1&q=数据帧&zhida_source=entity)概况
+
+（2）EthernetII:[数据链路层](https://zhida.zhihu.com/search?content_id=233475982&content_type=Article&match_order=1&q=数据链路层&zhida_source=entity)以太网帧头部信息
+
+（3）Internet Protocol Version 4:互联网层[IP包](https://zhida.zhihu.com/search?content_id=233475982&content_type=Article&match_order=1&q=IP包&zhida_source=entity)头部信息
+
+（4）Transmission Control Protocol:传输层T的数据段头部信息，此处是TCP
+
+（5）Hypertext Transfer Protocol:应用层的信息，此处是HTTP协议
+
 ## Berkeley Packet Filter过滤规则
 
 ### 一、语法规则

@@ -2,7 +2,12 @@
 
 ## 备注：
 
-### 三、结构体
+### 一、返回值
+
+1. int、double、float、string类型是可以直接返回的，返回的是原版的拷贝
+1. STL标准库中的类型一般要返回引用，或指针
+
+### 二、结构体
 
 1、结构体可以相互赋值（相同结构），结构体数组不能相互赋值
 
@@ -706,11 +711,30 @@ p = &a; // p 不能被修改，p不能改变指向的变量；初始化后就不
 
 ### 十一、typedef 类型重定义
 
-1、起别名
+1. 在C++中使用using替代typedef
+
+   ``` c++
+   typedef int int_name;
+   //等价于
+   using int_name = int;
+   ```
+
+2. 函数指针的定义
+
+   ``` c
+   typedef bool (*funcptr)(int, int); // 定义一个类型
+   typedef bool fun(int, int);
+   // 使用c++
+   using funcptr = bool (*)(int, int);
+   using fun = bool (int, int);
+   
+   // 使用，函数作为参数
+   void func2(int a, funcptr *fun);
+   ```
 
 ```c
 typedef int A; //重命名int为A
-typedef int A, B; //给int起2个别名
+typedef int A, B; // 给int起2个别名,A\B都是int
 typedef char* A; //给char *起一个别名
 typedef unsigned int u_int //给unsigned int 重命名为u_int
 
@@ -1099,11 +1123,13 @@ int main()
 }
 ```
 
-### 十、传函数（函数做参数） / 回调函数
+### 七、传函数（函数做参数） / 回调函数
 
-1、声明
+#### Ⅰ、声明
 
 ```c
+int (*funp)(int a, int b); // 函数指针
+
 /* 
 pfun是一个返回int类型的函数，同时他也是一个参数
 func是普通的函数
@@ -1112,13 +1138,12 @@ int func( int (*pfun)(int, int), ...);
 int func( int (*)(int, int), ...); //无法调用，没有函数名
 ```
 
-2、函数内使用**函数参数**
+#### Ⅱ、使用函数参数
 
 ``` c
-int func(int (*pfun)(int, int), int a)
-{
+int func(int (*pfun)(int, int), int a) {
     // 函数内使用,同变量，数组使用方法
-    *pfun(1,2);
+    (*pfun)(1,2);
 }
 ```
 
@@ -1126,7 +1151,7 @@ int func(int (*pfun)(int, int), int a)
 
 ``` c
 int func(int (*pfun)(int, int)){...}
-int pfun(int a, int b){...}
+int pfun(int a, int b){...} //
 
 int main()
 {
@@ -1441,7 +1466,7 @@ void* p = &a //万能指针，void
 
 ### 四、指针数组
 
-1、声明
+1. 声明
 
 - 比直接使用数组存放更节省空间（因为可以不定长存储）
 
@@ -1769,6 +1794,61 @@ func_array(s);
 ```
 
 ## 结构体
+
+1. 结构体可以相互赋值（相同结构），结构体数组不能相互赋值
+
+   ``` c
+   // 普通结构体
+   struct _A {
+       int a;
+   }
+   struct _A a,b;
+   a.a = 11;
+   b = a;
+   print("%d",b.a); //打印11
+   
+   // 结构体数组，本质数组就不能使用‘=’相互赋值
+   struct _b {
+       int a;
+   }
+   struct _b cc[100];
+   struct _b dd, ee[100];
+   dd = cc; // 错误
+   ee = cc; // 错误
+   ```
+
+   
+
+2. 结构体数组`[]`符号与使用指针效果相同
+
+   ``` c
+   // book 是一个Person类型结构体
+   struct Person *pson = book;
+   
+   for (int i = 0; i < len; i++) {
+       // pson[i] 等价于 *(pson + i)
+       printf("%s\n", pson[i].name);
+       // 与6行等价，注意一定是(*(pson+1)).name
+       printf("%s\n",(*(pson+1)).name)
+   }
+   ```
+
+   
+
+3. 关于资源释放
+
+   - 一般情况下，结构体不需要手动释放。如果结构体只包含基本类型（如 `int`、`float` 等）或没有指针成员，其内存由栈或堆自动管理，不需要手动释放。
+   - 如果结构体包含动态分配的资源（例如指针、文件句柄等），则需要在结构体的生命周期结束时手动释放这些资源。（析构函数中释放、RALL原则）
+
+   
+
+2、
+
+``` c
+
+```
+
+## 
 
 ### 一、结构体对齐
 

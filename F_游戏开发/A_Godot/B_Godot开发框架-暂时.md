@@ -8,41 +8,66 @@
 
   类名使用大驼峰命名法
 
+## 常见错误
+
+1. 资源挂载节点，不显示资源位置
+
+   应检查`D_METHOD`的方法与`PropertyInfo`方法是否一致
+
+   应检查`add_property`后的字符是不是当前类名
+
+2. 不显示自定义节点
+
+   应检查节点注册顺序，父类应在子类先注册
+
 ### 一、C++项目目录
+
+- 
 
 ``` shell
 # 项目根目录
  ├─demo `Godot项目目录`
- ├─Godot-cpp `Godot源码目录`
+ ├─external # 第三方库
+ |	└─godot-cpp
+ ├─include `头文件目录` 
  ├─src `C++代码目录` 
  │  ├─component # 组件
  |	├─system # 系统目录
- |	|	├─system_node.h # 系统节点
- |	|	├─system_node.cpp 
- │  |	├─FSC # 状态机目录
- │  |	└─manager # 管理类目录
- |	|		├─manager_input # 输入管理
- |	|		├─manager_scene # 场景管理
- |	|		├─manager_inventory # 背包管理
- |	|		└─include.h
+ |	|	├─system_node.cpp # 系统节点
+ │  |	├─FSC `状态机目录`
+ |	|	|	├─battery_substate `战斗子类`
+ |	|	|	└─fsc.cpp #状态机文件
+ │  |	└─manager `管理类目录`
+ |	|		├─manager_input # 输入管理器
+ |	|		├─manager_scene # 场景管理器
+ |	|		├─manager_inventory # 背包管理器
+ |	|		├─manager_enemy # 敌人管理器
+ |	|		└─manager_player # 玩家管理器
  │  ├─pickup_object # 详细查看：可拾取物品目录结构
- |	├─characters # 实体目录
- |	|	├─Players # 玩家节点
- |	|	|	├─player_character # 主角
- |	|	|	├─player_informers # 线人
- |	|	|	├─player_Antaonizers # 对抗者
- |	|	|	├─player_subangle # 副角
- |	|	|	└─player_supporter # 配角
+ |	├─characters_node `实体节点目录` 
+ |	|	├─character_node.cpp # 实体父文件
+ |	|	├─Players `玩家节点`
+ |	|	|	├─player.cpp # 根节点
+ |	|	|	├─player_character.cpp # 主角
+ |	|	|	├─player_informers.cpp # 线人
+ |	|	|	├─player_Antaonizers.cpp # 对抗者
+ |	|	|	├─player_subangle.cpp # 副角
+ |	|	|	└─player_supporter.cpp # 配角
  |	|	└─Enemys # 敌人节点
  |	|		├─Rat # 老鼠敌人挂载节点
  |	|		└─goblin # 哥布林敌人挂载节点
- |	├─resources# 资源类
- |	|	├─character
- |	|	|	├─enemy_date # 敌人数据目录
- |	|	|	├─player_date # 玩家数据目录
- |	|	|	├─character.h # 玩家资源父类
- |	|	|	└─character.cpp
- |	└─utils_node_set # 工具节点集合 
+ |	├─resources `资源类文件夹`
+ |	|	├─t_resources.cpp # 资源基类
+ |	|	|
+ |	|	└─entites_data  `实体数据文件夹`
+ |	|		├─enemy_date  `敌人数据目录`
+ |	|		|	├─enemy.cpp # 基类
+ |	|		|	└─general_data.cpp #
+ |	|		├─player_date `玩家数据目录`
+ |	|		|	├─player.cpp # 基类
+ |	|		|	└─protagonist_data.cpp #
+ |	|		└─entites_data.cpp # 基类
+ |	└─utils # 工具节点集合 
  |		├─t_button # 自定义Button节点
  |		├─test
  └─SConstruct  # SCons构建脚本
@@ -56,24 +81,21 @@
 |   ├─textures # 图像，纹理
 |   └─fonts    # 文件字体
 ├─entites # 实体（.tscn)，游戏场景中所有可见对象
-|   ├─characters 
-|   |   ├─enemies # 敌人 
-|   |   └─player # 玩家
+|   ├─enemies # 敌人 
+|   ├─players # 玩家
 |   ├─equipments # 装备
+|   ├─skill # 技能
 |   └─items # 物品
 ├─components # 组件，与不同的对象配合使用，实现不同行为
 |   ├─AI_component # AI组件
 │   └─move_component # 移动组件
-├─managers # 抽象功能集合
-|   ├─TFSM # 有限状态机
-|   └─TSceneManger # 场景管理器
+├─systems # 系统节点场景集合
 ├─scripts # 脚本目录
 |	├─teleporter # 传送脚本
 |	└─System # 系统脚本
-├─game_scenes # 游戏场景（.tscn)
+├─scenes # 游戏场景（.tscn)
 |   ├─One.tscn # 游戏场景一
 |   └─twe.tscn # 游戏场景二
-├─scenes # 控件场景（.tscn)
 ├─UI # 游戏UI相关
 |	├─login.tscn # 登录界面
 |	├─InventoryWindow.tscn # 背包窗口
@@ -91,63 +113,65 @@
 
 ### 三、状态机结构
 
-一些节点结构说明
-
-- 回合制RPG
-
-  ``` shell
-  ├─TFSM # 无限状态机
-  	├─TInitState # 初始化状态
-      ├─TOrdinaryState # 一般状态，移动和站立 
-      ├─TOpenBackpack # 背包打开，系统打开状态
-  	├─TBatState # 战斗状态
-  	|	├─InitState # 战斗状态初始化
-      |	├─State # 状态
-      |	├─State # 状态 
-  	├─TChangeScence # 切换场景状态
-  ```
-
-- 横板过关
-
-  ``` shell
-  ├─TFSM # 无限状态机
-  	├─TInitState # 初始化状态
-      ├─TMoveState # 移动状态 
-      ├─TIdleState # 站立状态
-  	├─TJumpState # 跳跃状态
-  	├─TChangeScence # 切换场景状态
-  ```
-
-状态机TSystemNode节点
-
-- %：代表场景内唯一节点（并不是整个游戏中唯一节点）
+回合制RPG
 
 ``` shell
-├─TSystemNode # 系统节点
-	├─%TFSM # 无限状态机
-	├─%TSceneManager # 场景管理器，用于切换场景，加载玩家，加载敌人等等
-	├─%InputManager # 输入管理，将输入信号传送出去，
-	├─%MapManager # 随机地图生成
-	├─%InventoryManager # 物品管理
-	└─%SignalManager # 信号控制
+TFSM # 无限状态机
+  ├─TInitState # 初始化状态
+  ├─TOrdinaryState # 一般状态，移动和站立 
+  ├─TOpenBackpack # 背包打开，系统打开状态
+  ├─TChangeScence # 切换场景状态
+  └─TBatState # 战斗状态
+      ├─auto_enemy # 敌人战斗状态
+      ├─operate_player # 玩家操作状态
+      ├─over # 战斗结束状态 
+      ├─setup # 战斗初始化状态 
+      ├─turn # 战斗切换状态状态
+      └─verification # 验证战斗状态 
 ```
 
-### 四、主场景结构说明
-
-1. [main] ：表示分组节点，用于不同场景中获取节点，分组名为main
+横板过关
 
 ``` shell
-main # 主循环
-├─TSystemNode # 系统节点
-| # TPlayerContainer节点，保存所有玩家场景(.tres)
-#├─[main]PlayersContainer:[C++]
-├─[main]PlayersContainer # 玩家资源节点
-|	├─Protagonist:[PlayerProtagonist] # 资源节点
-|	├─Support:[PlayerSupport] # 配角数据
-├─[main]Windows # 一些常用窗口
-|	├─InventoryWindow # 装备界面
-|	└─BattleWindow # 战斗界面 
-└─[main]World # 世界节点，用于动态加载
+TFSM # 无限状态机
+  ├─TInitState # 初始化状态
+  ├─TMoveState # 移动状态 
+  ├─TIdleState # 站立状态
+  ├─TJumpState # 跳跃状态
+  └─TChangeScence # 切换场景状态
+```
+
+### 四、管理器节点
+
+- 管理控制器的节点一定都要是全局唯一节点（%）
+
+``` shell
+ManagermentController
+	├─ TSceneManager `%` # 场景管理器，用于切换场景，加载玩家，加载敌人等等
+	├─ InputManager `%` # 输入管理，将输入信号传送出去，
+	├─ MapManager `%` # 随机地图生成
+	├─ InventoryManager `%` # 物品管理
+	├─ PlayerManager `%` # 玩家管理器
+	├─ EnemyManager `%` # 敌人管理器
+	└─ SignalManager `%` # 信号控制
+```
+
+### 五、主场景结构说明
+
+1. [main] ：表示分组节点，用于不同场景中获取节点，分组名为：main
+1. PlayerContainer节点为普通的Node节点，其子节点是C++定义的TPlayerNode类
+
+``` shell
+main `Node2D` # 主循环
+├─TFSC `TFSC` # 系统节点
+├─【main】TManagermentController `ManagermentController` # 管理器控制节点
+├─【main】PlayerContainer `Node` # 玩家资源节点
+|	├─Protagonist `TProtagonist` # 资源节点
+|	└─Support `TProtagonist` # 配角数据
+├─【main】Windows `Node` # 一些常用窗口
+|	├─InventoryWindow `CanvasLayer` # 装备界面
+|	└─BattleWindow `CanvasLayer` # 战斗界面 
+└─【main】World `Node` # 世界节点，用于动态加载
 ```
 
 ### 五、world场景结构
@@ -180,13 +204,14 @@ World # 场景
 
 #### Ⅰ、Player结构
 
-- 主角团数据统一保存在main$\to$playerdata节点下
+- 主角团数据统一保存在main$\to$PlayerContainer节点下
 
 ``` shell
 characterBody2D # 玩家
-├─ Graphic:Node2D # 图层
-|	├─Body:Sprite2D
-|	└─Shadow:Sprite2D
+├─ Graphic[Sprite2D] # 图层
+|	├─Body[Sprite2D]
+|	├─ChooseIcon[Sprite2D]
+|	└─Shadow[Sprite2D]
 ├─ CollisionShape2D # 碰撞体积
 ├─ Area2D # 进入区域碰撞体积
 |	└─ CollisionShape2D # 碰撞体积
@@ -201,14 +226,27 @@ characterBody2D # 敌人
 ├─ CollisionShape2D # 碰撞区域
 ├─ AnimationPlayer # 动画
 ├─ Graphic
-|	├─Body:Sprite2D
-|	└─Shadow:Sprite2D
+|	├─Body[Sprite2D] # 身体
+|	├─ChooseIcon[Sprite2D] # 选中标识
+|	└─Shadow[Sprite2D] # 影子
 └─ Function  # C++功能节点
-    ├─ DataNode[TCharaterNode] # 节点名要相同，资源挂载节点-操作资源节点
+    ├─ DataNode[TGeneralEnemy] # 节点名要相同，资源挂载节点-操作资源节点
     ├─ ScriptNode<脚本> # 脚本挂载节点
     └─ Component # 组件节点
         ├─MoveComponent # 移动组件，控制玩家移动
         └─DropComponent # 物品掉落组件
+```
+
+#### Ⅲ、技能结构
+
+``` shell
+skill
+├─ Graphic
+|	├─ AnimationPlayer # 动画
+|	└─ SkillIcon # 技能图标
+├─ AnimatedSprite2D # 动画
+├─ TSkillContainer # 技能挂载节点
+└─ ScriptNode<脚本> # 脚本挂载节点
 ```
 
 ### 七、战斗场景
@@ -224,60 +262,58 @@ BattleWindow # 战斗场景canvasLayer
 └─ UI # 控制UI
 ```
 
-
-
 ## 架构
 
-### 一、TSystemNode
+### 一、TFSC
 
-1. 状态机及各类控制器挂载的节点
+TFSC状态机，控制核心，TFSC调用TManagerController的方法，TMangerController调用其他节点
 
-2. 提供`initiazlie`供GDScript调用
+TFSC供外部调用的方法
 
-   - initiazlie方法，主要初始化所有的管理类
+1. `sys_initialize`方法，初始化所有的管理类
+2. `fsc_initialize`方法，初始化状态机相关
+3. `update`方法，供GDScript的`_process`调用
 
-     `s_global_inputmanager->initialize();`
-     `s_global_scenemanager->initialize();`
-     `s_global_inventorymanager->initialize();` 
+TFSC中定义常用的各个节点的静态变量供其子类调用
 
-   - 设置静态变量
+- `TFSC::s_global_main`：主场景节点，
 
-3. TSystemNode中定义常用的各个节点的静态变量供其子类调用
+  包含主场景中`World、PlayerContainer、Windows、TManagerController`节点
 
-   - `TSystemNode::s_global_main`：主场景节点
-   - `TSystemNode::s_global_player`：玩家节点
-   - `TSystemNode::s_global_inventorymanager`：仓库管理器
-   - `TSystemNode::s_global_scenemanager`：场景管理器
-   - `TSystemNode::s_global_inputmanager`：输入输出管理器
-   - `TSystemNode::s_global_inventorywindow`：背包窗口
-   - `TSystemNode::s_global_battlewindow`：战斗窗口
+  - `TFSC::s_global_main["World"]`：主场景中世界节点
+  - `TFSC::s_global_main["Player"]`：主场景中玩家节点
+  - `TFSC::s_global_main["Windows"]`：主场景中窗口节点
 
-4. 将主场景中`World、Player、Windows`节点分配给静态变量
+- `TFSC::s_global_player`：玩家节点
 
-   注意要在主场景中，将这3个节点添加进`main`分组中
+- `TFSC::s_global_inventorymanager`：仓库管理器
 
-   - `TSystemNode::s_global_main["World"]`：主场景中世界节点
-   - `TSystemNode::s_global_main["Player"]`：主场景中玩家节点
-   - `TSystemNode::s_global_main["Windows"]`：主场景中窗口节点
+- `TFSC::s_global_scenemanager`：场景管理器
 
-TSystemNode挂载的GDScript脚本
+- `TFSC::s_global_inputmanager`：输入输出管理器
+
+- `TFSC::s_global_inventorywindow`：背包窗口
+
+- `TFSC::s_global_battlewindow`：战斗窗口
+
+TFSC挂载的GDScript脚本
+
+- 注意extends，如果是Node，就要使用onready获取TFSC节点
+- 若继承自TFSC，就可以直接使用函数
 
 ``` python
+# Node继承
 extends Node
-
 @onready var tfsc = $TFSC
-@onready var system = $"."
-
 func _ready():
-	system.initialize() # 系统节点初始化方法
-	tfsc.initiazlie() # 状态机初始化
+	tfsc.sys_initiazlie(); # 状态机初始化
+    tfsc.fsc_initiazlie();
 	pass
-
 func _process(delta):
 	tfsc.update(delta)
 ```
 
-### 二、TFSC
+### 二、状态机
 
 1. 状态机节点，继承自TSystemNode节点
 

@@ -2,15 +2,36 @@
 
 1. 支持平台windows、Unix/X11、MAC OS 、Embedded
 
+## 环境配置
+
+1. 下载QT 开源版本：[Download Qt OSS: Get Qt Online Installer](https://www.qt.io/download-qt-installer-oss)
+2. 
+
 ## 打包发布
 
-### qt打包方式
+### 一、exe软件发布
 
-修改 debug 模式到 Release 模式 $\to$ 编译运行 $\to$ 找到Release目录下的exe文件 $\to$ 复制到新文件夹 $\to$ 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
+1. 修改 debug 模式到 Release 模式
+2.  编译运行
+3. 找到Release目录下的exe文件
+4. 复制到新文件夹 
+5. 在文件夹下运行 `windeployqt **.exe` （windeploypt是qt自带的软件，要运行它）
 
 windeployqt也可以通过菜单的qt $\to$ qt(MinGW)命令行直接启动（注意编译套件的版本与windeployqt的版本对应，若不对应程序无法运行，使用什么软件编译的就用什么处理）
 
-### hm nis edit（第三方打包）
+### 二、hm nis edit（第三方打包）
+
+### 三、安卓发布及配置
+
+#### Ⅰ、配置环境
+
+1. QT creater界面找到“工具”
+2. QT Maintenace Tool$\to$ Start Maintenace Tool
+3. 登陆$\to$添加或修改组件$\to$找到Android
+4. QT creater$\to$工具$\to$外部$\to$配置
+5. 选中“设备”$\to$ “Android”
+
+#### Ⅱ、发布
 
 ## 基本功能
 
@@ -137,15 +158,11 @@ qt的坐标在屏幕的左上角（0，0）；x以右为正方向，y以下为�
 
 #### 1、加载资源
 
-1、应先将资源文件复制到项目类
-
-2、创建资源文件夹：功能栏File  $\to$ New File... $\to$ Files and Classes中的Qt $\to$ Qt Resource File
-
-3、添加资源文件：Projects栏 $\to$ Resources文件夹 $\to$ 找到.qrc文件 $\to$ 右键.qrc文件，open in Editor $\to$ add Files（添加前缀用于资源分类）
-
-4、在Cmake.txt中添加资源文件
-
-5、使用资源：`QIcon(":/资源文件位置")` 
+1. 应先将资源文件复制到项目类
+2. 创建资源文件夹：功能栏File  $\to$ New File... $\to$ Files and Classes中的Qt $\to$ Qt Resource File
+3. 添加资源文件：Projects栏 $\to$ Resources文件夹 $\to$ 找到.qrc文件 $\to$ 右键.qrc文件，open in Editor $\to$ add Files（添加前缀用于资源分类）
+4. 在Cmake.txt中添加资源文件
+5. 使用资源：`QIcon(":/资源文件位置")` 
 
 **提醒信息：File are not auto matically added to the CMakeList.txt file of the CMake project. copy the path to the source files  to the clipboard** 
 
@@ -225,11 +242,11 @@ qt_add_executable(Qt_app_tomato_cpp
 
 ### 四、对象树
 
-简单来讲，当使用qt创建对象时都是继承QObject对象（例：QWidget,QMainWindow,），子类创建对象时会在QObject中自动维护一个children列表，当窗口释放时，会自动释放
+- 简单来讲，当使用qt创建对象时都是继承QObject对象（例：QWidget,QMainWindow,），子类创建对象时会在QObject中自动维护一个children列表，当窗口释放时，会自动释放
 
 ### 新建项目大量警告
 
-Help $\to$ About Plugins $\to$ C++ $\to$ ClangCodeModel 将其勾选掉
+- Help $\to$ About Plugins $\to$ C++ $\to$ ClangCodeModel 将其勾选掉
 
 ## 不同UI之间传值
 
@@ -855,6 +872,20 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget) {
 
 #### 1、修改窗体属性
 
+- Qt::MSWindowFiredSizeDialogHint: 为Windows系统上的窗口装饰一个窄的对话框边框，通常这个提示用于固定大小的对话框
+- Qt::MSWindowOwnDC: 为Windows系统上的窗口添加自身的显示上下文菜单
+- Qt::X11BypassWindowManagerHint: 完全忽视窗口管理器，它的作用是产生一个根本不被管理的无窗口边框的窗口(此时，用户无法使用键盘进行输入，除非手动调用QWidget::activateWindow()函数)
+- Qt::FramelessWindowHint: 产生一个无窗口边框的窗口，此时用户无法移动该窗口和改变它的大小
+- Qt::CustomizeWindowHint：关闭默认的窗口标题提示
+- Qt::WindowTitleHint：为窗口装饰一个标题栏
+- Qt::WindowSystemMenuHint:为窗口添加一个窗口系统系统菜单，并尽可能地添加一个关闭按钮
+- Qt::WindowMinimizeButtonHint:为窗口添加一个“最小化”按钮
+- Qt::WindowMaximizeButtonHint:为窗口添加一个“最大化”按钮
+- Qt::WindowMinMaxButtonHint:为窗口添加一个“最小化”按钮 和一个“最大化”按钮
+- Qt::WindowContextHelpButtonHint: 为窗口添加一个“上下文帮助”按钮
+- Qt::WindowStaysOnTopHint: 置顶窗口
+- Qt::WindowType_Mask:  一个用于提示窗口标识的窗口类型部分的掩码
+
 ``` c++
 // 设置窗体名称
 setWindowTitle(“sss”)
@@ -872,19 +903,7 @@ resize(600, 400);
 // 设置无边框
 this->setWindowFlag(Qt::FramelessWindowHint);
 /*
-Qt::MSWindowFiredSizeDialogHint:     为Windows系统上的窗口装饰一个窄的对话框边框，通常这个提示用于固定大小的对话框
-Qt::MSWindowOwnDC:                   为Windows系统上的窗口添加自身的显示上下文菜单
-Qt::X11BypassWindowManagerHint:      完全忽视窗口管理器，它的作用是产生一个根本不被管理的无窗口边框的窗口(此时，用户无法使用键盘进行输入，除非手动调用QWidget::activateWindow()函数)
-Qt::FramelessWindowHint:             产生一个无窗口边框的窗口，此时用户无法移动该窗口和改变它的大小
-Qt::CustomizeWindowHint:             关闭默认的窗口标题提示
-Qt::WindowTitleHint：                为窗口装饰一个标题栏
-Qt::WindowSystemMenuHint:            为窗口添加一个窗口系统系统菜单，并尽可能地添加一个关闭按钮
-Qt::WindowMinimizeButtonHint:        为窗口添加一个“最小化”按钮
-Qt::WindowMaximizeButtonHint:        为窗口添加一个“最大化”按钮
-Qt::WindowMinMaxButtonHint:          为窗口添加一个“最小化”按钮 和一个“最大化”按钮
-Qt::WindowContextHelpButtonHint:     为窗口添加一个“上下文帮助”按钮
-Qt::WindowStaysOnTopHint:            置顶窗口
-Qt::WindowType_Mask:                 一个用于提示窗口标识的窗口类型部分的掩码
+
 */
 ```
 
@@ -1084,8 +1103,6 @@ void onItemClicked(QListWidgetItem *item){
 ui->控件名称->setFrameShape(QListWidget::NoFrame);
 
 ```
-
-
 
 ### 七、tree_widget（ItemBase）
 
@@ -1339,15 +1356,11 @@ str.toUtf8() // 转QByteArray类型
 #### 2、QByteArray 
 
 ``` c++
-**可隐式转换为QString****类型**
-
+// 可隐式转换为QString****类型**
 QByteArray array = QByteArray(size, 0);
 
-类型转换
-
-.toUtf8() //转QByteArray类型
-
-.toInt()
+array.toUtf8(); //转QByteArray类型
+array.toInt(); // 转换为int
 ```
 
 ### 五、QDebug
@@ -1359,27 +1372,18 @@ qDebug() << "sssss";
 
 ### 六、Socket
 
-
-
+``` c++
 udp = QudpSocket(this);
-
 udp->bind();
+udp->writeDatagram(“wenben”, QHostAddress(192.168..), 111);
 
-udp->writeDatagram(“wenben”, QHostAddress(192.168..), 111）；
-
- 
-
-接收数据
-
+// 接收数据
 connect(udp, &QUdpSocket::readyRead, [=](){
-
-qint64 size = udp->pendingDatagramSize();
-
-QByteArray array = QByteArray(size, 0);
-
-udp->readDatagram(array.data(), size);
-
+	qint64 size = udp->pendingDatagramSize();
+	QByteArray array = QByteArray(size, 0);
+	udp->readDatagram(array.data(), size);
 })
+```
 
 ### 七、HTTP请求
 

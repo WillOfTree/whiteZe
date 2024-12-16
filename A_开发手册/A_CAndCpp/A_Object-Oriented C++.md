@@ -7,6 +7,24 @@
 - 行注释：//
 - 块注释：/**/
 
+常用目录结构
+
+``` shell
+project 
+├─bin # 编译后的可执行文件
+├─build # 存放.O 或.dep文件
+|	├─debug
+|	└─release
+├─doc # 项目文档
+├─include # 所有头文件
+├─src # 源文件
+├─lib # 静态库或动态库
+├─external # 第三方库
+├─tests # 测试代码
+├─Makefile # 项目构建配置文件
+└─README.md # 项目总体说明文件
+```
+
 ### 一、内存模型
 
 1. 代码区：存放函数的二进制代码，由操作系统管理
@@ -135,11 +153,14 @@ cout << ref << endl; // 打印1000
 
 #### 5、常量引用
 
+- 常量的引用可以结任何类型（加const的引用）
+- 普通变量可以赋值常量引用
+
 ``` c++
-//
-const int & ref = 10;
-// ref不能修改
-ref = 20;
+const int & ref = 10; // 可以赋值任何值
+ref = 20;// 错误，ref不能修改
+
+int a = ref; //普通变量可以赋值引用常量
 
 void test(const int &val)
 {
@@ -1132,6 +1153,8 @@ cout <<p <<p << endl;
 
 #### 6、函数运算符重载
 
+## C++三大特性
+
 ### 一、封装
 
 1. 类和结构体的区别就是默认权限不同，struct默认为公共，class默认权限是私有
@@ -1215,7 +1238,7 @@ class NPC
 #endif //宏定义
 ```
 
-### 五、继承
+### 二、继承
 
 1. 父类的private权限不允许继承
 
@@ -1226,11 +1249,42 @@ class NPC
    } 
    ```
 
-2. 构造先创建父类，再构造子类
-
-3. 析构先析构子类，再析构父类
-
 #### Ⅰ、基本语法
+
+1. 构造函数：继承中构造函数的调用顺序
+
+   - 子类未定义构造函数，编译器会自动添加进构造函数，
+
+   ``` c++
+   // 先调用父类构造函数，再调用子类构造函数
+   class Base {} // 父类
+   class chile : Base {}  // 子类
+   
+   chile c; // 先调用Base中的构造方法，再调用chile中构造方法
+   
+   /* 有参数的构造函数继承 */
+   class Base {
+       Base(int a){ ... }
+   }
+   class chile : Base {
+       chile() {...};
+   } 
+   // 父类构造需要一个参数，所以，必须提供参数
+   chile c(100); 
+   ```
+
+2. 析构函数：继承中构造函数的调用顺序
+
+   ``` c++
+   // 先调用子类析构函数，再调用父类析构函数
+   class Base {} // 父类
+   class chile : Base {}  // 子类
+   
+   chile c; // 构造
+   delet c; // 析构，先调用chile中的析构函数，再调用父类的析构函数
+   ```
+
+   
 
 ``` c++
 // 父类
@@ -1252,17 +1306,16 @@ class chile : protected Base {} //保护继承
 class chile : private Base {} //父类属性变为private
 ```
 
-#### Ⅱ、父类构造函数
+#### Ⅱ、显式调用父类构造
 
 ``` c++
 class Base{
     Base(){}
 }
-// 调用父类构造函数
+
 class Son:public Base{
-    Son() : Base(){
-        
-    } 
+    // 调用父类构造函数
+    Son() : Base(){ ... } 
 }
 ```
 
@@ -1394,7 +1447,7 @@ class B {};
 class C: virtual public B, virtual public A {}
 ```
 
-### 六、多态
+### 三、多态
 
 1. 多态分为2类，一是静态多态和动态多态
    - 静态多态：函数重载、运算符重载、函数名复用
@@ -1814,189 +1867,6 @@ ifs.read( (char *)&p, sizeof(Person))
 /* 关闭 */ 
 ofs.close();
 ```
-
-## 模板-泛型编程
-
-C++使用模板实现范式编程，模板的目的是提高程序的复用性（类似于PPT什么的）
-
-### 一、模板基本语法
-
-- template 声明创建一个模板
-- typename 表明这是一个数据类型，可以使用class代替
-- T 通用的数据类型，名称可以替换，通常为大写字母
-
-``` c++
-// 函数声明或定义
-template <typename T>
-
-// class与typename没有区别
-template <class T>
-函数声明或定义
-```
-
-#### 1、函数模板
-
-``` c++
-// 一般的例子，对照组：
-void swapInt(int &a, int &b){
-    int temp = a;
-    a = b;
-    b = temp;
-}
-/* 改写成模板 */ 
-// 声明一个模板，告诉编译器不要出错
-template <typename T>
-void mySwap(T &a, T&b){
-    T temp = a;
-    a = b;
-    b = T;
-}
-// 使用模板
-// 编译器自动推导
-int a = 10;
-int b = 20;
-mySwap(10, 20);
-
-// 显示指定类型
-int a = 10;
-int b = 20;
-// <>告诉模板是int类型
-mySwap<int>(a, b)
-```
-
-模板必须指定T的类型
-
-``` c++
-// 声明一个模板，告诉编译器不要出错
-template <typename T>
-void mySwap(){ cout << "xxx"; }
-// 因为mySwap中没有参数，但必须在模板中指定类型
-mySwap<int>()
-```
-
-#### 2、类模板
-
-``` c++
-template <class T>
-class mySwap{
-public:
-    mySwap();
-}
-
-//可以添加默认类型
-template<class T,class T2=int>
-class LinkList{
-	T name;
-	T2 age;
-	LinkList(T name, T2 age){}
-}
-
-int main(){
-	string a; int 1;
-    //必须使用显示转换，函数模板可以自动推导，类模板不能推导
-	LinkList<string, int>(a, b) 
-
-}
-```
-
-### 三、普通函数与模板的调用规则
-
-- 优先调用普通函数
-
-  ``` c++
-  // 优先调用
-  void mySwap(T &a, T&b){
-      cout << "xxx"
-  }
-  
-  template <typename T>
-  void mySwap(T &a, T&b){
-      cout << "xxx"
-  }
-  ```
-
-- 通过空模板参数列表来强制调用函数模板
-
-- 函数模板可以发生重载
-
-  ``` c++
-  template <typename T>
-  void mySwap(T &a, T&b){
-      cout << "xxx"
-  }
-  template <typename T>
-  void mySwap(T &a, T&b, T&c){
-      cout << "xxx"
-  }
-  ```
-
-  
-
-- 函数模板可以产生更好的匹配优先调用函数模板
-
-
-
-### 模板做函数参数
-
-``` c++
-void doWork(Person<string, int> &p) {
-	P.show()
-}
-
-//参数模板化
-template<class T1, class T2>
-void doWork(Person<T1, T2>&p){...}
-```
-
-### 具体化模板
-
-因为某些特定的数据，无法通过模板传递
-
-### 三、类模板与继承
-
-template<class T>
-
-class Base
-
-{
-
-public:
-
-T m_A;
-
-}
-
- 
-
-//必须告诉child类型,否则不能分配内存
-
-class Child: public Base<int> {}
-
- 
-
-//由用户指定类型
-
-template<class T1, class T2>
-
-class Child: pulbic Base<T2>
-
-{}
-
-### 四、模板的分文件编写
-
-1、模板的文件是.hpp
-
-2、方法实现与声明放到同一个文件中
-
-因为C语言是份文件编译，但模板文件类型是在运行时确定，所以不能使用.h方法引入
-
-可以直接引入.cpp文件，
-
-模板文件编译在运行时会出错
-
- 
-
-### 五、模板与友元函数
 
 ## 异常
 

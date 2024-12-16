@@ -223,6 +223,69 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 
 
 
+### 四、不同游戏设置数据
+
+#### Ⅰ、Android设置
+
+1. 游戏界面设置比例：19.5：9
+
+   宽度：540
+
+   高度：1170
+
+   窗口宽度覆盖：360
+
+   窗口高度覆盖：780
+
+   拉伸模式：canvas_items
+
+   比例：expand
+
+2. 异形屏幕问题
+
+   锚点全屏$\to$Control \ 锚点偏移$\to$ 顶：1170$\times$0.06 
+
+3. 元素居中
+
+   新建一个control节点$\to$设置锚点 \ 居中 $\to$ 将需要居中的元素（位置xy为0），变成其子节点 
+
+#### Ⅱ、windows常用配置
+
+1. 画面分辨率（视口大小）：640$\times$360 
+
+2. 窗口大小：（窗口覆盖大小）
+
+   - 1920$\times$1080：640$\times$360的3倍
+   - 1280$\times$720：640$\times$360的2倍
+
+3. 拉伸模式：canvas_items
+
+4. 画面模糊
+
+   $项目\to 常规\to 渲染\to 纹理\to 画布纹理\to 默认纹理:Nearest$ 
+
+#### Ⅲ、游戏人物大小
+
+星露谷游戏大小
+
+1. 画布：180$\times$320pix
+2. 物品植物（基础单位）：16$\times$16pix
+3. 角色大小（成人）：14$\times$29pix-2个基础单位大小
+
+风来之国大小
+
+1.  人物大小（成人）：33$\times$65pix
+2.  人物大小（小朋友）：33$\times$44pix
+3.  树：2倍成人、3倍成人
+
+#### Ⅳ、自动图块
+
+1. 需要64x96像素大小，平铺，内拐角
+2. 192\*192=树木 - 画布大小384\*216 ,树木要缩小到05~0.4，0.4是成人大小
+3. 0.4=76*76，
+4. 人物：64*64
+5. 320*240
+
 ## Godot核心
 
 ### 一、生命周期
@@ -334,7 +397,7 @@ if(int(val) == 4);
 
 - 头文件：`#include "core/variant/array.h"`
 
-- Array可以存放任意类型（可同时存放不同的类型）
+- Array可以存放任意类型（**可同时存放不同的类型，但只能是Godot内部支持对象**）
 
 - Array必须先使用`push_back\push_front`添加元素，才能使用`arr[i]`修改元素的值，不然会数组溢出
 
@@ -436,14 +499,6 @@ args.front()->get()
 #### Ⅴ、HashSet
 
 
-
-#### Vector2
-
-- 向量
-
-``` c++
-Vector2(10, 20);
-```
 
 ### 三、Object
 
@@ -675,20 +730,48 @@ func _on_body_entered(body):
 	pass 
 ```
 
-
-
 ### 七、可传递对象
 
 - `String、int、double`类型可以在子类中直接获取
 
-- 资源类型返回的`Variant`类型在父类可以获取，分情况
+- 资源类型返回的Variant类型在父类，分情况
 
-  1. 子节点中的父类添加资源，可以获取，
-  2. 直接在父类节点中添加资源，不可以获取，需要先获取节点
+  >  继承关系：`son`继承自`father` 
+  >
+  >  类属性信息：
+  >
+  >  ​	son类中有字段data，用于添加资源
+  >
+  >  ​	father类中有字段scene，用于添加资源
 
-- `_ready()`中定义赋予的值，在子类是无法获取的，要在子类调用专用的赋值方法
+  1. 在son节点的“检查器”$\to$ “father类”$\to$ “字段scene”添加资源文件，
 
-- 在子类如何获取`Dictionary、Array`变量
+     结论1：son类中可以直接获取父类资源（直接使用scene字段）
+
+     结论2：在son类中调用father类的赋值方法，也可直接获取资源文件
+
+     ``` c++
+     /* 父类 */ 
+     Variant father::get_data_from_father() {
+         return m_character_data; // 资源变量
+     }
+     /* 子类 */ 
+     Variant a = father::get_data_from_father(); //从父类获取对象
+     ```
+
+  2. 在father节点的“检查器”$\to$ “字段scene”中添加资源文件，
+
+     结论1：son类中不可以获取，需要先获取父类节点
+
+- 不同的节点之间是相互独立的，不存在数据通用
+
+  使用静态方法，变量可以在继承关系中的节点共享一份数据
+
+  `_ready()`中定义赋予的值，在子类是无法获取的，要在子类调用专用的赋值方法（注意，这样也只能在调用赋值方法的节点中使用数据，而在其他节点无法使用）
+
+- 要想使用其他节点数据，优先是使用`get_node`获取节点后再调用属性或方法
+
+- 在子类如何获取`Dictionary、Array`变量（只能在当前调用了赋值方法的节点中使用，其他节点没有对应的数据）
 
   ``` c++
   // 赋值方法
@@ -794,45 +877,6 @@ func _on_body_entered(body):
 
 1. Layer：block_movement 阻挡移动
 2. Layer：
-
-### 像素游戏
-
-#### Ⅰ、常用配置
-
-1. 画面分辨率（视口大小）：640$\times$360
-
-2. 窗口大小：（窗口覆盖大小）
-
-    - 1920$\times$1080：640$\times$360的3倍
-    - 1280$\times$720：640$\times$360的2倍
-
-3. 拉伸模式：canvas_items
-
-4. 画面模糊
-
-   $项目\to 常规\to 渲染\to 纹理\to 画布纹理\to 默认纹理:Nearest$ 
-
-#### Ⅱ、游戏人物大小
-
-星露谷游戏大小
-
-1. 画布：180$\times$320pix
-2. 物品植物（基础单位）：16$\times$16pix
-3. 角色大小（成人）：14$\times$29pix-2个基础单位大小
-
-风来之国大小
-
-1.  人物大小（成人）：33$\times$65pix
-2.  人物大小（小朋友）：33$\times$44pix
-3.  树：2倍成人、3倍成人
-
-#### Ⅲ、自动图块
-
-1. 需要64x96像素大小，平铺，内拐角
-2. 192\*192=树木 - 画布大小384\*216 ,树木要缩小到05~0.4，0.4是成人大小
-3. 0.4=76*76，
-4. 人物：64*64
-5. 320*240
 
 ## 2D游戏类
 
@@ -1059,20 +1103,40 @@ move_and_slide();// 可以沿着墙滑动
 ### 七、Random
 
 - 头文件：`#include <godot_cpp/classes/random_number_generator.hpp>` 
+
 - 文件utility_functions同样包含随机方法的静态方法
 
-``` c++
-/* Utility_functions */
+- `randf_range(0.0,5.0)`：产生浮点数，0.0-5.0之间的数，不包括0.0、5.0
 
-// 随机方向
-RandomNumberGenerator *r = new RandomNumberGenerator();
-// 随机取得-1，0，1
-float x = r->randf_range(-1, 1);
-float y = r->randf_range(-1, 1);
+  ``` c++
+  // 产生0~5之间的数，不包括5
+  int a = utility_functions::randf_range(0.0,5.0);
+  // 产生0~5之间的数，不包括0，5
+  double a = utility_functions::randf_range(0.0,5.0);
 
-// 只能取到0，1，2，3，4（取不到5）
-utility_functions::randf_range(0,5);
-```
+- `randi_range(1, 3)`：产生整数，1-3之间的数，包括1，3
+
+- `randi()`：产生整数
+
+  ``` c++
+  utility_functions::randi(); // 返回0 ~ 2^32-1之间的数
+  utility_functions::randi() % 20; // 返回0 ~ 19之间的数
+  ```
+
+- `randf()`：产生浮点数
+
+  ``` c
+  utility_functions::randf() * 10; //返回0 ~ 10之间的数
+  ```
+  
+- `randomize()`：产生随机数种子
+
+  ``` c++
+  #include <godot_cpp/classes/random_number_generator.hpp>
+  
+  RandomNumberGenerator *r = new RandomNumberGenerator();
+  r->randomize(); // 设置随机数种子
+  ```
 
 ### 八、Area2D
 
@@ -1253,7 +1317,7 @@ InputMap* map = InputMap::get_singleton();
 map->load_from_project_settings();
 ```
 
-### 十五、十六、Engine
+### 十五、Engine
 
 - 头文件：`#include <godot_cpp/classes/engine.hpp>` 
 
@@ -1340,17 +1404,29 @@ savefileforread.dispose(); //关闭句柄
 
 ## 软件开发控件
 
-### 一、画布类
+### 注意
 
-1. canvasLayer：新的画布，其属性独立于其他节点
-2. NinePatchRect：背景图层，显示图片纹理
-3. ColorRect：颜色控件
-4. panelcontainer：为图像提供背景
+1. 使用软件开发控件，一般不要使用游戏开发控件，因为contol控件有些参数，没有
+
+2. 使用TextureRect替代Sprite2D节点
+
+3. 一般节点位置信息
+
+   ``` shell
+   Control # 根节点，可设置锚点
+   ├─ XXXXX_Container # 容器，各种不同的容器，进一步划分场景
+   |	├─TextureRect # 背景，Sprite2d的替代节点
+   ```
+
+   
+
+### 一、画布类
 
 #### Ⅰ、canvasLayer
 
 - 头节点：`#include <godot_cpp/classes/canvas_layer.hpp>`
 - 可以用于进程场景切换
+- 新的画布，其属性独立于其他节点
 
 ``` c++
 // 获取
@@ -1363,20 +1439,49 @@ cl->show(); // 显示
 
 ### 二、容器类
 
+容器节点可以把子类的Transform信息提升到父类（容器节点）修改
+
+常用容器节点说明：
+
 1. Control：此节点可作为容器根节点，画出控件所占有的面积，其子节点空间，都在此面积中进行布局
+
 2. MarginContainer：边框容器，按照z轴进行排序
+
 3. Box容器：可以按照x轴方向、y轴方向进行排列
    - HboxContainer：横向排列的容器，用于制作角色血条等
    - VBoxContainer：纵向排列容器
-4. ViewportContainer：小窗口容器
-5. AspectRatioContainer：长宽比节点，保持一定的长宽比
-6. FlowContainer：流动容器，将元素从右向左放置，会自动换行
-7. GridContainer：网格容器，九宫格
-8. HSplitContainer：分割容器，划分屏幕左右，可拖拽
-9. VSplitContainer：分割容器，划分屏幕上下，可拖拽
-10. PanelContainer：面板容器
+
+4. PanelContainer：面板容器，随便停放
+
+   - 拥有一个 sort_children 信号
+   - 拥有一个 Theme Overrides / styles 参数
+
+   Panel：与PanelContainer基本相同
+
+   - 没有信号
+   - 缩放窗口，背景会抖动，可能有其他效果，暂时不知
+
+   ---
+
+5. ViewportContainer：小窗口容器
+
+6. AspectRatioContainer：长宽比固定，保持一定的长宽比
+
+7. FlowContainer：流动容器，将元素从右向左放置，会自动换行
+
+8. GridContainer：网格容器，九宫格
+
+9. HSplitContainer：分割容器，划分屏幕左右，可拖拽
+
+10. VSplitContainer：分割容器，划分屏幕上下，可拖拽
+
 11. ScrollContainer：滚动条，必须在Vbox或Hbox中才能正常工作
-12. TextureRect：用于显示纹理的空间，可做背景
+
+12. CenterContainer：居中容器
+
+13. TapContainer：选项卡容器
+
+14. SubViewportContainer / SubViewport：用于制作小地图的容器
 
 ### 三、功能类
 
@@ -1389,6 +1494,40 @@ cl->show(); // 显示
 7. VideoStreamPlayer：视频流播放器
 8. HSeparator：分隔符
 9. NinePatchRect：九宫格矩形，保存纹理被边角不变
+10. TextureRect：用于显示纹理的空间，可做背景
+
+### 四、Anchor锚点
+
+锚点使用方法
+
+- 点：保证子类图形距离锚点的相对位置不变
+- 线：保证锚点组成的线不会被拉伸
+- 面：保证锚点围成的面大小比例一致
+
+当父类使用“锚点预设 \ 整个矩形”时，其子类可以在这个矩形范围内进行 “锚点预设”
+
+- 锚点一般使用的根节点是 Control 节点（CanvasLayer节点、Node节点也是可以的）
+
+- 锚点预设的一般结构
+
+  ``` shell
+  Control # 锚点预设使用“整个矩形”其子类可以使用锚点预设设置位置
+  └─Container # 容器，各种不同的容器，进一步划分场景
+  	└─TextureRect # 背景，Sprite2d的替代节点
+  ```
+
+锚点参数：Layout / Layout Mode 选择 “Anchors”
+
+- Anchor Points：Left 、Top、Right、Bottom：是锚点左上右下靠近屏幕的位置，0是左边，1是右边
+- Anchors Offsets：锚点所围成方块的大小
+
+其他问题：
+
+1. 锚点是一个点的时候，子类不要选“整个图形”，这样需要设置最小大小才能显示区域
+
+   
+
+
 
 ## 常用功能实现
 
