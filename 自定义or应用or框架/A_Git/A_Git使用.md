@@ -35,9 +35,62 @@
 
 <img src="assets/A_Git使用/git操作命令.png"/>
 
+## 工作流程
+
+### 一、多人合作
+
+创建项目流程
+
+1. `git clone <git地址>`：克隆main分支项目
+2. `git checkout -b dev origin/dev`：创建一个开发分支
+
+其他小伙伴
+
+1. 下载开发分支
+
+2. 创建一个开发分支
+
+   `git checkout -b dev origin/dev`：远程开发分支
+
+   `git checkout -b dev`：本地开发分支
+
+3. 合并分支
+
+4. 上传主分支
+
+### 二、个人
+
+1. 创建项目
+2. ``
+
 ## 常用功能
 
-### 一、强制更新本地
+### 一、新建项目
+
+**注意：在GitHub上新建项目，不要配置添加READEME.md文件，这样就可以根据GitHub上的提示信息创建项目（要在本地创建READEME.md文件）** 
+
+本地已有项目合并到远程新建的库
+
+1. `git init` ：在本地初始化git项目
+2. `git add -A` 
+3. `git commit -m "xxx"`  
+4. `git branch -M main` ：创建分支
+5. `git remote add origin <地址>` ：将远程库与本地库连接起来
+6. `git push -u origin main`：提交到远程库
+
+> error: src refspec main does not match any
+> error: failed to push some refs to 'github.com:WillOfTree/DiJiang.git'
+
+- 远程库与本地库名称不相同导致，更改名称
+
+  `git branch -m oldBranchName newBranchName`
+
+> error: failed to push some refs to 'github.com:WillOfTree/DiJiang.git'
+
+- `git pull origin <branch-name>` ：拉取远程长裤的最新更改
+- `git push -f origin <branch-name>` ：强制用本地分支覆盖远程分支
+
+### 二、强制更新本地
 
 ``` shell
 #--- 
@@ -50,10 +103,6 @@ git fetch --all
 # 将head指向origin master
 git reset --hard origin/master
 ```
-
-### 二、回滚
-
-
 
 ### 三、版本比较
 
@@ -75,7 +124,7 @@ HEAD # workspace 与 Repository
 
 ```
 
-### 四、更新远程分支到本地
+### 四、远程分支到本地
 
 #### Ⅰ、直接克隆分支
 
@@ -97,6 +146,10 @@ HEAD # workspace 与 Repository
 3. 拉取远程分支：`git checkout -b <本地分支名> <origin/远程分支名称>` 
 4. 下载分支代码：`git pull origin <分支名称>` 
 5.  查看分支：`git branch -a` 
+
+### 五、合并
+
+
 
 ## 使用SSH Key
 
