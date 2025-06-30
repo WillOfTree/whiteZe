@@ -1,8 +1,7 @@
-# Godot使用说明
+# Godot 使用说明
 
 ## 概述
 
-- 版本：4.21
 - 基于C++
 - GDExtension不支持Godot4以下的版本
 
@@ -17,48 +16,23 @@
 
 #### Ⅰ、Android设置
 
-1. 游戏界面设置比例：19.5：9
-
-   宽度：540
-
-   高度：1170
-
-   窗口宽度覆盖：360
-
-   窗口高度覆盖：780
-
-   拉伸模式：canvas_items
-
-   比例：expand
-
-2. 异形屏幕问题
-
-   锚点全屏$\to$Control \ 锚点偏移$\to$ 顶：1170$\times$0.06 
-
-3. 元素居中
-
-   新建一个control节点$\to$设置锚点 \ 居中 $\to$ 将需要居中的元素（位置xy为0），变成其子节点 
-
-4. 设置app朝向
-
-   项目$\to$显示$\to$窗口$\to$手持设备、朝向：（Landscape横屏，portralt竖屏）
+| Key                                                       | Value                                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------ |
+| 游戏界面设置比例：19.5：9                                 | 宽度：540<br/>高度：1170<br/>窗口宽度覆盖：360<br/>窗口高度覆盖：780<br/>拉伸模式：canvas_items<br/>比例：expand |
+| 异形屏幕问题                                              | 锚点全屏$\to$Control \ 锚点偏移$\to$ 顶：1170$\times$0.06    |
+| 元素居中                                                  | 新建一个control节点$\to$设置锚点 \ 居中 $\to$ 将需要居中的元素（位置xy为0），变成其子节点 |
+| 设置app朝向                                               | 项目$\to$显示$\to$窗口$\to$手持设备、朝向：（Landscape横屏，portralt竖屏） |
+| 设置APP游戏图标：<.png>格式即可<br>项目$\to$配置$\to$图标 | 导出$\to$启动器图标$\to$Main 192$\times$192<br/>导出$\to$启动器图标$\to$Adaptive Foreground 432x432<br/>导出$\to$启动器图标$\to$Adaptive Background_432x432 |
 
 #### Ⅱ、windows常用配置
 
-1. 原图大小：3200 $\times$ 2400
-
-2. 画面分辨率（视口大小）：640$\times$360 
-
-3. 窗口大小：（窗口覆盖大小）
-
-   - 1920$\times$1080：640$\times$360的3倍
-   - 1280$\times$720：640$\times$360的2倍
-
-4. 拉伸模式：canvas_items
-
-5. 画面模糊
-
-   $项目\to 常规\to 渲染\to 纹理\to 画布纹理\to 默认纹理:Nearest$ 
+| KEy                        | VALUE                                                        |
+| -------------------------- | ------------------------------------------------------------ |
+| 原图大小                   | 3200 $\times$ 2400                                           |
+| 画面分辨率（视口大小）     | 640$\times$360                                               |
+| 窗口大小：（窗口覆盖大小） | 1920$\times$1080：640$\times$360的3倍<br>1280$\times$720：640$\times$360的2倍 |
+| 拉伸模式                   | canvas_items                                                 |
+| 画面模糊                   | $项目\to 常规\to 渲染\to 纹理\to 画布纹理\to 默认纹理:Nearest$ |
 
 #### Ⅲ、游戏人物大小
 
@@ -82,182 +56,36 @@
 4. 人物：64*64
 5. 320*240
 
-### 三、导出设置
-
-#### 下载构建模板
-
-- 方式一：项目$\to$安装Android构建模板$\to$管理模板$\to$下载安装
-- 方式二：从官网下载导出模板（Godot无法下载情况）
-- [模板下载地址](https://godotengine.org/download/windows/) $\to$编辑器$\to$管理导出模板$\to$导入下载好的模板文件
-- 方式三：编辑器$\to$管理导出模板$\to$下载安装
-
-#### Ⅰ、Android
-
-- 功能标签设置：[查看标签](https://docs.godotengine.org/zh-cn/4.x/tutorials/export/feature_tags.html#doc-feature-tags) 
-
-  platform：平台（windows、Linux、android、ios、web）
-
-  target：目标（debug：含有debug信号、release：不含debug信号的优化构造）
-
-  arch：架构（x86_64、x86_32、arm64：、arm32：）
-
-  generate_apk=yes：更改正在构建的架构列表、一般不需要使用
-
-  ```shell
-  scons platform=android target=release arch=arm32
-  ```
-
-- `.gdextension`文件中`[libraries]`与导出中的架构参数一一对应，
-
-  > 当其参数不对应会出现提示：
-  >
-  > No suitable library found for GDExtension:res://bin/XXX.gdextension. Possible feature flags for your platform: mobile, android, etc2, astc, arm64, template, release, template_release, single
-
-  | 库的关键字             | 导出-架构的参数 |
-  | ---------------------- | --------------- |
-  | android.release.x86_32 | x86             |
-  | android.release.x86_64 | x86_64          |
-  | android.release.arm32  | armeabi-v7a     |
-  | android.release.arm64  | arm64-v8a       |
-
-一些注意事项
-
-1. 若正常导出软件，安装后无法使用，闪退，可能是架构参数错误，
-
-   优先使用armeabi-v7a选项，
-
-基础配置信息：
-
-1. 下载Java SDK、安装Java SDK（安装到C盘可能会出现权限不够问题）
-
-   地址：[Latest Releases | Adoptium](https://adoptium.net/zh-CN/temurin/releases/?variant=openjdk17) 
-
-   - 平台：windows 
-
-   - 版本：17长期支持版，LTS
-
-2. 安装Android_SDK
-
-   - 下载：[Android Studio](https://developer.android.com/studio?hl=zh-cn) 命令行工具（下拉页面，到最后有下载地址）
-
-   - 在D盘根目录创建文件夹Android_SDK（Android_SDK目录不能有空格，不然会产生错误）
-
-   - Android_SDK$\to$将**Android Studio命令行工具**解压到Android_SDK目录
-
-3. 设置环境变量，重启系统
-
-   1. `JAVA_HOME`：Java_SDK的安装目录（填写<Java_SDK> / bin目录即可）
-
-   2. 添加Java_SDK的bin目录：环境变量$\to$ 系统环境变量$\to$ Path项
-   3. `ANDROID_HOME`：其位置为 Android_SDK的根目录（GDExtension 导出模板需要的变量）
-
-4. 配置Godot设置，打开编辑器
-
-   1. 编辑器$\to$导出$\to$Android，Java SDK Path：添加Java_SDK的根目录
-   2. 编辑器$\to$导出$\to$Android，Android SDK Path：设置为Android_SDK的根目录
-
-5. 打开cmd，验证是否正常运行，测试命令：java
-
-一般的生成Godot Android程序流程
-
-1. 生成密钥，打开`openJDK/bin`目录下运行命令
-
-   -alias：填写用户名
-
-   -validity：密钥有效期，单位天
-
-   -keystore：密钥文件文件名，若不使用此项，也会要求输入密码
-
-   -storepass：密码
-
-   -dname：cn-开发者名称，O-组织名称，C-国家或组织代码
-
-   `keytool -v -genkey -keystore tree.keystore -alias tree -keyalg RSA -validity 10000 -dname "CN=tree,O=Android,C=CN" `
-
-2. 运行命令后，会在当前目录生成tree.keystore文件
-
-3. 切换到Android_SDK目录，打开cmd，运行命令：注意sdkmanager的位置
-
-   ` ./cmdline-tools/bin/sdkmanager --sdk_root="." "platform-tools" "build-tools;34.0.0" "platforms;android-34" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;23.2.8568313"`
-
-4. 导出即可
-
-设置软件图标
-
-生成GDExtension Android 模板方法
-
-1. 切换到Android_SDK目录下，android_sdk_path是Android_SDK的目录
-
-   运行命令：`./cmdline-tools/bin/sdkmanager --sdk_root="." --licenses`
-
-   运行命令：`./cmdline-tools/bin/sdkmanager --sdk_root="." "platform-tools" "build-tools;34.0.0" "platforms;android-34" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;23.2.8568313"`
-
-2. 回到Godot-cpp 源码目录中，编译模板（模板只需要源码即可）
-
-   target参数：template_release标准模板，template_debug调试模板
-
-   运行命令：`scons platform=android target=template_release arch=arm32` 
-
-   运行命令：`scons platform=android target=template_release arch=arm64 generate_apk=yes`  
-
-3. 生成Godot模板，切换到`Godot项目/demo/android/build`
-
-   运行命令：` ./gradlew generateGodotTemplates`
-
-   若下载失败
-
-   - 可以手动下载gradlew，
-
-   - 切换到目录：`C:\Users\<用户名>\.gradle\wrapper\dists\gradle-8.2-bin\bbg7u40eoinfdyxsxr3z4i7ta` 
-
-   - 可以看到有两个文件分别为`gradle-8.2-bin.zip.park`和`gradle-8.2-bin.zip.lck` 
-
-   - 将下载的gradlew解压到当前目录并修改`gradle-8.2-bin.zip.park`名称
-
-     ``` shell
-     bbg7u40eoinfdyxsxr3z4i7ta #目录结构
-     ├─ gradle-8.2 # 文件夹，解压的文件 
-     ├─ gradle-8.2-bin.zip.park # 修改名称为 gradle-8.2-bin.zip.ok
-     └─ gradle-8.2-bin.zip.lck 
-     ```
-
-
-#### Ⅱ、Windows
-
-1. 下载RC：[Releases · electron/rcedit](https://github.com/electron/rcedit/releases) 
-2. 配置RC：编辑器$\to$编辑器设置$\to$Export \ Windows $\to$ rcedit，设置rcedit路径位置
-
-### 四、安卓远程调试
-
-不同安卓模拟器有不同的设置方式（这里使用网易的MuMu模拟器）
-
-1. 可查看MuMu模拟器开发者指南
-
-   MuMu模拟器$\to$常见问题$\to$开发者指南$\to$ADB连接$\to$MuMu模拟器12如何连接adb
-
-2. 查看ADB端口：设置$\to$问题诊断$\to$ADB诊断
-
-3. 执行连接ADB，进入MuMu目录$\to$shell$\to$adb.exe
-
-   命令：`adb.exe connect 127.0.0.1:<ADB端口>`
-
-4. 回到Godot，Godot右上角$\to$运行旁边的远程调试就可以使用了
+## 常见错误 
+
+| 关键                                                         | 说明                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 各种空指针错误                                               | `TIdleState * m_state_idle = NULL;` 指针初始化一定要指向空，防止一些不可名状的错误 |
+| AttributeError: 'NoneType' object has no attribute 'Append':<br/>File "D:\A_CodeItems\A_immortal_hero_world\SConstruct", line 8:<br/>env.Append(CPPPATH=["src/include/"]) | 有可能是godot-cpp版本问题，建议换个源码版本                  |
+| error LNK2019: 无法解析的外部符号                            | 必须.cpp中文件必须实现<br>在Sconstruct文件中没有正确引入对应的.cpp文件或.h文件 |
+| error LNK2001: 无法解析的外部符号                            | 若是在使用多态的时候出现错误，父类虚函数没有默认方法<br>静态方法没有初始化，静态属性初始化时没有添加类名 |
+| fatal error LNK1120: 1 个无法解析的外部命令                  | 可能是函数传递错误<br>需要引用传递:`void R(AAA* b)`<br>静态方法定义时没有添加类名 |
+| core/extension/gdextension.cpp:629 - <br>No GDExtension library found for current OS and architecture<br> (windows.x86_64) in configuration file: res://bin/a.gdextension<br/>Failed loading resource: res://bin/a.gdextension. Make sure resources have been imported by opening the project in the editor at least once. | 若确定.lib文件存在，则可能是编译环境错误，Godot的提示并不准确<br>验证GCC，gcc -v |
+| error C2504: “TMainNode”: 未定义基类<br>error C2027: 使用了未定义类型<br>出现了循环引用错误 | 在father.h文件中声明`class child;`<br>在father.cpp中引入头文件：`#include "child.h"` |
+| 成功编译，但编译后子类不存在节点中                           | `register.cpp`中要保证，父类在子类前面进行注册               |
+| error C2065: “TFSCINTERFACE”: 未声明的标识符<br>error C2027: 使用了未定义类型“TMOVESTATE” | 检测头文件的引用顺序                                         |
+| 使用继承创建Godot节点，子类可通过静态方法，访问父类属性、方法<br>不相关的节点只能通过get_node等方法、获取分组节点，先获取到目标节点，再调用其节点中的方法 |                                                              |
 
 ## 开发环境配置
 
 ### 一、win-SCons配置
 
-#### Ⅰ、环境配置
+环境配置
 
 1. 下载Godot可执行文件
 
     注意：Godot可执行文件版本要与godot-cpp版本相同
 
-2. 下载Godot-cpp源文件：[godot-cpp](https://github.com/godotengine/godot-cpp) 
+2. 下载Godot-cpp源文件：[godot-cpp地址](https://github.com/godotengine/godot-cpp) 
 
-    **《是Godot-CPP项目，不是Godot的源码》**
+    注意00：要下载godot-cpp项目，不是Godot的源码
 
-    注意：godot-cpp版本要与Godot可执行文件版本相同
+    注意01：godot-cpp版本要与Godot可执行文件版本相同
 
 3. 下载安装python（不建议使用微软商店安装）
 
@@ -275,16 +103,11 @@
 
     下载路径：[Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
 
-    版本选择：
+    | 版本参数 | x86_64       | win32       | seh                         | msvcrt                                     | ucrt                                 | posix      |
+    | -------- | ------------ | ----------- | --------------------------- | ------------------------------------------ | ------------------------------------ | ---------- |
+    | 说明     | 64位操作系统 | windows程序 | 异常处理模型，无脑选seh即可 | 是一个过时的C++运行库，主要是C99之前的标准 | 是一个通用的C运行库，支持最新C++语法 | 可移植版本 |
 
-    1. x86_64：64位操作系统
-    2. win32：windows程序
-    3. seh：异常处理模型，无脑选seh即可
-    4. msvcrt：是一个过时的C++运行库，主要是C99之前的标准
-    5. ucrt：是一个通用的C运行库，支持最新C++语法
-    6. posix：可移植版本
-
-6. 运行`MSYS2 MSYS` 
+6. 运行程序：MSYS2 MSYS
 
     更新：`pacman -Syu`
 
@@ -294,9 +117,56 @@
 
     验证命令：`gcc -v` 
 
-#### Ⅱ、新建项目目录
+新建项目目录
 
 ```shell
+godot_project/
+├── bin/                  # 编译后的可执行文件
+├── src/                  # 项目源码
+│   ├── core/             # 核心逻辑（与引擎无关的代码）
+│   │   ├── math/         # 数学工具类
+│   │   ├── utils/        # 通用工具类
+│   │   └── core.cpp      # 核心逻辑实现
+│   ├── game/             # 游戏逻辑
+│   │   ├── entities/     # 游戏实体（角色、敌人等）
+│   │   ├── levels/       # 关卡逻辑
+│   │   └── game.cpp      # 游戏主逻辑
+│   ├── ui/               # 用户界面
+│   │   ├── widgets/      # 自定义UI组件
+│   │   └── ui.cpp        # UI逻辑
+│   ├── modules/          # Godot C++模块
+│   │   ├── my_module/    # 自定义模块
+│   │   │   ├── SCsub     # 模块构建配置
+│   │   │   ├── register_types.cpp  # 模块注册
+│   │   │   └── my_class.cpp        # 自定义类实现
+│   │   └── other_module/ # 其他模块
+│   ├── third_party/      # 第三方库
+│   │   └── some_lib/     # 第三方库源码或头文件
+│   └── main.cpp          # 程序入口
+├── assets/               # 游戏资源
+│   ├── textures/         # 纹理
+│   ├── sounds/           # 音效
+│   ├── fonts/            # 字体
+│   └── scenes/           # Godot场景文件
+├── docs/                 # 项目文档
+│   ├── design/           # 设计文档
+│   ├── api/              # API文档
+│   └── README.md         # 项目说明
+├── tests/                # 单元测试
+│   ├── core/             # 核心逻辑测试
+│   ├── game/             # 游戏逻辑测试
+│   └── ui/               # UI测试
+├── scripts/              # 构建脚本或其他脚本
+│   ├── build.sh          # 构建脚本
+│   └── deploy.sh         # 部署脚本
+├── .gitignore            # Git忽略文件
+├── SConstruct            # Godot构建配置
+└── README.md             # 项目说明
+```
+
+最简单项目目录
+
+``` shell
 # 项目根目录
  ├─ demo `Godot项目目录`
  │  └─bin `dll文件目录` 
@@ -311,43 +181,17 @@
  └─SConstruct  # SCons构建脚本
 ```
 
-#### Ⅲ、编写SCons
+编写代码
 
-参考SConstruct注释：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\SConstruct`
+1. 参考SConstruct注释
+2. 编写C++代码
 
-#### Ⅳ、编写C++代码
-
-1. 编写C++代码：
-
-   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\t_example.cpp`
-
-2. 注册C++代码：
-
-   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\register_types.h`
-
-   参考：`whiteZe\F_游戏开发\A_Godot\Godot项目目录样例\src\register_types.cpp`
-
-#### Ⅴ、生成动态链接库（.dll）
+生成动态链接库（.dll）
 
 1. 切换到目录：SConstruct文件所在目录
 2. 运行命令：`SCons -j6 -Q platform=windows`  
 
-``` shell
-# 推荐
-# 多线程编译-6是6核应与CPU核心相同
-SCons -j12 platform=windows  
-
-# 默认去寻找VS的编译环境，找不到会寻找MinGW的编译环境
-scons platform=windows  
-
-#-- 用不到的命令
-# 强制使用mingw编译
-scons platform=windows use_mingw=yes 
-# 软件是64位还是32位置，bits=64 或者 bits=32
-scons platform=windows bits=32 
-```
-
-#### Ⅴ、修改.gdextension
+修改.gdextension
 
 1. 复制生成的.dll文件到example.gdextension文件指定的位置
 
@@ -375,76 +219,176 @@ compatibility_minimum = "4.1"
 windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 ```
 
-### 二、win-cmake配置
+### 二、vscode编辑器设置
 
-### 三、编辑器配置
-
-#### Ⅰ、vscode-scons
+安装软件
 
 1. 安装vscode的C/C++扩展
 
 2. 安装LLDB扩展（CodeLLDB）
 
-3. 安装GCC编译器（配置编译器路径，若是没有提示）
+3. 安装Task Explorer：用于只编译不运行并不是必须项
+
+4. 安装GCC编译器（配置编译器路径，若是没有提示）
 
    下载路径：[Releases · niXman/mingw-builds-binaries (github.com)](https://github.com/niXman/mingw-builds-binaries/releases) 
 
    验证命令：`gcc --version` 
 
-4. 创建task.json文件
+配置构建任务文件：task.json
 
-   $Ctrl + Shift + P\to输入:configure Task\to 选择:task.json\to 选择:other$​ 
+- 创建task.json文件：$Ctrl + Shift + P\to输入:configure Task\to 选择:task.json\to 选择:other$ 
 
-   ``` json
-   {
-       "version": "2.0.0",
-       "tasks": [
-           {
-               "label": "build", // launch.json中配置对应
-               "type": "shell", // 在shell中启动
-               "command": "scons", //执行命令
-               "args": [ // 命令参数
-                   "-j12",
-                   "target=template_debug", //debug设置
-                   "debug_symbols=yes"//debug设置
-               ]
-           }
-       ]
-   }
-   ```
+``` json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build", // launch.json中配置对应
+            "type": "shell", // 在shell中启动
+            "command": "scons", //执行命令
+            "args": [ // 命令参数
+                "-j12",
+                "target=template_debug", //debug设置
+                "debug_symbols=yes"//debug设置
+                "no_run=yes" // 只编译不运行
+            ]
+        }
+    ]
+}
+```
 
-5. 运行$Debug\to LLDB$ 创建launch.json
+配置运行和调试文件：launch.json
 
-   ``` json
-   {
-       "version": "0.2.0",
-       "configurations": [
-           {
-               "name": "Debug", // debug中显示的名称
-               "type": "lldb",
-               "preLaunchTask":"build",// 执行上一步的操作task.json
-               "request": "launch",
-               // Godot可执行文件的位置，C:\\User\\Godot.exe
-               "program": "${workspaceFolder}/<executable file>",
-               // 要编译的项目目录
-               "args": ["--editor","--path","C:\\user\\demo"],
-               "cwd": "${workspaceFolder}"
-            }
-       ]
-   }
-   ```
+- 运行$Debug\to LLDB$ 创建launch.json
+- 若不使用调试，可以不配置launch.json
 
-6. 设置Godot主场景
+``` json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug", // debug中显示的名称
+            "type": "lldb",
+            "preLaunchTask":"build",// 执行上一步的操作task.json
+            "request": "launch",
+            // Godot可执行文件的位置，C:\\User\\Godot.exe
+            "program": "${workspaceFolder}/<executable file>",
+            // 要编译的项目目录
+            "args": ["--editor","--path","C:\\user\\demo"],
+            "cwd": "${workspaceFolder}"
+         }
+    ]
+}
+```
 
-7. 下断点，调试项目
+配置文件导入目录：VSCode的IntelliSense
 
-#### Ⅱ、VisualStudio-scons
+- VSCode 的 IntelliSense 依赖于 `c_cpp_properties.json` 文件来配置头文件搜索路径。
+- 文件位置：`.vscode/c_cpp_properties.json` 
 
-### 四、cmd输出乱码
+``` c++
+{
+    "configurations": [
+        {
+            "name": "Win32",  // 根据你的操作系统选择
+            "includePath": [ // 设置头文件默认打开路径
+                "${workspaceFolder}/**",  // 默认包含项目根目录
+                "${workspaceFolder}/include",  // 绝对路径
+            ],
+           "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "D:\\Program Files\\msys64\\mingw64\\bin\\gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}
+```
 
-设置$\to$ 时间和语言$\to$语言和区域$\to$管理语言设置$\to$更改系统区域设置$\to$选中：Beta版，使用UTF-8提供全球语言支持
+配置完成后，就可使用了
+
+1. 设置Godot主场景
+
+2. 下断点，调试项目
+
+### 三、SCons使用
+
+``` shell
+# 推荐
+# 多线程编译-6是6核应与CPU核心相同
+SCons -j12 platform=windows  
+
+# 默认去寻找VS的编译环境，找不到会寻找MinGW的编译环境
+scons platform=windows  
+
+# no_run参数：编译，不运行
+scons platform=windows no_run=yes 
+
+#-- 用不到的命令
+# 强制使用mingw编译
+scons platform=windows use_mingw=yes 
+# 软件是64位还是32位置，bits=64 或者 bits=32
+scons platform=windows bits=32 
+```
 
 ## Godot核心
+
+### 备注\说明
+
+- 优先使用Godot自带的类，禁止使用STL [ 为啥禁用 ](https://docs.godotengine.org/zh-cn/4.x/about/faq.html#why-does-godot-not-use-stl-standard-template-library) 
+
+  优先使用std库场景
+
+  1. 纯C++模块，无脚本交互
+  2. 高频访问的固定类型数据
+
+  使用Godot引擎功能
+
+  1. 序列化（基于Variant类型实现）、信号、资源管理等依赖于Variant类型
+  2. 与GDScript交互时，使用Godot容器
+
+- 当创建一个非游戏的应用程序时，确保在项目设置中启用[低处理器模式](https://docs.godotengine.org/zh-cn/4.x/classes/class_projectsettings.html#class-projectsettings-property-application-run-low-processor-mode)以减少 CPU 和 GPU 占用。
+
+- 资源类型优先使用 `const Ref<T>&` 
+
+  ``` c++
+  void set_texture(Ref<Texture2D>& p_texture) 
+  {
+      // 参数传递阶段：零开销（无拷贝）。
+  	// 赋值给成员变量时：发生一次拷贝（引用计数 +1）。
+      texture = p_texture;
+  }
+  ```
+
+- 其他类型是否推荐使用`const &`
+
+  | **类型**       | **大小** | **拷贝成本**     | **推荐传递方式** |
+  | :------------- | :------- | :--------------- | :--------------- |
+  | `int`, `float` | 4-8 字节 | 极低             | 直接传值         |
+  | `Vector2`      | 8 字节   | 低               | `const &` 或传值 |
+  | `String`       | 变长     | 中等（引用计数） | `const &`        |
+  | `Array`        | 变长     | 高（深层复制）   | `const &`        |
+  | `Dictionary`   | 变长     | 高（深层复制）   | `const &`        |
+  
+- 关于引入头文件，避免循环引用错误
+
+  **前向声明的本质**：编译器需要知道 `Node2D` 属于哪个命名空间，即使后续通过 `using namespace` 省略。
+
+  **一致性要求**：Godot 的 C++ 绑定严格将类定义在 `godot` 命名空间内，前向声明必须匹配。
+
+  ``` c++
+  namespace godot {
+      class Node2D;  // 前向声明（必须在 godot 命名空间内）
+  }
+  
+  using namespace godot;  // 使用命名空间
+  ```
 
 ### 一、生命周期
 
@@ -490,9 +434,25 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 
 ### 二、宏定义
 
-错误宏：
+错误宏
 
 ``` c++
+ERR_FAIL_NULL_MSG(a, "xxxxx");    // 判断指针a是否为空,并输出错误信息，程序返回
+ERR_FAIL_NULL_EDMSG(a, "xxxxx2"); // 判断指针a是否为空,并输出错误信息，程序返回
+
+ERR_FAIL_NULL(a);     // 判断是否为空，空输出a为空
+ERR_FAIL_NULL_V(a, 1);// 第2个参数不知道是什么
+
+ERR_FAIL_V_MSG(nullptr, err); // 带返回值的，错误信息
+
+// 通用错误宏
+ERR_FAIL_MSG("Error fail msg");     // 打印错误信息，程序返回
+ERR_FAIL_EDMSG("error fail edmsg"); // 错误打印，通知编辑器
+ERR_FAIL_V(b); // 程序错误，并返回其值b
+
+ERR_PRINT("Error print"); // 打印错误，程序继续执行
+ERR_PRINT_ED("Error print ed"); // 通知编辑器，程序继续执行
+ERR_FAIL();                     // 程序返回
 ```
 
 检查宏
@@ -502,7 +462,16 @@ windows.debug.x86_64 = "res://libgodot.debug.x86_64.lib"
 CHECK(int(map["Hello"]) == 0);
 ```
 
+其他宏
 
+``` c++
+CHECK_EQ(a1, a1); // compare self
+CHECK_FALSE(a1 != a1);
+CHECK_EQ(a1, a2); // different equivalent arrays
+CHECK_FALSE(a1 != a2);
+CHECK_NE(a1, other_a); // different arrays with different content
+CHECK_FALSE(a1 == other_a);
+```
 
 ### 三、内存分配
 
@@ -530,19 +499,67 @@ CHECK(int(map["Hello"]) == 0);
 
 ### 四、Variant类型
 
-- 数组和字典都是Variant实现的
+- Godot的万能类型，可以转换为Godot的任意类型
+- 要实现序列化，就应将变量类型转换为Godot容器（Array、Dictionary等）
 
-- 优先使用GODOT容器，其他情况优先使用C++容器
+显示转换（适用于转Array、Dictionary、Vector2等）
 
-  将容器字段序列化，导出到引擎编辑器窗口 时
+- 一般要使用类型检测，不然会出错停止
 
-  需要将容器作为参数或其他方式提供给GODOT API
+``` c++
+Vector2 my_v = my_variant; // 转换为vector2
+Array my_a = my_variant; // my_variant是variant类型
+Dictionary my_d = my_variant; // 直接转换
 
-- 优先使用Array、Dictionary类型，Godot的Array、Dictionary由Map、vector、list实现
+/* 测试 */
+// 检测是不是字典类型
+if (my_variant.get_type() == Variant::DICTIONARY) {
+    Dictionary my_dict = my_variant;
+} else {
+    UtilityFunctions::print("Variant is not a Dictionary!");
+}
+```
 
-#### Ⅰ、Dictionary
+使用cast_to转换
 
-- 头文件：`#include "core/variant/array.h"` 
+- 适用于 **`Object` 类型之间的转换**（如从 `Node`到 `CharacterBody3D`类型）。
+- 基本就是Node类转换为其他Node子类
+- 如果转换失败，`cast_to` 返回 `nullptr`。
+- **仅适用于 `Object` 派生类**，不能用于 `int`、`float` 等基本类型。
+
+``` c++
+// 使用 Object::cast_to<T>（推荐）
+Node *node = v;
+// 从node转换为Node2D
+Node2D *player = cast_to<Node2D>(node);
+```
+
+隐式转换，使用`=`或`Ref<>`
+
+- 适用于 Godot 的 **`Ref<>` 智能指针系统**（如 `Ref<Resource>`, `Ref<Node>` 等）。
+- 当使用Dictionary或Array保存`Ref<>`时，使用隐式转换
+
+``` c++
+/* 情况1：Variant 存储的是 Resource 类型 */ 
+Variant v = ResourceLoader::get_singleton()->load("res://texture.png");
+Ref<Texture2D> texture = v; // 直接赋值（隐式转换）
+
+/* 情况2：Variant 存储的是 Node 类型 */ 
+Variant node_v = get_node("Player");
+Node *node = node_v; // 直接转换为 Node*
+```
+
+### 五、Dictionary
+
+- Godot所有变量都需要使用`cast_to`转换
+- 不同的Dictionary类型
+  - 如果需要存储多种类型的数据，使用 `Dictionary`。
+  - 如果需要存储特定类型的数据，使用 `TypedDictionary<K, V>`。
+  - 如果需要保持键值对的顺序，使用 `OrderedDictionary`。
+  - 如果需要高性能的密集字典，使用 `PackedDictionary` 系列。
+
+
+初始化方法：没有适合方法
 
 Dictionary使用方法
 
@@ -556,71 +573,96 @@ map.find_key(6).get_type();
 map.make_read_only();
 map.size();
 map.get_key_list(ptr);
+Array a = map.keys(); // 获取所有key
 
 Variant val = map.get_key_at_index(0);
 if(int(val) == 4);
 ```
 
-#### Ⅱ、Array
-
-- 头文件：`#include "core/variant/array.h"`
+### 六、Array类型
 
 - Array可以存放任意类型（**可同时存放不同的类型，但只能是Godot内部支持对象**）
+- 需要使用`cast_to`进行类型转换
+- 如果需要高性能的密集数组，使用 `PackedArray` 系列。内存紧凑，性能高。
 
-- Array必须先使用`push_back\push_front`添加元素，才能使用`arr[i]`修改元素的值，不然会数组溢出
+**注意**：当使用ClassDB::add_property添加外部属性，其类型是Array的时候，对应存储变量必须是Public权限，private权限、protected权限都有可能造成Array的值只能使用1次就被释放（版本：4.4），Dictionary字典类型就可以完美保存
 
-- 一些宏定义
-
-  ``` c++
-  CHECK_EQ(a1, a1); // compare self
-  CHECK_FALSE(a1 != a1);
-  CHECK_EQ(a1, a2); // different equivalent arrays
-  CHECK_FALSE(a1 != a2);
-  CHECK_NE(a1, other_a); // different arrays with different content
-  CHECK_FALSE(a1 == other_a);
-  ```
-
-Array使用方法：
+Array常用使用方法
 
 ``` c++
-Array arr;
-arr.push_bach(1);
-arr.pop_front();
-arr.pop_back()
-arr.append_array(arr2); // 追加数组
+/* 创建数组 */
+Array arr; // 创建空数组
+Array arr = Array::make(1, 2, 3, "hello", true); // 创建带初始值的数组
+
+/* 额外方法 */
 arr.size(); 
-arr[1]; // 读取
-arr.insert(0, 2); //插入元素
-arr.erase(3); // 删除
-arr.resize(2); // 重置大小
 arr.front();
 arr.back();
 arr.remove_at();
-arr.has(1);
 arr.count(2);
-arr.max();
-arr.min();
+arr.max(); // 最大
+arr.min(); // 最小
 arr.slice();
+arr.pick_random(); //随机获取一个数
 ```
 
-#### Ⅲ、Variant
+Array常用使用方法-添加元素
 
-- Godot的万能类型，可以转换为Godot的任意类型
-- Variant中只有Object的派生类需要使用cast_to转换
+- **`append(value)`**：在数组末尾添加一个元素。
+- **`push_back(value)`**：与 `append` 相同。
+- **`insert(position, value)`**：在指定位置插入一个元素。
 
-``` c++
-// 准备一个Variant类型变量
-Variant temp = tg.pop_back();
-
-/* 转换样例，cast_to方法 */
-// 转换类型到Node *，
-// cast_to<目标类型>(待转换的变量);
-Node *t = cast_to<Node>(temp);
+```c++
+my_array; // [1, 2, 3]
+my_array.append(4);          // [1, 2, 3, 4]
+my_array.push_back(5);       // [1, 2, 3, 4, 5]
+my_array.insert(2, 99);      // [1, 2, 99, 3, 4, 5]
 ```
 
-#### Ⅳ、TypedArray
+Array常用使用方法-删除元素
+
+- **`remove(position)`**：删除指定位置的元素。
+- **`erase(value)`**：删除第一个匹配的元素。
+- **`pop_back()`**：删除并返回最后一个元素。
+- **`pop_front()`**：删除并返回第一个元素。
+- **`clear()`**：清空数组。
+
+```c++
+my_array.remove(2);          // 删除索引为2的元素
+my_array.erase(3);           // 删除第一个值为3的元素
+Variant last_element = my_array.pop_back();  // 删除并返回最后一个元素
+Variant first_element = my_array.pop_front(); // 删除并返回第一个元素
+my_array.clear();            // 清空数组
+```
+
+Array常用使用方法-查找元素
+
+- **`find(value)`**：返回第一个匹配元素的索引，未找到返回 `-1`。
+- **`has(value)`**：检查数组是否包含某个值。包含返回真
+
+```c++
+int index = my_array.find(2);  // 返回值为2的索引
+if (my_array.has("hello")) {
+    Godot::print("Found 'hello'");
+}
+```
+
+Array常用使用方法-排序/ 反转
+
+- **`sort()`**：对数组进行升序排序。
+- **`sort_custom(callable)`**：使用自定义函数排序。
+- **`reverse()`**：反转数组。
+
+```
+my_array.sort();  // 升序排序
+my_array.reverse();  // 反转数组
+```
 
 TypedArray使用方法
+
+- 类型安全：只能存储指定类型的元素。
+- 性能优化：由于类型固定，访问元素时无需类型检查。
+- 支持的类型：`Node`, `Resource`, `Object` 等
 
 ``` c++
 /* 存放一般数据 */
@@ -637,203 +679,487 @@ TypedArray<TResNode> w3;
 w3.push_back(this);
 ```
 
+### 七、GDExtension中函数返回值
 
+**直接通过函数return返回**
 
-### 四、Templates类型
+1. 小型数据
 
-#### Ⅰ、Map
+   这些类型大小 ≤ 16 字节，**返回值优化（RVO/NRVO）** 会消除拷贝。
 
-1. Map分为AHashMap、HashMap、OAHashMap
+   例如：`Vector2、Vector3、Color、Rect2`
 
-#### Ⅱ、CommandQueue
+2. 常用节点的指针，如：`Node *`、`CharacterBody2D *`、`Marker2D *` 
 
-#### Ⅲ、List
+3. Godot字符串类型
 
-- List可以存放类、自定义类等
+   Godot 的字符串类已优化，**复制时仅递增引用计数**，无深拷贝开销。
+
+   例如：`String、StringName、NodePath`
+
+4. Ref<>对象
+
+   `Ref<>` 是智能指针，**复制时仅增减引用计数**，无性能问题。
+
+**通过`const &`或函数参数带出**
+
+1. Array、Dictionary类型：容器较大，避免复制开销
+2. 自定义大结构体（struct、class）：避免深拷贝
+3. 返回多个值时
+
+### 八、GDExtension中可传递对象
+
+1. 优先是使用`get_node`获取节点后再调用属性或方法，万能方法，获取节点后再获取数据
+2. 不同的节点之间是相互独立的，不存在数据通用
+3. 使用静态方法，变量可以在继承关系中的节点共享一份数据
+4. `_ready()`中定义赋予的值，在子类是无法获取的，要在子类调用专用的赋值方法（注意，这样也只能在调用赋值方法的节点中使用数据，而在其他节点无法使用）
+
+#### Ⅰ、普通类型
+
+`Bool、String、int、Float、double` 自动类型
+
+- 其值可以在子类中直接获取。
+- 任何情况、任何方法都可获取父类属性。
 
 ``` c++
-List<String> args; 
-List<Variant> keys;
-List<Variant> *ptr = &keys;
-
-args.push_back("xxx"); // 添加字符
-args.find("xxx"); // 查找
-args.is_empty();
-args.front()->get()
+/* 父类TFather-定义的属性 */ 
+int father_1 = 1;
+double father_2 = 1.1;
+String father_3 = "aa";
+/* 子类-直接调用 */
+UtilityFunctions::print(TFather::father_1);
+UtilityFunctions::print(father_1);
 ```
 
-#### Ⅳ、vector
+#### Ⅱ、其他类型
 
+`Array、Dictionary、Variant` 不能直接获取父类属性
 
+- 直接调用父类的Array、Dictionary、Variant其值在子类为空，需要先得到父类节点才可以
 
-#### Ⅴ、HashSet
+- return可以返回函数内创建的Array、Dictionary的值
 
+  ``` c++
+  Array return_array()
+  {
+      Array a;
+      a.push(1);
+      return a; // 可以返回
+  };
+  Dictionary return_dictionary()
+  {
+      Dicctionary a;
+      return a; // 返回属性值
+  };
+  // 子类可以获取其拷贝副本
+  UtilityFunctions::print(TFather::return_array());
+  UtilityFunctions::print(return_dictionary());
+  ```
 
+- return不能获取类属性属性（使用指针也不能获取）
 
-### 三、Object
+  ``` c++
+  /* 父类TFather-定义的属性 */ 
+  Array father_1;
+  Dictionary father_2;
+  Array return_array()
+  {
+      return father_1; // 返回属性值
+  };
+  Dictionary return_dictionary()
+  {
+      return father_2; // 返回属性值
+  };
+  /* 子类无法获取父类属性 */
+  UtilityFunctions::print(TFather::return_array());//空
+  UtilityFunctions::print(return_dictionary());//空
+  /* 子类获取父类节点后调用 */
+  TFather * n = get_node<TFather>(".."); // 获取父类节点
+  n->father_1; // 获取属性值
+  ```
 
-1. 所以类的基类，这意味Object中的方法可以直接调用
-
-#### Ⅰ、注册对象
-
-1. 普通注册：`ClassDB::register_class<MyCustomClass>()` 
-2. 注册为虚拟类：`ClassDB::register_class<m_class>(true)` 
-3. 注册为抽象类，不能被实例化：`ClassDB::register_abstract_class<m_class>()` 
-4. 注册为内核类：`ClassDB::register_internal_class<m_class>()` 
-
-#### Ⅱ、常量绑定
-
-``` c++
-// 定义一个常量
-enum SomeMode {
-   MODE_FIRST,
-   MODE_SECOND
-};
-// 绑定
-VARIANT_ENUM_CAST(MyClass::SomeMode); 
-// 在_bind_methods中绑定
-BIND_CONSTANT(MODE_FIRST);
-BIND_CONSTANT(MODE_SECOND);
-```
-
-#### Ⅲ、PropertyInfo
-
-1. 定义：`PropertyInfo(type, name, hint, hint_string, usage_flags)`
-
-2. 样例：
-
-   `PROPERTY_HINT_RANGE`：范围，0-49，步长1
-
-   ``` c++
-   PropertyInfo(
-       Variant::INT, "amount", 
-       PROPERTY_HINT_RANGE, "0,49,1", 
-       PROPERTY_USAGE_EDITOR)
-   ```
-
-3. 样例：
-
-   `PROPERTY_HINT_ENUM`：枚举，只接收`Enabled,Disabled,Turbo`
-
-   ```
-   PropertyInfo(
-   	Variant::STRING, "modes", 
-   	PROPERTY_HINT_ENUM, "Enabled,Disabled,Turbo")
-	```
-
-ARRAY数组类型定义
+子类调用父类的`Dictionary、Array、Variant`赋值方法也可获取其属性（不推荐使用）
 
 ``` c++
-/* 方法绑定 */
-void TEST::_bind_methods() {
-    ClassDB::bind_method(
-        D_METHOD("set_enemy", "r"), &TEnemyContainer::set_enemy);
-    ClassDB::bind_method(
-        D_METHOD("get_enemy"), &TEnemyContainer::get_enemy);
-    // 绑定元素，选择Variant::ARRAY
-    ClassDB::add_property("TEST",
-    	PropertyInfo(Variant::ARRAY, "Array"),
-        "set_enemy",
-        "get_enemy");
+// 赋值方法
+void TFather::get_res_from_father()
+{
+    father_1.push_back(111); // Array
+    father_2["333"] = 333;  // Dictionary
+    father_3 = get_node<Node>("../Node"); // 节点
 }
-/* 保存数据的变量，Array，Godot的类型 */
-Array m_enemy_array;
-/* 保存Array的数据 */
-void TEST::set_enemy(Variant a){
-    m_enemy_array = a;
+// 子类调用赋值方法
+TFather::get_res_from_father(); 
+// 然后就可以使用父类属性了
+UtilityFunctions::print(TResFather::father_1);
+UtilityFunctions::print(TResFather::father_2);
+UtilityFunctions::print(TResFather::father_3);
+```
+
+#### Ⅲ、资源类型
+
+**资源类型可以在子类直接获取**（全局唯一）
+
+``` c++
+/* 父类 */
+Variant father_res; //父类定义的资源
+/* 子类 */
+UtilityFunctions::print(father_res); // 可以直接获取父类资源类
+```
+
+关于资源类型的使用
+
+- 类属性信息：
+
+  son类中有字段data，用于添加资源
+
+  father类中有字段scene，用于添加资源
+
+  res资源类有属性aa；
+
+- 情况一：资源添加在子类节点中
+
+  > son节点 ：“检查器”$\to$ “father类”$\to$ “字段scene”添加资源文件
+
+  ``` c++
+  /* 父类 */
+  Variant father_res; //父类定义的资源
+  /* 子类 */
+  TRes *a = cast_to<TRes>(father_res); // Variant转换为TRes类型
+  UtilityFunctions::print(a->aa); // 打印属性值
+  ```
+
+- 情况二：资源添加在父类节点中，不能获取资源，需要先获取父类节点
+
+- 情况三：资源添加在父类节点中，在子类调用父类的赋值方法，也是可以获取属性值（不推荐使用）
+
+### 九、信号方法
+
+1. Godot操作方法：连接信号方法$\to$ 连接到脚本（选中自定义类）$\to$ 接受方法旁的“选取”
+
+2. 一个信号只能连接到同一个 Callable 一次。
+
+   如果该信号已经连接，除非该信号是使用 CONNECT_REFERENCE_COUNTED 连接的，否则该方法会返回 ERR_INVALID_PARAMETER 并推送一条错误消息。
+
+   为防止这种情况，请首先使用 is_connected() 检查已存在的连接。
+
+3. 操作方法：连接信号方法$\to$ 连接到脚本（选中自定义类）$\to$ 接受方法旁的“选取”
+
+#### Ⅰ、信号使用
+
+1. 信号定义、发射、连接方法，都可以在任意位置
+2. 信号定义、发射、连接方法，都不在一个文件中，需要获取对应的节点
+
+声明信号
+
+- 信号声明，可以在任意文件中
+
+``` c++
+/* 创建信号 */
+// 带参数信号
+ADD_SIGNAL(MethodInfo(
+    "game_stop",//信号名称
+    PropertyInfo(Variant::STRING, "data")//信号参数
+));
+// 普通信号
+ADD_SIGNAL(MethodInfo("game_stop"));
+```
+
+发射信号
+
+- GDScript发射信号：需要获取定义信号的节点
+
+``` c++
+/* 发送信号 */
+// 发射信号
+emit_signal("信号名称");
+emit_signal("信号名称", "参数1");
+
+// 发射其他类中定义信号，需要先获取定义信号的类
+get_node<Node>("节点名")->emit_signal("信号名称");
+
+/* GDScript发射信号 */
+get_node("signal")->emit_signal("xx");
+```
+
+信号的处理方法
+
+- 一定要设置bind_method方法，不然无法触发信号处理方法
+
+``` c++
+/* 暴露信号的触发方法到GDScript */
+// up: 供GDScript调用的方法名
+// up_testst：up触发的C++方法
+ClassDB::bind_method(D_METHOD("up"), &TTest::up_testst);
+
+/* 设置响应方法 */
+void Test::up_testst(){ //...}
+```
+
+连接信号与信号处理方法，连接方法根据不同的情况，选择不同的方法
+
+- `connect("信号名称", Callable(类, "触发的GDScript可调用的方法"))` 
+- 信号连接方法，可以在任意地方
+
+``` c++
+/* 方式一 */ 
+// 1.当前类定义了信号：game_stop
+// 2.触发当前类的方法
+connect("game_stop", Callable(this, "up"));
+
+/* 方式二  */
+// 1.当前类定义了信号：game_stop
+// 2.触发其他类方法
+Node *p = get_node<Node>("aim"); // 获取其他类
+connect("game_stop", Callable(p, "up"));
+
+/* 方式三 */ 
+// 1.aim类中定义了信号:game_stop
+// 2.触发aim中方法up
+get_node<Node>("aim") 
+ 	->connect("game_stop", Callable(this, "up"));
+
+/* 方法四 */ 
+// 1.当前类没有定义信号
+// 2.当前类没有触发方法
+Node *p = get_node<Node>("aim"); // 获取触发方法
+get_node<Node>("Area2D") // 获取信号
+ 	->connect("game_stop", Callable(p, "up"));
+```
+
+#### Ⅱ、自定义节点属性
+
+- 注意：`ClassDB::bind_method `方法一定要在 `ClassDB::add_property` 之前
+- 需要重新打开Godot，才能显示属性
+- 中文会乱码
+
+基本用法：
+
+``` c++
+void Test::_bind_methods(){
+    /* 2.将Godot界面属性与C++方法绑定 */
+    // 要先定义绑定方法
+    ClassDB::bind_method(D_METHOD("set_radius", "a"), &Test::set_radius);
+    ClassDB::bind_method(D_METHOD("get_radius"), &Test::get_radius);
+    
+    /* 1.添加界面接口
+    ClassDB::add_property("类名",
+    	PropertyInfo(参数类型, "参数名称"),
+        "参数设置方法", 
+        "获取参数数值");
+    */
+    ClassDB::add_property("Test",
+    	PropertyInfo(Variant::FLOAT, "xxxx"),
+        "set_radius",
+        "get_radius");
+}
+
+/* 3.设置get_radius、set_radius方法 */
+double Test::get_radius(){
+    return radius;
+}
+void Test::set_radius(double r){
+    this->radius = r;
+}
+```
+
+给属性添加分组
+
+``` c++
+/* 
+ADD_GROUP("分组名称","分组标识");
+ADD_SUBGROUP("分组名称", "分组标识");
+*/
+// 设置分组表示，
+ADD_GROUP("Group01","first_");
+// 设置分组标识，二级分组
+ADD_SUBGROUP("Group02", "first_second_");
+
+/* 添加属性到分组中 */
+ClassDB::add_property("Test",
+    // 添加分组标识
+    PropertyInfo(Variant::FLOAT, "first_second_xxxxx"),
+    "set_radius",
+    "get_radius");
+```
+
+#### Ⅲ、connect方法
+
+1. connect中Callable方法只能触发GDScript能调用的方法（使用CLassDB::bind_method绑定的方法）
+
+2. 出现错误：
+
+   > Cannot connect to 'animation_finished': the provided callable is not valid: 
+
+   应检测`D_METHOD`的绑定方法与`Callable()`中的方法名是否一致
+
+携带参数的bind方法
+
+``` c++
+/* 定义可调用方法 */ 
+ClassDB::bind_method(D_METHOD("destroy_tetrominoes", "a", "b"), &aa::destroy);
+
+/* 连接信号 */
+int a = 100;
+anim_player->connect(
+    "animation_finished", // anim_player节点的信号
+    // _on_animation_finished：触发的方法，需要在bind_method中绑定
+    // bind(a)：绑定的参数，可以是任何值，节点，值都行
+	Callable(this, "destroy_tetrominoes").bind( a ));
+
+/* 调用方法 */
+// const String &anim_name：AnimationPlayer的finished信号默认绑定参数
+// int a：我们自定义的绑定参数
+void aa::destroy(const String &anim_name, int a)
+{
+    // 动画节点第一个参数是默认传递的
+    if (anim_name == "play") { \\...    }
+}
+```
+
+Lambda绑定方式
+
+- 有错，意义不明
+
+``` c++
+Node * sprite = get_node<Node>("Sprite");
+anim_player->connect(
+    "animation_finished",
+    Callable::bind(
+        // Lambda表达式
+        [this](const String &anim_name, Node *sprite) {
+            if (anim_name == "play") sprite->queue_free();
+        },
+        // 绑定的参数
+        sprite 
+    )
+);
+```
+
+
+
+### 十、资源相关操作
+
+1. 使用`@export var player_date: Resource`让节点可以加载资源文件
+
+2. **资源类可以直接使用，他在游戏中是唯一的** 
+
+3. 资源类中只定义数据变量，不定义方法，方法在容器中定义
+
+4. 静态的数据，不会修改的信息，都可以写成资源（可以理解为数据库）
+
+5. 同时，一个资源类（C++文件）代表一类资源，可用这个资源生成具体的资源文件（.tres）
+
+   比如，编写weapen.cpp（武器资源）可生成dadao.tres（大刀）、xiaodao.tres（小刀）
+
+资源参数说明
+
+| 名称                    |                                                              |
+| ----------------------- | ------------------------------------------------------------ |
+| resource_local_to_scene | 一个资源文件应用于多个地方时，（true）可保证每一个资源都独立 |
+|                         |                                                              |
+
+#### Ⅰ、资源tres文件
+
+- 资源节点需要在regi中注册
+- 基本类型使用普通属性添加 
+- Object类型可以用于其他数据类型添加，Resource类型使用Object类型
+
+资源头文件（.h）
+
+- 头文件：`#include <godot_cpp/classes/resource.hpp>`
+- 必须继承Resource类型
+
+``` c++
+using namespace godot;
+class TFood : public Resource
+{
+    GDCLASS(TFood, Resource);
+public:
+    /* 基础属性 */
+    String m_name = "";
+    Variant m_level;
+protected:
+    static void _bind_methods();
+
+private:
+    // 修改属性方法
+    void set_name(const String & s);
+    String get_name();
+}
+```
+
+普通资源属性（.cpp）
+
+``` c++
+#include "food.h"
+/* 普通属性添加 */
+void TFood::_bind_methods() {
+    /* 设置可在编辑器修改 */
+    ClassDB::bind_method(D_METHOD("set_name", "a"), &TFood::set_name);
+    ClassDB::bind_method(D_METHOD("get_name"), &TFood::get_name);
+    ClassDB::add_property("TFood",
+     	PropertyInfo(Variant::STRING, "Name"),
+        "set_name",
+        "get_name");
+}
+/* 在编辑器修改的具体逻辑 */
+void TFood::set_level(const int & a){
+     m_name = a;
 };
-Variant TEST::get_enemy(){
-    return m_enemy_array;
+int TFood::get_level(){
+     return m_name;
+}; 
+```
+
+添加Resours类型（.CPP）
+
+``` c++
+#include "food.h"
+
+/* 其他属性添加，Resours资源添加 */
+void TFood::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_name", "a"), &TFood::set_name);
+    ClassDB::bind_method(D_METHOD("get_name"), &TFood::get_name);
+    ClassDB::add_property("TFood",
+        // 使用特殊的OBJECT类型
+     	PropertyInfo(Variant::OBJECT, "Name"), // 修改地方
+        "set_name",
+        "get_name");
+}
+// 对应于不是基础类型的使用Variant类型
+void TFood::set_level(const Variant & a){
+     m_level = a;
 };
+Variant TFood::get_level(){
+     return m_level;
+}; 
 ```
 
-#### Ⅳ、Reference
+#### Ⅱ、创建tres文件
 
-1. Reference继承自Object并保存引用计数. 它是引用计数对象类型的基础. 必须使用Ref<>模板来声明它们. 
-2. 例如:
+使用Godot创建资源，创建后的资源类（.tres）文件，加载到其他节点即可使用
 
-``` c++
-class MyReference: public Reference {
-    GDCLASS(MyReference, Reference);
-};
+![](assets/111183620.png)
 
-// myref是引用计数. 当没有更多Ref<>模板指向它时, 它将被释放.
-Ref<MyReference> myref(memnew(MyReference));
-```
+#### Ⅲ、资源转换及问题
 
-#### Ⅴ、ResourceLoader
+1. Ref<>类型转换为Ref<>使用隐式转换，不使用cast_to方法
 
-1. 头文件：`#include <godot_cpp/classes/resource_loader.hpp>` 
+常出现的错误提示
 
-2. 类型头文件：
+- 出现为`<NULL>`：可能是资源没有正确添加，需要重启Godot
 
-   场景资源：`#include <godot_cpp/classes/packed_scene.hpp>`
+- Dictionary资源打印会出现：`{ "I": [Wrapped:0] }`
 
-3. 类型：
+  `[Wrapped:0]`：并不是空，其`[]`也不意味着数组
 
-   PackedScene：场景资源（.tscn）
-   Texture2D：图片纹理，图片资源
-
-4. 如果先前已加载对该资源的引用并且该引用在内存中（已实例化）, 则资源加载器将返回该引用. 这意味着只能同时从磁盘上引用的文件加载一个资源.
-
-``` c++
-/* 方法一
-load("路径","类型"); // 加载
-*/ 
-ResourceLoader *R = new ResourceLoader();
-Ref<PackedScene> scene = R->load("res://game2.tscn","PackedScene");
-// 判断节点是否加载成功
-scene.is_valid()
-// 把资源初始化，然后就可以调用了
-Node *b = scene->instantiate();
-// 将b节点转变为指导想调用节点
-Button *b = scene->instantiate()->get_node<Button>(".");
-// 将b节点，添加到主场景即可显示
-Node *a = get_node<Node>("%node");
-a->add_child(b);
-
-/* 方法二 */
-Ref<Resource> res = ResourceLoader::load("res://someresource.res")
-```
-
-#### Ⅵ、ResourceSaver
-
-``` c++
-ResourceSaver::save("res://someresource.res", instance);
-```
-
-### 五、文本资源加载
-
-#### Ⅰ、FileAccess
-
-- 头文件：`#include <godot_cpp/classes/file_access.hpp>`
-
-- 文件读取类型
-
-  `FileAccess::READ = 1`
-
-  `FileAccess::WRITE = 2`
-
-  `FileAccess::READ_WRITE = 3`
-
-  `FileAccess::WRITE_READ = 7`
-
-``` c++
-// 读取文件
-Ref<FileAccess> f = FileAccess::open("Path", FileAccess::READ);
-f->close(); // 关闭文件
-
-String a = f->get_as_text(); // 将FileAccess类型转换为字符串
-Vector<String> header = f->get_csv_line(); // Default delimiter: ","
-Vector<String> row1 = f->get_csv_line("~"); // 使用"~"分割字符串
-```
-
-#### Ⅱ、JSON
+#### Ⅳ、JSON
 
 1. Godot内置呢JSON解析方法，不用使用jsoncpp
 2. 注意：Json类型不能通过`ClassDB::add_property`方式添加进Godot
 
-读取/保存本地json文件，需要`FileAccess`类
+**读取/保存**本地json文件，需要`FileAccess`类
 
 - json头文件：`#include <godot_cpp/classes/json.hpp>` 
 - 文件加载类：`#include <godot_cpp/classes/file_access.hpp>` 
@@ -841,6 +1167,7 @@ Vector<String> row1 = f->get_csv_line("~"); // 使用"~"分割字符串
 ``` c++
 Ref<FileAccess> f = FileAccess::open("Path", FileAccess::READ);
 String a = f->get_as_text(); // 将FileAccess类型转换为字符串
+f->close(); // 关闭文件
 ```
 
 **parse**：json文本（字符串）转json对象
@@ -892,76 +1219,7 @@ JSON.stringify(data_to_send, "\t")
 
 ```
 
-### 七、可传递对象
-
-1. 优先是使用`get_node`获取节点后再调用属性或方法，万能方法，获取节点后再获取数据
-2. 不同的节点之间是相互独立的，不存在数据通用
-3. 使用静态方法，变量可以在继承关系中的节点共享一份数据
-4. `_ready()`中定义赋予的值，在子类是无法获取的，要在子类调用专用的赋值方法（注意，这样也只能在调用赋值方法的节点中使用数据，而在其他节点无法使用）
-
-#### Ⅰ、普通类型
-
-`String、int、double`类型可以在子类中直接获取（任何情况方法都可获取父类属性）
-
-``` c++
-/* 父类TFather-定义的属性 */ 
-int father_1 = 1;
-double father_2 = 1.1;
-String father_3 = "aa";
-/* 子类-直接调用 */
-UtilityFunctions::print(TFather::father_1);
-UtilityFunctions::print(father_1);
-```
-
-#### Ⅱ、数组字典
-
-`Variant`类型与Array一样不能直接获取父类属性，需要获取父类节点
-
-`Array、Dictionary` 类型不能直接在子类调用，可以调用父类方法获取
-
-- 直接调用父类的Array、Dictionary其值在子类为空，需要先得到父类节点才可以
-
-- return可以返回函数内创建的Array、Dictionary的值
-
-  ``` c++
-  Array return_array()
-  {
-      Array a;
-      a.push(1);
-      return a; // 可以返回
-  };
-  Dictionary return_dictionary()
-  {
-      Dicctionary a;
-      return a; // 返回属性值
-  };
-  // 子类可以获取其拷贝副本
-  UtilityFunctions::print(TFather::return_array());
-  UtilityFunctions::print(return_dictionary());
-  ```
-
-- return不能获取类属性属性（使用指针也不能获取）
-
-  ``` c++
-  /* 父类TFather-定义的属性 */ 
-  Array father_1;
-  Dictionary father_2;
-  Array return_array()
-  {
-      return father_1; // 返回属性值
-  };
-  Dictionary return_dictionary()
-  {
-      return father_2; // 返回属性值
-  };
-  /* 子类无法获取父类属性 */
-  UtilityFunctions::print(TFather::return_array());//空
-  UtilityFunctions::print(return_dictionary());//空
-  /* 子类获取父类节点后调用 */
-  TFather * n = get_node<TFather>(".."); // 获取父类节点
-  n->father_1; // 获取属性值
-
-子类调用父类的`Dictionary、Array、Variant`赋值方法也可获取其属性（不推荐使用）
+获取其属性（不推荐使用）
 
 ``` c++
 // 赋值方法
@@ -979,591 +1237,24 @@ UtilityFunctions::print(TResFather::father_2);
 UtilityFunctions::print(TResFather::father_3);
 ```
 
-#### Ⅲ、资源类型
+#### Ⅵ、ResourceLoader
 
-资源类型可以在子类直接获取（与int、double、String一样）
+1. 头文件：`#include <godot_cpp/classes/resource_loader.hpp>` 
 
-``` c++
-/* 父类 */
-Variant father_res; //父类定义的资源
-/* 子类 */
-UtilityFunctions::print(father_res); // 可以直接获取父类资源类
-```
+2. 类型头文件：
 
-关于资源类型的使用
+   场景资源：`#include <godot_cpp/classes/packed_scene.hpp>`
 
-- 类属性信息：
+3. 类型：
 
-  son类中有字段data，用于添加资源
+   - Ref<PackedScene>：场景资源（.tscn）
+   - Ref<Texture2D>：图片纹理，图片资源
 
-  father类中有字段scene，用于添加资源
+4. 如果先前已加载对该资源的引用并且该引用在内存中（已实例化）, 则资源加载器将返回该引用. 这意味着只能同时从磁盘上引用的文件加载一个资源.
 
-  res资源类有属性aa；
+5. Ref<Resource> 是所有资源的基类，Ref<PackedScene> 继承自 Ref<Resource>
 
-- 情况一：资源添加在子类节点中
-
-  > son节点 ：“检查器”$\to$ “father类”$\to$ “字段scene”添加资源文件
-
-  ``` c++
-  /* 父类 */
-  Variant father_res; //父类定义的资源
-  /* 子类 */
-  TRes *a = cast_to<TRes>(father_res); // Variant转换为TRes类型
-  UtilityFunctions::print(a->aa); // 打印属性值
-  ```
-
-- 情况二：资源添加在父类节点中，不能获取资源，需要先获取父类节点
-
-- 情况三：资源添加在父类节点中，在子类调用父类的赋值方法，也是可以获取属性值（不推荐使用）
-
-### 常见错误 
-
-> 各种空指针错误
-
-- `TIdleState * m_state_idle = NULL;` 指针初始化一定要指向空，防止一些不可名状的错误
-
-> AttributeError: 'NoneType' object has no attribute 'Append':
->   File "D:\A_CodeItems\A_immortal_hero_world\SConstruct", line 8:
->     env.Append(CPPPATH=["src/include/"])
-
-- 有可能是godot-cpp版本问题，建议换个源码版本
-
-> error LNK2019: 无法解析的外部符号 
-
-- 必须.cpp中文件必须实现
-- 在Sconstruct文件中没有正确引入对应的.cpp文件或.h文件
-
-> error LNK2001: 无法解析的外部符号 
-
-- 若是在使用多态的时候出现错误，父类虚函数没有默认方法
-- 静态方法没有初始化，静态属性初始化时没有添加类名
-
-> fatal error LNK1120: 1 个无法解析的外部命令
-
-- 可能是函数传递错误，
-- 需要引用传递:`void R(AAA* b)`
-- 静态方法定义时没有添加类名
-
-> core/extension/gdextension.cpp:629 - No GDExtension library found for current OS and architecture (windows.x86_64) in configuration file: res://bin/a.gdextension
-> Failed loading resource: res://bin/a.gdextension. Make sure resources have been imported by opening the project in the editor at least once.
-
-- 若确定.lib文件存在，则可能是编译环境错误，Godot的提示并不准确
-- 验证GCC，gcc -v
-
-> 父类：father.h；子类:child.h；
-
-1. 在father.h文件中声明`class child;`
-2. 在father.cpp中引入头文件：`#include "child.h"` 
-
-> 成功编译，但编译后子类不存在节点中
-
-- `register.cpp`中要保证，父类在子类前面进行注册
-
-
-
-> error C2039: "speak": 不是 "TMOVESTATE" 的成员
-
-- 子类不能写virtual关键字
-
-> 节点未找到
-
-- 由于Godot的节点加载顺序
-
-> error C2065: “TFSCINTERFACE”: 未声明的标识符
->
-> error C2027: 使用了未定义类型“TMOVESTATE”
-
-- 检测头文件的引用顺序
-
-> 使用继承创建Godot节点，子类可通过静态方法，访问父类属性、方法
->
-> 不相关的节点只能通过get_node等方法、获取分组节点，先获取到目标节点，再调用其节点中的方法
-
-### layer physics
-
-1. Layer：block_movement 阻挡移动
-2. Layer：
-
-## GDScript脚本相关
-
-1. `@onready var tfsc = $TFSC` 
-
-### 一、类型转换
-
-1. String **str**(...)：
-2. Variant **str_to_var**(string: String ) ： 将string转换为variant
-3. String **var_to_str**(variable: Variant) ：将variant转化为String
-
-World-Teleport-area
-
-``` python
-signal ssss # 自定义信号
-# 获取不同场景的方法
-sprite2d = get_node("/root/"+get_tree().current_scene.name + "/placfortm/sprite2D")
-# 通过分组获取不同场景节点,节点提前加入分组
-@onready var sprite2D = get_tree().get_first_node_in_group("Sprite2D")
-
-# 传送脚本
-extends Area2D
-@onready var tfsc = get_node("/root/main/System/TFSC")
-func _on_body_entered(body):
-    # 场景，加载的玩家位置
-	tfsc.area_teleporter("secen00", "enter");
-	pass 
-```
-
-
-
-## 2D游戏类
-
-### 一、Node
-
-1. Node节点是大部分节点的父节点，所以Node的方法一般可用直接使用
-2. 节点操作都应在_ready之后的生命周期使用
-
-
-#### Ⅰ、获取向量
-
-``` c++
-/* 设置位置坐标 */ 
-// 获取当前位置，相对与父节点
-// Node中的方法
-Vector2 p = get_position();
-/* 获取当前向量速度 */ 
-vector2 a = get_velocity();
-
-// 全局节点
-Vector2 p = get_global_position();
-```
-
-#### Ⅱ、Get_node
-
-1. 使用 `%` 标注场景内唯一节点，可以获取场景内任意位置的 `%` 标注的节点
-
-   `get_node<Node>("%sprite"); // 必须携带%标注全局查找` 
-
-2. `get_node()`中必须是`“”`，若是`‘’`，则会发生未知错误
-
-3. 函数方法：get_node<节点类型>(" 路径"); 
-
-``` c++
-/* 获取子节点 */
-// 只能获取子节点,不能得到父节点
-get_node<Node>("xx");
-// 通过相对路径，可以获取子节点的子节点
-get_node<Node>("xxx/vvv"); 
-
-/* 获取父节点 */ 
-get_node<Node>("..");
-get_parent();
-
-// find_child会对节点进行遍历，太多节点会影响速度
-Node *c0 = find_child("Test");
-
-/*得到当前所有子节点*/ 
-Array b = get_children();
-UtilityFunctions::print(b[0].get_type());
-
-/* 获取节点 */
-// 获取所有节点数量
-get_child_count();
-get_child("节点序号");
-
-/* 删除节点 */
-c0->queue_free();
-```
-
-#### Ⅲ、节点其他操作
-
-``` c++
-is_inside_tree(); // 验证节点是否在树中
-
-```
-
-### 二、Sprited2D
-
-- 主要用于图片显示
-
-``` c++
-// 获取要修改的节点
-Sprite2D *root11 = get_node<Sprite2D>
-    ("/root/Node2D/Test");
-// 设置新纹理
-root11->set_texture(i3);
-// 设置中心点
-root11->set_centered(false);
-// 平移
-Vector2 p = Vector2(100, 100);
-root11->set_offset(p);
-```
-
-### 三、动画类
-
-#### Ⅰ、AnimatedSprite2D
-
-- 用于动画播放，简单物品动画
-- 在Godot添加自定义动画类，设置动画效果
-
-``` c++
-// 获取节点，注意是Animatedsprite2d类型
-AnimatedSprite2D *a_s = get_node<AnimatedSprite2D>("/root/Node2D/A_node2d");
-// 调用播放动画方法，a是Godot已经设置好的动画
-a_s->play("a");
-a_s->pause();//暂停
-a_s->stop();//停止
-a_s->is_playing();//状态
-```
-
-#### Ⅱ、AnimationPlay
-
-- Godot所有元素都可以使用它来生成动画，包括场景中来回移动的物体，怪物等
-
-#### Ⅲ、AnimationTree
-
-- 头文件
-
-    `#include <godot_cpp/classes/animation_tree.hpp>` 
-
-    `#include <godot_cpp/classes/animation_node_state_machine_playback.hpp>` 
-
-- AnimationRootNode：动画树节点的基本资源。通常，它不会直接使用，
-
-- AnimationNodeBlendTree:：包含多个混合类型节点，
-
-- AnimationNodeBlenderSpace1D: 1D空间混合
-
-- AnimationNodeBlenderSpace2d: 在2D空间中旋转根节点
-
-- AnimationNodeStateMachine：动画节点状态机
-
-- AnimationNodeAnimation: 从列表中选择一个动画播放，这是最简单的根节点类型，通常不直接作为Tree Root根节点使用。
-
-- 注意：AnimationPlay不能设置自动播放，但要设置循环
-
-- 注意：状态机（连接线）要设置enable，如果设置auto会出现意外情况，使用travel控制播放动画
-
-``` c++
-/* 获取节点 */
-// 获取动画节点
-AnimationPlayer *m_animatePL = get_node<AnimationPlayer>("AnimationPlayer");
-// 获取动画树节点
-AnimationTree m_animateTr = get_node<AnimationTree>("../../AnimationTree");
-
-/* 获取AnimationNodeStateMachineplayback属性 */
-// 这个属性地址，可以在Godot界面查找
-Variant b = m_animateTr->get("parameters/playback");
-// 转为AnimationNodeStateMachineplayback
-m_animationState = cast_to<AnimationNodeStateMachinePlayback>(b);
-
-/* 启动动画树 */
-// 字符串可在godot界面查找
-// aoix是Input向量
-m_animateTr->set("parameters/idle/blend_position", aoix);
-m_animateTr->set("parameters/run/blend_position", aoix);
-// 设置播放动画
-m_animationState->travel("run");
-```
-
-
-
-### 四、AudioStreamPlayer
-
-- 音频流播放器
-- AudioStreamPlayer2D具有距离属性的音效
-
-``` c++
-#include <godot_cpp/classes/audio_stream_player.hpp>
-/* 代码加载 */
-// 加载音频资源
-ResourceLoader *R = new ResourceLoader();
-Ref<AudioStream> bg = R->load("res://02.mp3","AudioStream");
-// 音频类
-AudioStreamPlayer *a = new AudioStreamPlayer();
-// 加载音频
-a->set_stream(k_01);
-// 播放音乐，每次从头开始播放
-a->play();
-// 继续播放
-a->set_stream_paused(false);
-// 暂停播放
-a->set_stream_paused(true);
-```
-
-### 五、Vector2
-
-- 头文件：不需要引用
-
-- 向量A - 向量B = B指向A的向量
-
-    > To find a vector pointing from A to B, use B - A.
-
-
-``` c++
-/* 创建一个向量 */
-// Vector(x轴，y轴)
-Vector2 a = Vector(100, 100);
-// 设置x，y向量
-a.x = 50;
-a.y = 50;
-
-/* a向量是否为0向量 */ 
-a.is_zero_approx();
-/* 向量单位化 */ 
-// 得到一个向量的方向
-a.normalized();
-
-/* 设置a走向B的向量 */ 
-// B：向量（方向和大小），
-// C：每帧的增量
-a.move_toward(B, C);
-
-/* 在一个范围内 */ 
-Vector2 direction = m_startPosition - position;
-if(direction.length() > 200){}
-// 返回从该向量指向 to 的归一化向量。相当于使用 (b - a).normalized()。
-direction_to(to: Vector2) const
-// 返回该向量与 to 之间的距离。
-distance_to(to: Vector2);
-```
-
-### 六、CharacterBody2D
-
-``` c++
-// 设置当前向量
-set_velocity(a);
-// move_and_collide不能沿着墙滑动
-// 根据set_velocity设定，自动进行碰撞体积
-move_and_slide();// 可以沿着墙滑动
-```
-
-### 七、Random
-
-- 头文件：`#include <godot_cpp/classes/random_number_generator.hpp>` 
-
-- 文件utility_functions同样包含随机方法的静态方法
-
-- `randf_range(0.0,5.0)`：产生浮点数，0.0-5.0之间的数，不包括0.0、5.0
-
-  ``` c++
-  // 产生0~5之间的数，不包括5
-  int a = utility_functions::randf_range(0.0,5.0);
-  // 产生0~5之间的数，不包括0，5
-  double a = utility_functions::randf_range(0.0,5.0);
-
-- `randi_range(1, 3)`：产生整数，1-3之间的数，包括1，3
-
-- `randi()`：产生整数
-
-  ``` c++
-  utility_functions::randi(); // 返回0 ~ 2^32-1之间的数
-  utility_functions::randi() % 20; // 返回0 ~ 19之间的数
-  ```
-
-- `randf()`：产生浮点数
-
-  ``` c
-  utility_functions::randf() * 10; //返回0 ~ 10之间的数
-  ```
-  
-- `randomize()`：产生随机数种子
-
-  ``` c++
-  #include <godot_cpp/classes/random_number_generator.hpp>
-  
-  RandomNumberGenerator *r = new RandomNumberGenerator();
-  r->randomize(); // 设置随机数种子
-  ```
-
-### 八、Area2D
-
-1. 能够检测其他节点的进入和退出，不与其他节点封装
-2. worldBoundaryShape2D：可以在一个方向上无线延长的节点
-3. 层（Collision/Layer）：隶属层级（显示图像、遮盖等效果）
-4. 遮罩（Collision/Mask）：碰撞层级（物理碰撞）
-5. _on_body_entered：characterBody2D节点碰触
-6. _on_area_entered：不同的area区域碰撞
-
-``` c++
- // Array[Area2D] get_overlapping_areas()
- // Array[Node2D] get_overlapping_bodies()
-```
-
-攻击框
-
-- 都是继承的Area2D节点，Hurtbox,
-- 需要定义图层
-
-### 九、utility_functions
-
-- 包含很多常用方法
-- 头文件：`#include <godot_cpp/variant/utility_functions.hpp>`
-
-``` c++
-// 打印方法
-UtilityFunctions::print("hello world");
-UtilityFunctions::print("hello world");
-// double
-UtilityFunctions::randf();
-// int64_t
-UtilityFunctions::randi_range(int64_t from, int64_t to);
-// double
-UtilityFunctions::randf_range(double from, double to);
-// double
-UtilityFunctions::randfn(double mean, double deviation);
-// Variant
-UtilityFunctions::type_convert(const Variant &variant, int64_t type);
-```
-
-
-
-### 十、SceneTree
-
-1. 头节点：`#include <godot_cpp/classes/scene_tree.hpp>` 
-
-``` c++
-// 获取场景树
-SceneTree *tree = Node::get_tree();
-
-// get_current_scene():获取当前场景的根节点
-Node *root = tree->get_current_scene();
-// 获取
-SceneTree::get_singleton()->initialize();
-```
-
-#### Ⅰ、场景切换
-
-- 只能用于游戏场景切换，因为他会释放所有节点，再新建节点，
-- 场景切换要进程场景初始化操作，加载
-- 头文件：scene_tree()
-
-``` c
-// 获取场景树
-SceneTree *t = Node::get_tree();
-// 切换场景，使用路径
-t->change_scene_to_file("res://game2.tscn");
-// 使用pack，节点对象
-t->change_scene_to_packed(Node);
-// 切换场景方法
-t->call_deferred("change_scene_to_file", "res://bat2.tscn");
-```
-
-#### Ⅱ、分组
-
-``` c++
-SceneTree * t = get_tree();
-
-// 添加进分组
-// 其名称是godot节点名称
-t->add_to_group("组名"); 
-t->call_group("组名", "方法名"); // 调用组名中方法
-t->remove_from_group(); //删除分组
-
-/* 获取一个分组，获取分组中的节点 */
-Array a = t->get_nodes_in_group("组名"); // 返回一个分配给给定组的所有节点的列表
-Node * ab = cast_to<Node>(a[0]); // 转换节点，调用a[0]
-ab->get_name(); // 获取节点名称
-```
-
-#### Ⅲ、分组操作
-
-``` c++
-/* 调用分组中公共方法 */
-// 获取场景树
-SceneTree *t = get_tree();
-// 调用分组empy的脚本中ttt1方法
-t->call_group("empy", "ttt1");
-
-/* 动态添加分组 */
-/* 使用get_node获取指定节点 */
-Sprite2D *root1 = get_node<Sprite2D>
-    ("/root/Node2D/Test/Sprite2D");
-root1->add_to_group("empy");
-```
-
-#### Ⅳ、场景实例化
-
-``` c++
-// my_scene场景对象，可以是在资源目录添加的场景
-Ref<PackedScene> temp_scene = cast_to<PackedScene>(my_scene);
-Node * temp_player = temp_scene->instantiate();
-```
-
-
-
-### 十二、Path2D
-
-- 使用PATH2d在地图上画出路径
-- 创建Pathfollow2d节点，pathfollow2d节点会根据path2d设置的路径行走
-
-``` c
-PathFollow2D *p = get_node<PathFollow2D>("/root/Node2D/Path2D/PathFollow2D");
-// 设置移动距离，单位像素
-p->set_progress(500);
-
-// 获取当前移动坐标
-Vector2 v = p->get_position();
-Sprite2D *s = get_node<Sprite2D>("/root/Node2D/Sprite2D");
-// 将坐标设置给精灵
-s->set_position(v);
-```
-
-### 十三、RayCast2D
-
-- 射线投射节点，用于检测碰撞不可见射线，根据设置的箭头进行碰撞检测
-
-``` c++
-is_colliding(); //检测是否发生碰撞
-```
-
-### 十四、Input
-
-1. 虚拟映射设置
-
-2. 需要配置虚拟按键，不然会出现错误
-
-3. 菜单栏$\to$ 项目$\to$ 项目设置$\to$ 输入映射$\to$​ 添加键位映射
-
-4. 虚拟按键不支持中文
-
-#### Ⅰ、Input
-
-- 头文件：`#include <godot_cpp/classes/input.hpp>`
-
-``` c++
-// 获取Input静态实例
-Input *ii = Input::get_singleton(); 
-
-ii->is_action_pressed("d");// 按下d键，触发多次
-ii->is_action_just_pressed("d"));// 按下按键，触发1次
-ii->is_action_just_released("d"));// 松开D键
-ii->is_anything_pressed();// 任意键按下
-
-/* 获取按下s的力量 */
-float s = ii->get_action_strength("s");
-
-/* 获取x，y轴 */
-// 左-1，右1
-float h = ii->get_axis("左", "右");
-
-/* 获取向量 */
-// 位置一定对应，不然方向会出错
-Vector2 dir = ii->get_Vector("左","右","上","下");
-dir.x !=0; // x轴
-dir.y !=0; // y轴
-```
-
-#### Ⅱ、InputMap
-
-- 头文件：`#include <godot_cpp/classes/input_map.hpp>`
-- 可以解决 this inputmap 不存在bug
-
-``` c++
-// 从Godot中的设置加载设置
-InputMap* map = InputMap::get_singleton();  
-map->load_from_project_settings();
-```
-
-### 十五、Engine
+### 十一、Engine类使用
 
 - 头文件：`#include <godot_cpp/classes/engine.hpp>` 
 
@@ -1628,141 +1319,1451 @@ set_process(FAILED); // 暂停
 
 ```
 
-### 资源创建与使用
+### 十二、Input
 
-1. 使用`@export var player_date: Resource`让节点可以加载资源文件
-2. 资源类可以直接使用，他在游戏中是唯一的
-3. 资源类中只定义数据变量，不定义方法，方法在容器中定义
+1. 需要配置虚拟按键，不然会出现错误
 
-#### Ⅰ、资源.tres文件
+2. 菜单栏$\to$ 项目$\to$ 项目设置$\to$ 输入映射$\to$​ 添加键位映射
 
-- 需要在regi中注册
+3. 虚拟按键不支持中文
 
-创建资源（.h）
+4. 头文件：`#include <godot_cpp/classes/input.hpp>` 
 
-- 头文件：`#include <godot_cpp/classes/resource.hpp>`
-- 必须继承Resource类型
+获取单个按钮按下动作
 
 ``` c++
-using namespace godot;
-class TFood : public Resource
-{
-    GDCLASS(TFood, Resource);
-public:
-    /* 基础属性 */
-    String m_name = "";
-    Variant m_level;
+// 获取Input静态实例
+Input *ii = Input::get_singleton(); 
+
+ii->is_action_pressed("d");// 按下d键，触发多次
+ii->is_action_just_pressed("d"));// 按下按键，触发1次
+ii->is_action_just_released("d"));// 松开D键
+ii->is_anything_pressed();// 任意键按下
+```
+
+获取水平方向/垂直方向的动作
+
+``` c++
+// 获取Input静态实例
+Input *ii = Input::get_singleton(); 
+
+// 获取水平轴（左负右正，自动标准化到 [-1, 1]），不用使用.
+float h = ii->get_axis("左", "右");
+return Vector2(h, 0);
+
+// 获取垂直轴
+float v = ii->get_axis("下", "上");
+return Vector2(0, v);
+```
+
+获取4个方向的动作
+
+``` c++
+Input *ii = Input::get_singleton(); 
+
+// 位置一定对应，不然方向会出错
+Vector2 dir = ii->get_vector("左","右","上","下").normalized();
+dir.x !=0; // x轴
+dir.y !=0; // y轴
+```
+
+其他
+
+``` c++
+Input *ii = Input::get_singleton(); 
+
+/* 获取按下s的力量 */
+float s = ii->get_action_strength("s");
+```
+
+InputMap
+
+- 头文件：`#include <godot_cpp/classes/input_map.hpp>`
+- 可以解决 this inputmap 不存在bug
+
+``` c++
+// 从Godot中的设置加载设置
+InputMap* map = InputMap::get_singleton();  
+map->load_from_project_settings();
+```
+
+### 十三、FileAccess
+
+- 头文件：`#include <godot_cpp/classes/file_access.hpp>`
+
+- 文件读取类型
+
+  | KEY                    | v    |
+  | ---------------------- | ---- |
+  | FileAccess::READ       | 1    |
+  | FileAccess::WRITE      | 2    |
+  | FileAccess::READ_WRITE | 3    |
+  | FileAccess::WRITE_READ | 7    |
+
+``` c++
+// 读取文件
+Ref<FileAccess> f = FileAccess::open("Path", FileAccess::READ);
+// 关闭文件
+f->close(); 
+
+String a = f->get_as_text(); // 将FileAccess类型转换为字符串
+Vector<String> header = f->get_csv_line(); // Default delimiter: ","
+Vector<String> row1 = f->get_csv_line("~"); // 使用"~"分割字符串
+```
+
+### 十三、存档系统
+
+#### Ⅰ、游戏路径
+
+关于保存游戏路径
+
+1. `user://`：系统默认的保存位置
+
+   通过 $项目\to 打开“用户数据”文件夹$ 可以直接打开数据存放位置
+
+   **可读写**：无论是否导出，`user://` 目录始终可写13。
+
+   **跨平台兼容**：路径自动适配不同操作系统（如 Windows 的 `%APPDATA%`、Linux 的 `~/.local/share`）14。
+
+   **独立于项目**：数据保存在用户设备上，不会被打包进游戏
+
+2. `res://`：资源目录
+
+   **导出后 `res://` 不可写**：如果尝试在导出后写入 `res://`，会导致错误
+
+关于游戏存档格式
+
+1. `.tres`：人类可以看懂得保存格式（Debug会用）
+2. `.res`：更好得数据安全和游戏性能
+
+#### Ⅱ、ConfigFile
+
+- 一般是配置文件的保存
+- 简单数据保存
+
+``` c++
+var config = ConfigFile.new();
+config.set_value("名称", "key", value);
+config.save("user://key");
+
+var config = ConfigFile.new();
+vart re = config.load("user://");
+int b = re.get_value("名称", "key");
+
+// 加密保存
+var key = "xxxx"; // 加密密钥
+config.save_encrypted_pass("user://key", key);
+// 解密读取
+config.load_encrypted_pass("user://key", key);
+```
+
+#### Ⅲ、ResourceSave
+
+- 头文件：`#include <godot_cpp/classes/resource_saver.hpp>`
+- 继承自Resource类得资源都可以使用ResourceSave保存
+- Resource可以保存一整个节点，使用PackedScene
+
+验证是否资源文件存在
+
+1. 直接使用`ResourceSaver::get_singleton()->load(save_path)`，若save_path不存在，会出现一个错误
+
+2. 使用FileAccess::file_exists验证文件
+
+   头文件：`#include <godot_cpp/classes/file_access.hpp>`
+
+``` c++
+// 验证文件是否存在
+bool t = FileAccess::file_exists(save_path);
+if (t) {}
+```
+
+保存方法：
+
+1. 声明：GameData是资源类型
+
+``` c++
+/* 保存方法1 */
+String save_path = "res://t_tetrominoes_data.tres";
+GameData * p = cast_to<GameData>(a); // 获取数据
+ResourceSaver::get_singleton()->save(game_set_data, save_path); // 保存游戏设置
+
+/* 保存方法二，新建resource */
+// 或者使用Ref<>定义资源
+GameSetData * aa = memnew(GameSetData);
+aa->game_level = 100; // 设置游戏等级
+aa->game_max_level = 1000; // 设置最大游戏等级
+// 保存游戏设置
+ResourceSaver::get_singleton()->save(aa, "res://t_tetrominoes_data_001.tres"); 
+```
+
+读取方法
+
+``` c++
+// 路径
+String save_path = "res://t_tetrominoes_data.tres"; 
+// 加载资源
+Ref<Resource> resource_loader = ResourceSaver::get_singleton()->load(save_path); 
+// 类型转换，因为load方法得到的是Ref<Resource>类型
+Ref<GameSetData> game_set_data = resource_loader;
+// 获取数据
+int a = game_set_data->game_max_level;
+```
+
+GDScript脚本保存读取
+
+``` python
+# /* 保存 */
+var data = GameData.new()
+data.p = 100; # 保存数据
+ResourceSaver.save(data, "user://...")
+
+# /* 读取 */
+# load返回的是Resource类，需要使用 as 转换为目标类
+var data = ResourceLoader.load(save_path) as GameData;
+aa = data.aa # 获取数据
+```
+
+
+
+## Object对象
+
+1. 所以类的基类，这意味Object中的方法可以直接调用
+
+### 一、注册方法说明
+
+1. 主要是GDExtension对GDScript中的影响，通过不同的注册方法，GDScript可以通过不同的方式调用
+2. **要想在C++中使用抽象类，查看：注册抽象类（C++）**
+3. 一般使用`ClassDB::register_class<T>()` 即可
+
+#### Ⅰ、register_class
+
+1. 普通注册：`ClassDB::register_class<T>()` 
+
+2. 注册为不可实例化的类：`ClassDB::register_class<T>(true)` 
+
+   不强制要求子类实现任何方法（与纯虚函数无关）
+
+   设计意图不如 `register_abstract_class` 明确
+
+   一般是：工具类/静态方法类容器 
+
+#### Ⅱ、register_virtual_class
+
+1. 标记为“可继承但不可直接实例化”
+2. 可继承但无需实现所有方法
+3. 典型用途：提供部分默认实现的基类
+
+Animal.h (Godot 3/4 通用)
+
+``` c++
+class Animal : public Object {
+    GDCLASS(Animal, Object) // 注意：不是 GDOBJECT()
 protected:
-    static void _bind_methods();
+    static void _bind_methods() {
+        ClassDB::bind_virtual_method(
+            "Animal", D_METHOD("make_sound"), &Animal::make_sound);
+    }
+    
+    virtual void make_sound() { 
+        print("默认声音"); // 提供默认实现
+    }
+};
+```
 
-private:
-    // 修改属性方法
-    void set_name(String s);
-    String get_name();
+在register_types.cpp中注册抽象类：` ClassDB::register_virtual_class<Animal>();`
+
+GDScript脚本
+
+``` python
+extends Animal
+# 可不实现 make_sound()，使用父类默认逻辑
+```
+
+#### Ⅲ、register_abstract_class
+
+1. 强制要求子类实现抽象方法
+2. 仅 Godot 4+ 支持
+3. GDScript 必须实现所有抽象方法
+4. 定义严格接口（如插件系统）
+
+Shape.h (Godot 4+)
+
+``` c++
+class Shape : public Object {
+    GDCLASS(Shape, Object)
+protected:
+    static void _bind_methods() {
+        ClassDB::bind_method(D_METHOD("get_area"), &Shape::get_area);
+    }
+    
+    virtual float get_area() const = 0; // 纯虚函数,子类必须实现
+};
+```
+
+在register_types.cpp中注册抽象类：` ClassDB::register_abstract_class<Shape>();` 
+
+GDScript脚本
+
+``` python
+extends Shape
+func get_area():# 必须实现，否则报错
+    return 0.0  
+```
+
+### 二、INT变量绑定
+
+- 绑定只能绑定Int类型，枚举类型，因为bind_constant方法不可用
+
+- 都是使用bind_integer_constant方法
+
+  ``` c++
+  // 绑定整数常量（专用于枚举和整型）
+  static void bind_integer_constant(
+      const char *p_class,      // 类名，应与类相同
+      const char *p_enum,       // 枚举类型名，Int类型填空
+      const char *p_name,       // 常量名
+      int64_t p_constant        // 常量值
+  );
+  ```
+
+使用宏定义绑定
+
+``` c++
+class MyClass : public Node {
+    GDCLASS(MyClass, Node);
+public:
+    static const int P = 100; // 宏定义-1
+    static const int PT;  //宏定义-2，需要在类外定义
+
+protected:
+    static void _bind_methods() {
+        BIND_CONSTANT(P);  // 宏定义-1：绑定     
+        BIND_CONSTANT(PT); // 宏定义-2：绑定   
+    }
+};
+// 类外定义-2
+const int TMainNode::PT = 200;
+```
+
+使用方法绑定
+
+- 枚举类型只能使用bind_integer_constant方法绑定
+
+``` c++
+class MyClass : public Node {
+    GDCLASS(MyClass, Node);
+public:
+    // 定义枚举-供枚举类型绑定
+    enum MyEnum {
+        ENUM_A = 0,
+    };
+
+protected:
+    static void _bind_methods() {
+        // 绑定枚举，枚举不能使用宏定义
+        ClassDB::bind_integer_constant("MyClass", "MyEnum", "ENUM_A", ENUM_A);
+        // 绑定int变量，不需要提前定义
+        ClassDB::bind_integer_constant("TMainNode", "", "P", 3.14);
+    }
+};
+
+```
+
+GDScript调用
+
+``` python
+# 调用Int类型，直接使用：类名.常量名
+print(TMainNode.P) 
+```
+
+### 三、属性添加
+
+``` c++
+PropertyInfo(
+    Variant::Type type,            // 属性类型（如 Variant::INT, Variant::STRING）
+    const String& name,            // 属性名称（显示在编辑器）
+    PropertyHint hint = PROPERTY_HINT_NONE,  // 属性提示（如范围、枚举）
+    const String& hint_string = "", // 提示的附加信息（如 "0,100" 表示范围）
+    uint32_t usage = PROPERTY_USAGE_DEFAULT // 属性用途（如编辑、存储）
+);
+```
+
+#### Ⅰ、基础类型
+
+整数范围添加
+
+``` c++
+void MyNode::_bind_methods() {
+   	/* 范围添加 */
+    ADD_PROPERTY("MyNode"
+        PropertyInfo(
+            Variant::INT, "health", 
+        	// 整数属性（带范围提示 0~100）
+        	PROPERTY_HINT_RANGE, "0,100"), 
+        "set_health", 
+        "get_health");
 }
 ```
 
-创建资源（.cpp）
-
-- 基本类型使用普通属性添加 
-- Object类型可以用于其他数据类型添加，Resource类型使用Object类型
+浮点数范围添加
 
 ``` c++
-#include "food.h"
-/* 普通属性添加 */
-void TFood::_bind_methods() {
-    /* 设置可在编辑器修改 */
-    ClassDB::bind_method(D_METHOD("set_name", "a"), &TFood::set_name);
-    ClassDB::bind_method(D_METHOD("get_name"), &TFood::get_name);
-    ClassDB::add_property("TFood",
-     	PropertyInfo(Variant::STRING, "Name"),
-        "set_name",
-        "get_name");
+void MyNode::_bind_methods() {
+    ADD_PROPERTY("MyNode"
+        PropertyInfo(
+            Variant::FLOAT, "speed",
+        	// 浮点数属性（步长 0.1）
+        	PROPERTY_HINT_RANGE, "0.1, 10.0, 0.1"), 
+        "set_speed", 
+        "get_speed");
 }
-/* 在编辑器修改的具体逻辑 */
-void TFood::set_level(int a){
-     m_name = a;
-};
-int TFood::get_level(){
-     return m_name;
-}; 
-
-/* 其他属性添加，Resours资源添加 */
-void TFood::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_name", "a"), &TFood::set_name);
-    ClassDB::bind_method(D_METHOD("get_name"), &TFood::get_name);
-    ClassDB::add_property("TFood",
-        // 使用特殊的OBJECT类型
-     	PropertyInfo(Variant::OBJECT, "Name"), // 修改地方
-        "set_name",
-        "get_name");
-}
-// 类型统一使用Variant类型
-void TFood::set_level(Variant a){
-     m_level = a;
-};
-Variant TFood::get_level(){
-     return m_level;
-}; 
 ```
 
-#### Ⅱ、使用逻辑
-
-- 出现为`<NULL>`：可能是资源没有正确添加，需要重启Godot
-
-父类`father.cpp`：
+文件属性添加
 
 ``` c++
-/*father.cpp*/
-// 设置外部添加资源属性
-void TFather::_bind_methods() {
-    // 设置外部添加资源属性
-    ClassDB::bind_method(D_METHOD("set_resouce", "r"), &TFather::set_resouce);
-    ClassDB::bind_method(D_METHOD("get_resouce"), &TFather::get_resouce);
-    ClassDB::add_property("TFather",
-           PropertyInfo(Variant::OBJECT, "RES"),
-           "set_resouce",
-           "get_resouce");
+void MyNode::_bind_methods() {
+	/* 文件 */
+    ADD_PROPERTY("MyNode"
+        PropertyInfo(
+            Variant::STRING, "config_path",
+        	// 字符串属性（文件路径提示）
+        	PROPERTY_HINT_FILE, "*.json"), 
+        "set_config_path", 
+        "get_config_path");
+}
+```
+
+#### Ⅱ、资源类型
+
+添加Texture2D
+
+``` c++
+void MyNode::_bind_methods() {
+    /* 添加Texture2D类型 */
+    ADD_PROPERTY("MyNode"
+        // 需要设置Variant::OBJECT类型
+        PropertyInfo(
+            Variant::OBJECT, "texture", 
+        	// 纹理属性（限定类型为 Texture2D）
+        	PROPERTY_HINT_RESOURCE_TYPE, "Texture2D"), 
+        "set_texture",
+        "get_texture");
+}
+```
+
+添加PackedScene
+
+``` c++
+void MyNode::_bind_methods() {
+	/* 添加PackedScene类型 */
+    ADD_PROPERTY("MyNode"
+        PropertyInfo(
+            Variant::OBJECT, "enemy_scene",
+        	// 场景属性（限定类型为 PackedScene）
+        	PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), 
+        "set_enemy_scene", 
+        "get_enemy_scene");
+}
+```
+
+#### Ⅲ、数组字典
+
+``` c++
+void MyNode::_bind_methods() {
+    // 整数数组
+    ADD_PROPERTY(
+        PropertyInfo(Variant::ARRAY, "scores"), 
+        "set_scores", "get_scores");
+
+    // 字典（带键名提示）
+    ADD_PROPERTY(
+        PropertyInfo(Variant::DICTIONARY, "player_data", 
+        PROPERTY_HINT_NONE, "", 
+        PROPERTY_USAGE_STORAGE), // 仅存储，不在编辑器显示
+        "set_player_data", "get_player_data");
+}
+```
+
+#### Ⅳ、枚举类型
+
+``` c++
+// 定义枚举
+enum Element { FIRE, WATER, WIND };
+
+void MyNode::_bind_methods() {
+    // 注册枚举到 Godot
+    ClassDB::bind_enum("Element", "MyNode", {
+        { "FIRE", Element::FIRE },
+        { "WATER", Element::WATER },
+        { "WIND", Element::WIND }
+    });
+
+    // 枚举属性（显示为下拉菜单）
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "element", 
+        PROPERTY_HINT_ENUM, "Fire,Water,Wind"), 
+        "set_element", 
+        "get_element");
+}
+```
+
+
+
+- .h 文件
+
+``` c++
+class Light2D : public Node2D {
+	GDCLASS(Light2D, Node2D);
+Public:
+    /* 在类中定义枚举类型 */
+	enum BlendMode {
+		BLEND_MODE_ADD,
+		BLEND_MODE_SUB,
+		BLEND_MODE_MIX,
+	};
+    /* 参数修改方法 */
+	void set_mode(BlendMode p_mode);
+	BlendMode get_mode() const;
+    /* 保存枚举类型 */
+    BlendMode blend_mode = BLEND_MODE_ADD;
+}
+```
+
+- .cpp 文件
+
+``` c++
+void Light2D::_bind_methods() {
+    // 1.绑定方法到Godot
+	ClassDB::bind_method(D_METHOD("set_mode", "mode"), &Light2D::set_mode);
+	ClassDB::bind_method(D_METHOD("get_mode"), &Light2D::get_mode);
+    // 2.添加参数
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT, "blend_mode", // 枚举类型只能Int
+            PROPERTY_HINT_ENUM, "A,S,M"), // 枚举可选值为A、S、M
+        "set_mode", 
+        "get_mode");
+    // 3.绑定枚举类型，需要注册到枚举才能使用
+    BIND_ENUM_CONSTANT(BLEND_MODE_ADD);
+	BIND_ENUM_CONSTANT(BLEND_MODE_SUB);
+	BIND_ENUM_CONSTANT(BLEND_MODE_MIX);
+}
+
+// 4.保存和返回变量的方法
+void Light2D::set_mode(BlendMode p_mode) {
+	blend_mode = p_mode;
+}
+Light2D::BlendMode Light2D::get_mode() const {
+	return blend_mode;
+}
+```
+
+#### Ⅴ、PropertyInfo使用样例
+
+- 优先使用`const &`与`const Ref<> &`
+
+ARRAY数组类型定义
+
+``` c++
+/* 方法绑定 */
+void TEST::_bind_methods() {
+    ClassDB::bind_method(
+        D_METHOD("set_enemy", "r"), &TEnemyContainer::set_enemy);
+    ClassDB::bind_method(
+        D_METHOD("get_enemy"), &TEnemyContainer::get_enemy);
+    // 绑定元素，选择Variant::ARRAY
+    ClassDB::add_property("TEST",
+    	PropertyInfo(Variant::ARRAY, "Array"),
+        "set_enemy",
+        "get_enemy");
+}
+/* 保存数据的变量，Array，Godot的类型 */
+Array m_enemy_array;
+
+/* 保存Array的数据 */
+void TEST::set_enemy(const Array &a){
+    m_enemy_array = a;
 };
-// 设置外部添加资源属性
-Variant TFather::get_resouce() {
-    return res;
+Array TEST::get_enemy(){
+    return m_enemy_array;
 };
-// 设置外部添加资源属性
-void TFather::set_resouce(Variant a){
-    res = a;
+```
+
+资源类型设置（以Texture2D为例）
+
+- 资源类型众多，若出现不可访问错误，可能需要添加Ref<>
+
+``` c++
+/* 方法绑定 */
+void TEST::_bind_methods() {
+    ClassDB::bind_method(
+        D_METHOD("set_enemy", "r"), &TEnemyContainer::set_enemy);
+    ClassDB::bind_method(
+        D_METHOD("get_enemy"), &TEnemyContainer::get_enemy);
+    // 绑定元素，选择Variant::ARRAY
+    ClassDB::add_property("TEST",
+    	PropertyInfo(Variant::OBJECT, "Array"),
+        "set_enemy",
+        "get_enemy");
+}
+/* 保存数据的变量，Array，Godot的类型 */
+Ref<Texture2D> m_enemy_array;
+
+/* 保存Array的数据 */
+void TEST::set_enemy(const Ref<Texture2D> &a){
+    m_enemy_array = a;
 };
-// 供子类调用的方法，获取资源，方法1
-Variant TFather::get_res_from_father()
+Ref<Texture2D> TEST::get_enemy(){
+    return m_enemy_array;
+};
+```
+
+### 四、bind_virtual_method
+
+相对于C++ 的 virtual 为什么使用bind_virtual_method
+
+1. bind_virtual_method可以暴露给 Godot 脚本系统，可被引擎识别为虚方法
+2. bind_virtual_method绑定的方法可以使用call方法调用
+3. 不供Godot重写直接使用C++的virtual
+
+animal.h定义一个类
+
+``` c++
+// animal.h
+class Animal : public Object {
+    GDCLASS(Animal, Object)
+protected:
+    static void _bind_methods() {
+        // 绑定方法
+        ClassDB::bind_virtual_method(
+            "Animal", D_METHOD("make_sound"), &Animal::make_sound);
+    }
+    
+    virtual void make_sound() { 
+        print("默认声音"); 
+    }
+};
+```
+
+GDScript子类定义
+
+``` python
+extends Animal
+func make_sound():
+    print("汪汪！")  # 成功覆盖 C++ 方法
+```
+
+### 五、bind_method
+
+#### Ⅰ、常见问题
+
+1. 没有找到对应方法：
+
+   应检查参数类型是不是`Variant`，参数不对应也不会显示C++方法
+
+   需要重启Godot
+
+2. GDScript调用方法：
+
+   ``` python
+   # 使用 @onready 方法 《推荐》
+   # 拖拽节点，形成对节点的引用
+   # @onready会等节点树加载完毕，防止出现不在节点树错误
+   @onready var tfsc = $TFSC
+   
+   # 使用 New 方法
+   # 此方法会开创一个新节点，此节点不在节点树中
+   # 不用引入节点，需要new对象使用
+   var a = Test.new();
+   a.start_test();
+   ```
+
+#### Ⅱ、bind_method与&
+
+1. 绑定的方法不能使用 &（但可以使用const &）
+
+2. bind_method方法是值传递，使用&、const &没有特别效果
+
+   （资源类定义时除外，资源类可使用const &）
+
+3. bind_method方法底层都是使用Variant变量处理的，优先使用Variant定义
+
+``` c++
+// 绑定方法
+ClassDB::bind_method(D_METHOD("start_test", "a"), &Test::start_test);
+
+void Test::start_test(int & a){}; // 错误不能使用&，无法通过编译
+void Test::start_test(Variant a){}; // 正确，优先使用方法
+void Test::start_test(int a){}; // 正确
+void Test::start_test(Dictionary a){}; // 正确
+void Test::start_test(const Dictionary & a){}; // 正确，a不可修改，没有性能优势，本质还是值传递
+```
+
+#### Ⅲ、不带参数的绑定方法
+
+``` c++
+void Test::_bind_methods(){
+    /* ClassDB::bind_methond(D_METHOD("函数名"), 方法地址) */
+    ClassDB::bind_method(D_METHOD("start_test"), &Test::start_test);
+}
+
+// 不带参数的接收函数
+void Test::start_test(){}
+```
+
+#### Ⅳ、带参数的绑定方法
+
+``` c++
+void Test::_bind_methods(){
+    /* ClassDB::bind_methond(D_METHOD("调用的函数名", "参数1", "参数2"), 方法地址) */
+    ClassDB::bind_method(D_METHOD("start_test", "a", "b"), &Test::start_test);
+}
+
+// 带有参数的接收函数
+// 参数类型，一般都使用Variant类型
+void Test::start_test(Variant a, Variant b){
+   	// 使用cast_to转换为适合类型
+	Area2D *t = cast_to<Area2D>(a);
+    // 基本类型使用隐式转换
+    Dictionary c = a;
+}
+```
+
+#### Ⅴ、绑定方法的返回值
+
+1. bind_method反正类型必须是Godot定义的类型
+2. 返回类型Godot会自动转换类型
+3. 优先返回具体的类型，不要使用Variant定义所有的返回值，Variant多了一层检测
+
+``` c++
+// 返回 int/float/bool 等基础类型（自动包装为 Variant）
+int get_score() { return 100; }
+// 返回 Godot 内置类型（隐式转换为 Variant）
+Vector2 get_position() { return Vector2(10, 20); }
+// 返回 Godot 对象（必须继承 Object/Resource）
+Ref<Texture2D> get_texture() { return texture; }
+// 返回 Array（Godot 风格）
+Array get_player_info() {
+    Array result;
+    result.append("John");
+    return result;
+}
+// 返回 Dictionary（更易读）
+Dictionary get_stats() {
+    Dictionary stats;
+    stats["health"] = 80;
+    return stats;
+}
+```
+
+### 五、Ref资源说明
+
+1. Ref：Reference继承自Object并保存引用计数. 它是引用计数对象类型的基础.
+
+   >  必须使用Ref<>模板来声明它们.
+
+2. `Ref` 的功能
+
+   - **引用计数**：`Ref` 通过引用计数机制管理对象的生命周期。对象会自动销毁。
+   - **资源管理**：`Ref` 主要用于管理 `Resource` 类型的对象（如纹理、场景、脚本等），确保资源在不再被使用时自动释放。
+   - **内存安全**：通过引用计数，避免内存泄漏和悬空指针问题。
+
+3. `Ref` 的使用场景
+
+   - **加载资源**：从文件或网络中加载资源时，通常返回 `Ref<Resource>`。
+   - **传递资源**：在函数或方法之间传递资源时，使用 `Ref` 可以避免资源被意外释放。
+   - **存储资源**：在类或数据结构中存储资源时，使用 `Ref` 可以确保资源的生命周期被正确管理。
+
+4. Ref 与 Resource 的关系
+
+   Resource 是基类：Resource 是Godot中所有资源类型的基类（如纹理、场景、脚本等）。
+
+   Ref 是智能指针：Ref 用于管理 Resource 对象的生命周期。
+
+### 六、生成对象
+
+物体乱跑（基于物理引擎，
+
+``` c++
+var box_node = box.instantiate();
+get_tree().current_scene.add_child(box_node);
+box_node.freeze = true; // 停止物理计算,核心
+
+```
+
+创建节点
+
+- **节点类**：`Node`、`Sprite2D`、`Control` 等
+- **资源类**：`Resource`、`Texture2D`、`Material` 等
+- **自定义扩展类**：通过 `GDCLASS` 宏定义的类
+
+``` c++
+// 以Button为例
+Button *p = memnew(Button); // 创建一个节点
+p->set_text("xxxxxxxxxxx"); // 设置属性
+
+// 向指定位置添加节点
+Node *postion = get_node<Node2D>("test_node");
+postion->add_child(p);
+```
+
+删除节点
+
+- `void queue_delete(obj: Object)`：（SceneTree方法）当前节点会在帧末尾删除
+- `void queue_delete()`：（NODE节点下的方法）当前节点会在帧末尾删除，其子节点也会被删除
+
+### 七、注册抽象类（C++）
+
+定义接口类
+
+``` c++
+// IEnemy.h
+class IEnemy : public Node {
+    GDCLASS(IEnemy, Node) // 必须继承自 Godot 对象（如 Node/Resource）
+
+protected:
+    // 纯虚函数：子类必须实现
+    virtual void attack() = 0;
+    virtual int get_damage() const = 0;
+
+    // 注册方法和接口-不是必须的
+    static void _bind_methods() {
+        ClassDB::bind_method(D_METHOD("attack"), &IEnemy::attack);
+        ClassDB::bind_method(D_METHOD("get_damage"), &IEnemy::get_damage);
+    }
+
+public:
+    // 标记为抽象类（Godot 4+）
+    virtual bool is_abstract() const override { return true; }
+};
+```
+
+子类实现接口
+
+``` c++
+// Goblin.h
+#include "IEnemy.h"
+
+class Goblin : public IEnemy {
+    GDCLASS(Goblin, IEnemy)
+
+protected:
+    void attack() override {
+        UtilityFunctions::print("Goblin throws a rock!");
+    }
+
+    int get_damage() const override {
+        return 10;
+    }
+};
+```
+
+在register_types.cpp中注册抽象类
+
+- `ClassDB::register_abstract_class<IEnemy>();`注册抽象类
+- `ClassDB::register_class<Goblin>();`抽象类的子类
+
+另外的，在GDScript中，继承该类也需要实现对应的方法
+
+``` python
+# 继承IEnemy类
+extends IEnemy
+
+func attack():
+    print("Dragon breathes fire!")
+
+func get_damage() -> int:
+    return 50
+```
+
+### GDExtension触发GDScript方法
+
+方法 1：使用Call方法
+
+- 最直接高效
+- 需要确保方法名和参数完全匹配
+- 格式：`call("GDScript中定义的方法名", 参数变量)` 
+
+``` c++
+// 获取目标节点
+Node* target_node = get_node<Node>("/root/Main/Player");
+
+/* 调用无参方法 */ 
+target_node->call("gdscript_method");
+
+/* 调用带参方法，向GDScript传递参数 */ 
+Variant args[] = { "hello", 42 };
+target_node->callv("gdscript_method_with_args", args);
+```
+
+方法2：通过信号触发，详细查看 - 信号方法
+
+- 跨场景通信
+- 避免直接引用
+
+方法3：Callable方法
+
+方法4：RPC方法
+
+C++端
+
+``` c++
+// 标记为RPC方法
+RPCMode rpc_mode = RPC_MODE_ANY_PEER;
+ClassDB::bind_method(D_METHOD("rpc_from_cpp"), &MyClass::rpc_from_cpp, rpc_mode);
+
+// 调用GDScript的RPC方法
+target_node->rpc("gdscript_rpc_method");
+```
+
+GDScript端
+
+``` python
+@rpc
+func gdscript_rpc_method():
+    print("RPC调用成功")
+```
+
+### GDScript触发GDExtension方法
+
+1. 方式一：通过`ClassDB::bind_method`注册普通方法，供GDScript调用
+2. 方式二：通过`ClassDB::bind_static_method`注册静态方法，供GDScript调用
+
+静态方法文件
+
+``` c++
+class TMainNode : public Node
 {
-    return res;
+    GDCLASS(TMainNode, Node);
+public:
+private:
+protected:
+    static void get_direction00(); // 核心，要定义为static类型
+    
+    static void _bind_methods()
+    {
+        // 注册静态方法
+        ClassDB::bind_static_method(
+            // ！TMainNode：类名，同时供GDScript调用
+            // ！D_METHOD("get_direction")：在GDScript中触发的方法
+            "TMainNode", D_METHOD("get_direction"), 
+            // 实际调用的方法
+            &TMainNode::get_direction00); 
+    };
 };
+
+// 触发方法
+Vector2 TMainNode::get_direction00() { //... };
 ```
 
-子类son.cpp
+GDScript脚本-静态方法
+
+``` python
+# /* GDScript中使用方法 */    
+# 不需要实例，直接通过类名调用
+var dir = TMainNode.get_direction()
+```
+
+
+
+## 常用类/方法说明
+
+### 一、节点操作
+
+#### Ⅱ、Get_node
+
+注意事项：
+
+1. 使用 `%` 标注场景内唯一节点，可以获取场景内任意位置的 `%` 标注的节点
+
+   `get_node<Node>("%sprite"); // 必须携带%标注全局查找` 
+
+2. `get_node()`中必须是`“”`，若是`‘’`，则会发生未知错误
+
+3. `get_node<类型>("")`注意类型，**一般不能填错，填错会找不到节点**
+
+使用方法：
 
 ``` c++
-// 引入资源头文件，用于cast_to
-#include "res.h"
+/* 获取子节点 */
+// 只能获取子节点,不能得到父节点
+get_node<Node>("xx");
+// 通过相对路径，可以获取子节点的子节点
+get_node<Node>("xxx/vvv"); 
 
-// 方法一，调用父类方法获取资源类
-Variant a = get_res_from_father();
-TResouce *b = cast_to<TResouce>(a); // 转换为资源类型，以使用
+/* 获取父节点 */ 
+get_node<Node>("..");
+get_parent();
 
-// 方法二，直接使用父类中的属性
-// res是父类保存资源的属性
-TResouce *a = cast_to<TResouce>(res); // 转换为资源类型，以使用
+// find_child会对节点进行遍历，太多节点会影响速度
+Node *c0 = find_child("Test");
+
+/*得到当前所有子节点*/ 
+Array b = get_children();
+UtilityFunctions::print(b[0].get_type());
+
+/* 获取节点 */
+// 获取所有节点数量
+get_child_count();
+get_child("节点序号");
+
+/* 删除节点 */
+c0->queue_free();
+```
+
+#### Ⅲ、节点其他操作
+
+``` c++
+is_inside_tree(); // 验证节点是否在树中
 ```
 
 
 
-#### Ⅲ、创建tres文件
+### 二、位置/全局位置区别
 
-使用Godot创建资源，创建后的资源类（.tres）文件，加载到其他节点即可使用
+1. `get_positon`：相对于当前节点的父节点为原点，获取的坐标信息
 
-<img src="assets/20240822 131118.png" style="zoom:70%;" />
+2. `get_global_position`：相对于场景根节点（root节点）
+
+3. 性能差距
+
+   `get_position()`性能消耗极低，只读取节点的position属性
+
+   `get_global_position()`性能消耗稍高
+
+   - 节点链深度 ≤ 3，要慢1.5~2倍
+   - 节点链深度 > 10，要慢3~5倍
+
+   解决方法：一般不需要优化（单帧调用小于100次），高频调用可以使用缓存全局坐标，手动计算全局坐标
+
+4. 当设置了Camera2D节点，对get_global_position()与get_position()没有影响
+
+节点位置演示：
+
+``` shell
+场景根节点 (0,0)
+   └── 父节点 (100,100)
+       └── 子节点 position=(50,50)
+               ├── get_position() → (50,50)
+               └── get_global_position() → (150,150)
+```
+
+  获取位置方法
+
+``` c++
+/* 设置位置坐标 */ 
+// 获取当前位置，相对与父节点
+// Node中的方法
+Vector2 p = get_position();
+/* 获取当前向量速度 */ 
+vector2 a = get_velocity();
+
+// 全局节点
+Vector2 p = get_global_position();
+```
+
+### 三、类型转换方法
+
+- `String::num`转换的是float/double类型
+- `String::num_int64`转换的是整形
+
+数字转String
+
+``` c++
+/* 数字转换为string */
+float pi = 3.14159f;
+
+// 方法2: String::num，性能最佳
+String str = String::num(pi);
+// 方法1: Variant 转换
+String str = Variant(pi);
+// 方法3: String::num 带精度
+String str = String::num(pi, 3);  // 保留3位小数
+// 方法4: UtilityFunctions::str
+String str = UtilityFunctions::str(pi);
+```
+
+String转数字
+
+``` c++
+/* string转换为数字 */
+String my_string = "12345";
+
+int my_int = my_string.to_int();  // 基本转换，性能最佳
+int my_int = Variant(my_string);  // 自动转换为int
+int my_int = UtilityFunctions::int(my_string);  // 使用UtilityFunctions
+```
 
 
+
+### 四、current_scene与root区别
+
+### 三、动画类
+
+#### Ⅰ、AnimatedSprite2D
+
+- 用于动画播放，简单物品动画
+- 在Godot添加自定义动画类，设置动画效果
+
+``` c++
+// 获取节点，注意是Animatedsprite2d类型
+AnimatedSprite2D *a_s = get_node<AnimatedSprite2D>("/root/Node2D/A_node2d");
+// 调用播放动画方法，a是Godot已经设置好的动画
+a_s->play("a");
+a_s->pause();//暂停
+a_s->stop();//停止
+a_s->is_playing();//状态
+```
+
+#### Ⅱ、AnimationPlay
+
+- Godot所有元素都可以使用它来生成动画，包括场景中来回移动的物体，怪物等
+
+### 四、AudioStreamPlayer
+
+- 音频流播放器
+- AudioStreamPlayer2D具有距离属性的音效
+
+``` c++
+#include <godot_cpp/classes/audio_stream_player.hpp>
+/* 代码加载 */
+// 加载音频资源
+ResourceLoader *R = new ResourceLoader();
+Ref<AudioStream> bg = R->load("res://02.mp3","AudioStream");
+// 音频类
+AudioStreamPlayer *a = new AudioStreamPlayer();
+// 加载音频
+a->set_stream(k_01);
+// 播放音乐，每次从头开始播放
+a->play();
+// 继续播放
+a->set_stream_paused(false);
+// 暂停播放
+a->set_stream_paused(true);
+```
+
+### 五、Vector2-向量
+
+- 头文件：不需要引用
+- Godot坐标系，其坐标原点在屏幕左上点
+    - `Vector2(0, 1)` 表示 **向下**。
+    - `Vector2(0, -1)` 表示 **向上**。
+
+向量的**加法**计算
+
+``` c++
+var a = Vector2(1, 2);
+var b = Vector2(3, 4);
+print(a + b);  // 输出 (4, 6)
+print(a - b);  // 输出 (-2, -2)
+```
+
+向量的标量乘除
+
+``` c
+var vec = Vector2(2, 4);
+print(vec * 2);   // 输出 (4, 8)
+print(vec / 2);   // 输出 (1, 2)
+
+print(a.dot(b))  // 输出 1*3 + 2*4 = 11
+```
+
+向量乘法
+
+``` c++
+// Vector2(x1 * x2, y1 * y2)
+print(Vector2(2, 3) * Vector2(4, 5))  // 输出 (8, 15);
+```
+
+
+
+向量操作方法
+
+``` c++
+/* 创建一个向量 */
+// Vector(x轴，y轴)
+Vector2 a = Vector(100, 100);
+
+/* 获取向量x值、y值 */
+Vector2 position = node->get_position();
+float x_value = position.x;  // 直接访问x成员
+float x_value = position.get_x();  // 使用get_x()方法
+float x_value = position[0];  // 获取x值
+float y_value = position[1];  // 获取x值
+
+/* 修改向量x值、y值 */
+Vector2 position = node->get_position();
+position.x = 100.0f; // 方法1：直接设置成员
+position.set_x(100.0f);// 方法2：使用set_x方法
+position[0] = 50.0f;         // 设置x值
+position[1] = 50.0f;         // 设置y值
+```
+
+获取方向（从A移动到B的方向）
+
+- 向量A - 向量B = B指向A的向量
+
+    > To find a vector pointing from A to B, use B - A.
+
+``` c++
+// 从 A 点指向 B 点的方向向量
+Vector2 direction = (pointB - pointA).normalized();
+```
+
+向指定方向移动pixel_distance的像素
+
+``` c++
+Vector2 direction = (target - current_pos).normalized(); // 获取方向
+// 方法一
+Vector2 pixel_distance = Vector2(100, 0); // 移动像素，向右移动100像素
+Vector2 movement = direction * pixel_distance; // 计算位移
+
+ node->set_position(current_pos + movement);  // 当前移动位置 + 位移  
+
+// 方法二
+// 每帧移动 100 像素
+set_position(get_position() + direction * 100 * delta);
+```
+
+一些属性方法
+
+
+``` c++
+/* a向量是否为0向量 */ 
+a.is_zero_approx();
+/* 向量单位化 */ 
+// 得到一个向量的方向，若方向不单位化，移动像素会不准
+a.normalized();
+
+/* 设置a走向B的向量 */ 
+// B：向量（方向和大小），
+// C：每帧的增量
+a.move_toward(B, C);
+
+/* 在一个范围内 */ 
+Vector2 direction = m_startPosition - position;
+if(direction.length() > 200){}
+// 返回从该向量指向 to 的归一化向量。相当于使用 (b - a).normalized()。
+direction_to(to: Vector2) const
+// 返回该向量与 to 之间的距离。
+distance_to(to: Vector2);
+```
+
+人物移动
+
+``` c++
+// 获取输入向量
+Vector2 temp_v = m_inputHandler
+    ->get_vector("G_LEFT", "G_RIGHT", "G_UP", "G_DOWN").normalized();
+
+temp_v = temp_v.move_toward(temp_v * 1000, external_move_speed * delta) ;
+// 设置角色移动
+m_player->set_velocity(temp_v);
+m_player->move_and_slide();
+```
+
+### 六、CharacterBody2D
+
+``` c++
+// 设置当前向量
+set_velocity(a);
+// move_and_collide不能沿着墙滑动
+// 根据set_velocity设定，自动进行碰撞体积
+move_and_slide();// 可以沿着墙滑动
+```
+
+### 七、随机数
+
+- 头文件：`#include <godot_cpp/classes/random_number_generator.hpp>` 
+
+- 文件`utility_functions`同样包含随机方法的静态方法
+
+- `randf_range(0.0,5.0)`：产生浮点数，0.0-5.0之间的数，不包括0.0、5.0
+
+  ``` c++
+  // 产生0~5之间的数，不包括5
+  int a = utility_functions::randf_range(0.0,5.0);
+  // 产生0~5之间的数，不包括0，5
+  double a = utility_functions::randf_range(0.0,5.0);
+
+- `randi_range(1, 3)`：产生整数，1-3之间的数，包括开始（1）和结束值（3）
+
+- `randi()`：产生整数
+
+  ``` c++
+  utility_functions::randi(); // 返回0 ~ 2^32-1之间的数
+  utility_functions::randi() % 20; // 返回0 ~ 19之间的数
+  ```
+
+- `randf()`：产生浮点数
+
+  ``` c
+  utility_functions::randf() * 10; //返回0 ~ 10之间的数
+  ```
+  
+- `randomize()`：产生随机数种子
+
+  ``` c++
+  #include <godot_cpp/classes/random_number_generator.hpp>
+  
+  RandomNumberGenerator *r = new RandomNumberGenerator();
+  r->randomize(); // 设置随机数种子
+  ```
+
+### 九、utility_functions
+
+- 包含很多常用方法
+- 头文件：`#include <godot_cpp/variant/utility_functions.hpp>`
+
+``` c++
+// 打印方法
+UtilityFunctions::print("hello world");
+UtilityFunctions::print("hello world");
+// double
+UtilityFunctions::randf();
+// int64_t
+UtilityFunctions::randi_range(int64_t from, int64_t to);
+// double
+UtilityFunctions::randf_range(double from, double to);
+// double
+UtilityFunctions::randfn(double mean, double deviation);
+// Variant
+UtilityFunctions::type_convert(const Variant &variant, int64_t type);
+```
+
+### 十、SceneTree相关方法
+
+1. 头节点：`#include <godot_cpp/classes/scene_tree.hpp>` 
+
+``` c++
+// 获取场景树
+SceneTree *tree = Node::get_tree();
+
+// get_current_scene():获取当前场景的根节点
+Node *root = tree->get_current_scene();
+// 获取
+SceneTree::get_singleton()->initialize();
+```
+
+#### Ⅰ、场景切换
+
+- 只能用于游戏场景切换，因为他会释放所有节点，再新建节点，
+- 场景切换要进程场景初始化操作，加载
+- 头文件：scene_tree()
+
+``` c
+// 获取场景树
+SceneTree *t = Node::get_tree();
+// 切换场景，使用路径
+t->change_scene_to_file("res://game2.tscn");
+// 使用pack，节点对象
+t->change_scene_to_packed(Node);
+// 切换场景方法
+t->call_deferred("change_scene_to_file", "res://bat2.tscn");
+```
+
+#### Ⅱ、分组
+
+获取分组
+
+``` c++
+// 获取场景树
+SceneTree * tree = get_tree();
+    
+// 获取分组中的所有节点
+Array a = tree->get_nodes_in_group("组名");
+Node * ab = cast_to<Node>(a[0]); // 转换节点，调用a[0]
+ab->get_name(); // 获取节点名称
+```
+
+添加删除分组
+
+- 需要引入SceneTree头文件
+
+``` c++
+t->add_to_group("组名"); // 将节点t添加进分组
+t->remove_from_group("组名"); // 将节点t从分组删除
+```
+
+其他方法
+
+``` c++
+/* 调用分组中公共方法 */
+// 获取场景树
+SceneTree *t = get_tree();
+// 调用分组empy的脚本中ttt1方法
+t->call_group("empy", "ttt1");
+
+/* 动态添加分组 */
+/* 使用get_node获取指定节点 */
+Sprite2D *root1 = get_node<Sprite2D>
+    ("/root/Node2D/Test/Sprite2D");
+root1->add_to_group("empy");
+```
+
+#### Ⅲ、场景实例化
+
+1. `Ref<PackedScene>`有特殊的方法`instantiate()` 
+
+通过节点的属性（Variant::OBJCT）添加，《场景资源会随父节点加载而加载，资源会一直存在》
+
+- 头文件：`#include <godot_cpp/classes/packed_scene.hpp>`
+
+``` c++
+/*my_scene：Variant类型，场景对象*/
+Ref<PackedScene> temp_scene = cast_to<PackedScene>(my_scene);
+// 每次调用instantiate都会生成不同资源
+Node * temp_player = temp_scene->instantiate();
+```
+
+通过ResourceLoader实例化场景添加，节省不必要的资源开支
+
+- 头文件：`#include <godot_cpp/classes/resource_loader.hpp>` 
+
+``` c++
+/* 通过对象加载 */
+ResourceLoader *R = new ResourceLoader();
+Ref<PackedScene> PS = R->load("res://units/enemy_wolf.tscn","PackedScene");
+
+/* 通过单例模式加载 */
+Ref<PackedScene> PS = ResourceLoader::get_singleton()
+    ->load("res://path/to/your/resource.tres");
+
+// 初始化，元素初始化
+Node *b = PS->instantiate();
+
+// marker2d加载敌人素材
+m1->add_child(b);
+
+// 判断节点是否加载成功
+PS.is_valid()
+```
+
+### 十二、Path2D
+
+- 使用PATH2d在地图上画出路径
+- 创建Pathfollow2d节点，pathfollow2d节点会根据path2d设置的路径行走
+
+``` c
+PathFollow2D *p = get_node<PathFollow2D>("/root/Node2D/Path2D/PathFollow2D");
+// 设置移动距离，单位像素
+p->set_progress(500);
+
+// 获取当前移动坐标
+Vector2 v = p->get_position();
+Sprite2D *s = get_node<Sprite2D>("/root/Node2D/Sprite2D");
+// 将坐标设置给精灵
+s->set_position(v);
+```
+
+### 十三、RayCast2D
+
+- 射线投射节点，用于检测碰撞不可见射线，根据设置的箭头进行碰撞检测
+
+``` c++
+is_colliding(); //检测是否发生碰撞
+```
 
 ### TileMap
 
@@ -1778,681 +2779,6 @@ set_cells_terrain_connect
 - AI算法，9期移动AI-05分 
 
 
-
-## 软件开发控件
-
-1. 开发软件时，一般不要使用游戏开发控件，因为contol控件有些参数没有
-
-2. 使用TextureRect替代Sprite2D节点
-
-3. 一般节点位置信息
-
-   ``` shell
-   CanvasLayer # 根节点，可设置锚点
-   ├─ PanelContainer # 背景面板
-   |	├─MarginContainer # 背景，Sprite2d的替代节点
-   ```
-
-
-### 一、画布类
-
-#### Ⅰ、canvasLayer
-
-属性说明：
-
-1. Visibility：
-
-   1. visible：显示
-   2. Modulate：可以继承的颜色
-   3. Self Modulate：只修改自己的颜色
-   4. Show behind
-   5. Top Level：置顶
-   6. Clip Children
-   7. Light Mask：
-   8. Visibility Layer：
-
-2. Ordering
-
-   1. Z index：排序
-   2. Z as Relative：
-   3. Y Sort Enabled：Y轴排序，多用于地图设计
-
-3. Texture
-
-   1. Filter：过滤模式
-   2. Repeat：重复模式
-
-4. Material：
-
-   
-
-代码实现：
-
-- 头节点：`#include <godot_cpp/classes/canvas_layer.hpp>` 
-- 新的画布，其属性独立于其他节点
-
-``` c++
-// 获取
-CanvasLayer * cl = get_node<CanvasLayer>("%InventoryWindow");
-cl->set_visible(TRUE); // 设置是否可见
-cl->is_visible(); // 当前是否打开
-cl->hide();  // 隐藏
-cl->show(); // 显示
-```
-
-### 二、容器类
-
-1. 所有容器都有`锚点预设`、都可以作为其他控件的父类
-2. 容器节点可以把子类的Transform信息提升到父类（容器节点）修改
-3. `锚点预设-扩展`：在vbox、hbox中使用会将剩余空间填满
-
-#### Ⅰ、Control
-
-Control在容器内节点添加，可以使其子节点自由移动
-
-属性说明：
-
-1. Layout：布局
-
-2. Localization：本地化
-
-3. Tooltip：鼠标悬停，显示的提示信息
-
-4. Focus：空间布局关系，移动焦点时，让焦点知道往哪移动
-
-5. Mouse：鼠标，当点击无用时，有可能时空间遮掩，并停止了事件传递
-
-   Filter：鼠标事件过滤
-
-   Default Cursor Shape：鼠标样式
-
-6. Input：将控件添加进屏幕？
-
-7. Theme：主题
-
-#### 其他常用容器节点说明
-
-1. Box容器：可以按照x轴方向、y轴方向进行排列
-   - HboxContainer：横向排列的容器，用于制作角色血条等
-   - VBoxContainer：纵向排列容器
-
-2. PanelContainer：面板容器，<当作背景板、父类样式节点、Tab标签页等使用>
-
-   - StyleBox样式：
-
-     StyleBoxFlat：可以自定义样式
-
-     StyleBoxEmpty：没有样式
-
-     StyleBoxTexture：使用图片
-
-     StyleBoxLine：
-
-   - 可以保证其子节点，不会超出PanelContainer的范围
-
-   - 拥有一个 sort_children 信号
-
-   - 拥有一个 Theme Overrides / styles 参数
-
-   Panel：与PanelContainer基本相同
-
-   - 可以当成背景板
-   - 不能保证其子节点都在Panel的范围内
-
-   ---
-
-3. MarginContainer：边框容器，<可进行边距设置>
-
-4. ViewPortContainer：小窗口容器
-
-5. AspectRatioContainer：长宽比固定，保持一定的长宽比
-
-6. FlowContainer：流动容器，将元素从右向左放置，会自动换行
-
-7. GridContainer：九宫格容器，<需要设置Columns才能看见效果>
-
-8. HSplitContainer：分割容器，划分屏幕左右，可拖拽
-
-9. VSplitContainer：分割容器，划分屏幕上下，可拖拽
-
-10. ScrollContainer：滚动条，必须在Vbox或Hbox中才能正常工作
-
-11. CenterContainer：居中容器
-
-12. TapContainer：选项卡容器
-
-13. SubViewportContainer / SubViewport：用于制作小地图的容器
-
-### 三、功能类
-
-1. Progressbar：进度条，软件常用
-2. TextureProgressbar：进度条，游戏常用，可设置背景
-3. Button：按钮
-4. Label：标签
-5. RichTextLabel：富文本标签
-6. ColorRect：颜色矩形，用于显示颜色
-7. VideoStreamPlayer：视频流播放器
-8. HSeparator：分隔符
-9. NinePatchRect：九宫格矩形，保存纹理被边角不变
-10. TextureRect：用于显示纹理的空间，可做背景
-
-### 四、Anchor锚点
-
-锚点使用方法
-
-- 点：保证子类图形距离锚点的相对位置不变
-- 线：保证锚点组成的线不会被拉伸
-- 面：保证锚点围成的面大小比例一致
-
-当父类使用`锚点预设`$\to$` 整个矩形`时，其子类可以在这个矩形范围内进行 “锚点预设”
-
-- 当锚点的父类是Node或Node2D节点，就不能进行锚点拖拽（此时锚点就只能是一个定位点）
-
-  解决方案：将锚点的父类替换为其他节点（优先选CanvasLayer）
-
-- 锚点一般使用的根节点是 Control 节点（CanvasLayer节点、Node节点也是可以的）
-
-- 锚点预设的一般结构
-
-  ``` shell
-  Control # 锚点预设使用“整个矩形”其子类可以使用锚点预设设置位置
-  └─Container # 容器，各种不同的容器，进一步划分场景
-  	└─TextureRect # 背景，Sprite2d的替代节点
-  ```
-
-锚点参数：Layout / Layout Mode 选择 “Anchors”
-
-- Anchor Points：Left 、Top、Right、Bottom：是锚点左上右下靠近屏幕的位置，0是左边，1是右边
-- Anchors Offsets：锚点所围成方块的大小
-
-其他问题：
-
-1. 锚点是一个点的时候，子类不要选“整个图形”，这样需要设置最小大小才能显示区域
-
-   
-
-### 五、主题
-
-1. theme与theme override
-
-   调用顺序：theme override$\to$theme $\to$ 父类的theme节点样式$\to$项目设置、GUI、Theme中设置
-
-2. 主题在根据设置主题，其子节点会继承主题
-
-3. 主题可以新建主题（与新建资源相同，Resource中有Theme）
-
-4. 样式盒子说明
-
-   styleBox
-
-主题界面说明
-
-![](assets/屏幕截图 2024-12-22 120600.png)
-
-一个控件定义多种样式：
-
-1. 修改位置：`Theme / Theme Type Value` 属性修改
-2. 控件选择器 $\to$ 直接输入名称 $\to$ 直接添加即可，这样就可以创建一个自定义控件
-3. 在自定义控件下，选择🔧图标（扳手加叉子）$\to$ 基础类型$\to$选择想要继承的控件
-4. 正常修改样式
-5. 设置Theme Type value的值为自定义控件名称
-
-样式继承
-
-## 常用功能实现
-
-### 一、_bind_methods方法
-
-#### Ⅰ、自定义信号
-
-1. 发射信号
-2. Variant::STRING类型可参考Variant
-3. 这能在Godot面板中的信号设置信号发出
-
-不带参数的信号：
-
-``` c++
-void Test::_bind_methods(){
-    // 普通信号，信号名称为：hello_signal
-    ADD_SIGNAL(MethodInfo("hello_signal"));
-}
-void Test::xxx(String world){
-    // 发射信号，hello_singal
-    emit_signal("信号名称");
-}
-```
-
-带参数的信号：
-
-``` c++
-void Test::_bind_methods(){
-    // 携带参数的信号
-    ADD_SIGNAL(MethodInfo(
-        "hello_signal",//信号名称
-        PropertyInfo(Variant::STRING, "data")
-    ));//信号参数
-}
-void Test::xxx(String world){
-    // 发射信号，hello_singal
-    emit_signal("信号名称", "参数1");
-}
-```
-
-#### Ⅱ、信号的接收方法
-
-1. 代码方法参考：Ⅳ、方法绑定
-3. 操作方法：连接信号方法$\to$ 连接到脚本（选中自定义类）$\to$​ 接受方法旁的“选取”
-
-<img src="assets/111183620.png" style="zoom:55%;" />
-
-
-
-#### Ⅲ、自定义节点属性
-
-- 注意：`ClassDB::bind_method `方法一定要在 `ClassDB::add_property` 之前
-- 需要重新打开Godot，才能显示属性
-- 中文会乱码
-
-基本用法：
-
-``` c++
-void Test::_bind_methods(){
-    /* 2.将Godot界面属性与C++方法绑定 */
-    // 要先定义绑定方法
-    ClassDB::bind_method(D_METHOD("set_radius", "a"), &Test::set_radius);
-    ClassDB::bind_method(D_METHOD("get_radius"), &Test::get_radius);
-    
-    /* 1.添加界面接口
-    ClassDB::add_property("类名",
-    	PropertyInfo(参数类型, "参数名称"),
-        "参数设置方法", 
-        "获取参数数值");
-    */
-    ClassDB::add_property("Test",
-    	PropertyInfo(Variant::FLOAT, "xxxx"),
-        "set_radius",
-        "get_radius");
-}
-
-/* 3.设置get_radius、set_radius方法 */
-double Test::get_radius(){
-    return radius;
-}
-void Test::set_radius(double r){
-    this->radius = r;
-}
-```
-
-给属性添加分组
-
-``` c++
-/* 
-ADD_GROUP("分组名称","分组标识");
-ADD_SUBGROUP("分组名称", "分组标识");
-*/
-// 设置分组表示，
-ADD_GROUP("Group01","first_");
-// 设置分组标识，二级分组
-ADD_SUBGROUP("Group02", "first_second_");
-
-/* 添加属性到分组中 */
-ClassDB::add_property("Test",
-    // 添加分组标识
-    PropertyInfo(Variant::FLOAT, "first_second_xxxxx"),
-    "set_radius",
-    "get_radius");
-```
-
-#### Ⅳ、方法绑定
-
-- 使用方法绑定，可以让GDScript调用C++函数
-
-- 同时也可以变成信号接收方法，若没有相关信号，需要重启Godot
-
-- 方法可以放到 private 中，若Godot不能识别C++方法，应检查参数类型是不是`Variant`，参数不对应也不会显示C++方法
-
-- 调用方法：
-
-  ``` python
-  # 使用 New 方法
-  # 此方法会开创一个新节点，此节点不在节点树中
-  # 不用引入节点，需要new对象使用
-  var a = Test.new();
-  a.start_test();
-  
-  # 使用 @onready 方法 《推荐》
-  # 拖拽节点，形成对节点的引用
-  # @onready会等节点树加载完毕，防止出现不在节点树错误
-  @onready var tfsc = $TFSC
-  ```
-
-不带参数的接收方法
-
-``` c++
-void Test::_bind_methods(){
-    /* ClassDB::bind_methond(D_METHOD("函数名"), 方法地址) */
-    ClassDB::bind_method(D_METHOD("start_test"), &Test::start_test);
-}
-
-// 不带参数的接收函数
-void Test::start_test(){}
-```
-
-带参数的接收方法
-
-``` c++
-void Test::_bind_methods(){
-    /***
-     * ClassDB::bind_methond(D_METHOD("调用的函数名", "参数1", "参数2"), 方法地址)
-     */
-    ClassDB::bind_method(D_METHOD("start_test", "a", "b"), &Test::start_test);
-}
-
-// 带有参数的接收函数
-// 参数类型，一般都使用Variant类型
-void Test::start_test(Variant a, Variant b){
-   	// 使用cast_to转换为适合类型 
-    // cast_to<类型>(要转换的变量);
-	Area2D *t = cast_to<Area2D>(a);
-}
-```
-
-#### Ⅴ、代码连接信号
-
-``` c++
-/* 1.声明可连接的信号 */
-// 声明信号-A类
-ADD_SIGNAL(MethodInfo(
-    "game_stop",//信号名称
-    PropertyInfo(Variant::STRING, "data")//信号参数
-));
-
-/* 2.设置信号的调用方法 */
-// up: 供GDScript调用的方法名
-// up_testst：up触发的C++方法
-ClassDB::bind_method(D_METHOD("up"), &TTest::up_testst);
-
-/* 3.连接方法与信号 */ 
-// connect("信号名称", Callable(类, "触发的GDScript可调用的方法"))
-// up：ClassDB::bind_method中绑定的方法
-// connect就是连接了game_stop与up这两个
-connect("game_stop", Callable(this, "up"));
-
-// 例子：在类中连接其他类中的其他方法
-// get_node<Area2D>("Area2D") // 获取节点
-// 		->connect("area_entered", Callable(ba_s, "change"));
-
-/* 3.设置响应方法 */
-void Test::up_testst(){
-	// 若是带有参数，查看Ⅳ、方法绑定
-}
-```
-
-### 二、人物移动
-
-``` c++
-/**
- * 角色移动
- */
-Vector2 temp_v = m_inputHandler
-    ->get_vector("G_LEFT", "G_RIGHT", "G_UP", "G_DOWN").normalized();
-temp_v = temp_v.move_toward(temp_v * 1000, external_move_speed * delta) ;
-
-m_player->set_velocity(temp_v);
-m_player->move_and_slide();
-```
-
-### 三、物品相关
-
-#### Ⅰ、物品创建
-
-1. 基于场景创建，继承关系
-
-   物品：`PickableObject -> Item -> SmallPotion ` 
-
-   装备：`PickableObject -> equipment -> Armour ` 
-
-2. 结构
-
-   ``` shell
-   SmallPotion  # 物品名称，小血瓶,Node2D
-   ├─Sprite2D # 物品图像
-   ├─Area2D # 碰撞体积
-   |  └─CollisionShape2D # 形状
-   └─CombatManager # 
-   ```
-   
-
-####  Ⅱ、背包系统
-
-1. 节点构成
-
-   ``` shell
-   CanvasLayer
-   └─MarginContainer
-   	├─ColorRect # 遮盖层，纯黑色等
-   	└─HBoxContainer # 水平排列子节点
-   		├─Panel2 # 左侧面板
-   		|	└─MarginContainer #
-   		|		└─ScrollContainer # 滚动窗口
-   		|			└─VBoxContainer # 背包物品显示单元
-   		└─Panel2 # 右侧面板
-   			└─MarginContainer
-   				└─Label # 物品信息
-   ```
-
-2.  创建UI脚本
-
-
-
-#### Ⅲ、物品掉落
-
-
-
-#### Ⅳ、物品拾取
-
-#### Ⅴ、物品逻辑
-
-1. 主动使用物品
-2. 被动效果
-
-### 四、补间动画
-
-- C++使用没有效果，只进行记录
-
-  ```c++
-  #include <godot_cpp/classes/tween.hpp>
-  #include <godot_cpp/classes/property_tweener.hpp>
-  
-  Ref<Tween> tw = Node::create_tween()->set_loops();
-  bool b = tw->is_valid();// 验证是否存活
-  bool a = tw->is_running();// 验证是否运行
-  
-  Sprite2D *sp01 = get_node<Sprite2D>("../sp2");
-  // 属性补间
-  tw->tween_property(cr, NodePath("color:a"), 255.0, 4.0);
-  ```
-
-- 使用GD脚本编写
-
-  `.set_delay(x)`：延迟x秒执行补间动画
-
-  `.set_loop()`：设置补间动画循环
-
-  `.from_current(x)`：从x状态执行到目标状态
-
-  `.set_ease()`：设置变化曲线
-
-  `.set_trans()`：带有物理属性
-
-``` python
-# 获取节点，4.0以上版本需要使用@字符
-@onready var ax = $sp2
-# 创建一个补间动画
-var tween = create_tween()
-# 创建属性补间动画
-# ax:欲添加补间动画的对象
-# "position"：初始状态
-# Vector2(1000, 500)：目标状态
-# 5：持续时间
-tween.tween_property(ax, "position",Vector2(1000, 500), 5)
-tween.interval(1.0); # 循环的补间动画的间隔
-```
-
-### 五、场景管理器
-
-- 方法一：使用change_scens_to_file方法，将用户 资源等等传递给下一个场景，将系统场景设置为全局场景，场景切换，只能用于
-- 方法二：直接使用add_child方法，将节点添加进当前节点
-- 方法三：同一场景中的镜头切换，直接关闭相机，`camera.enabled = false`; 
-- 方法四：背包等一些功能图层，直接使用
-
-#### Ⅰ、场景切换
-
-1. 使用分组功能，用分组记录上一次的位置
-
-### 七、碰撞检测
-
-1. 检测碰撞需要 `Area2D` 节点，被碰物体（敌人）与碰撞物体（玩家）都需要添加 `Area2D` 节点
-2. 使用玩家（敌人）的信号 `area_entered` 进行碰撞后代码运行
-
-本例是玩家 `CharacterBody2D` 中的 `Area2D` 发出信号
-
-``` shell
-# Player节点构造
-Player # CharacterBody2D 类型
-├─ CollisionShape2D `碰撞结构`
-├─ temp # 其他节点
-└─ Area2D `碰撞体检测节点` 
-	└─ CollisionShape2D `碰撞结构`
-```
-
-多场景使用C++步骤流程
-
-1. 接收信号类（对信号进行处理），暴露信号方法
-
-   ``` c++
-   ClassDB::bind_method(
-       // change_state_parameter：信号
-       // &TBatState::change_state_parameter：信号触发方法
-       D_METHOD("change_state_parameter", "a"), &TBatState::change_state_parameter
-   );
-   ```
-
-2. 连接信号
-
-   ``` c++
-   // 任意类，获取到指定 Area2D 节点，进行信号连接
-   Player
-       ->get_node<Area2D>("Area2D")
-       // area_entered：区域进入信号Godot官方信号
-       // ba_s：类，战斗节点
-       // change_state_parameter：ba_s中的方法
-       // 注意：这里链接的是 Area2d 节点中area_entered信号
-       ->connect("area_entered", Callable(ba_s, "change_state_parameter"));
-   ```
-
-### 鼠标设置
-
-``` c++
-#include <godot_cpp/classes/input.hpp>
-Test::Test() {
-	// 这里可以通过ctrl查看input类
-    Input *I = new Input();
-    // MOUSE_MODE_HIDDEN：鼠标移入程序隐藏鼠标，同时在编辑器中也会隐藏
-    I->set_mouse_mode(Input::MOUSE_MODE_HIDDEN);
-};
-```
-
-### 十、相机
-
-``` c++
-tileMap.get_used_rect(); //
-tilemap.tile_set.tile_side; //地图大小
-camera.limit_top;//相机顶位置
-/* 重置相机位置，取消过度动画 */
-camera.reset_smoothing(); 
-camera.force_update_scroll();
-```
-
-### 十二、设置Y层
-
-1. 根节点设置Y启用
-2. Tilemap设置Y启用
-3. Tilemap -> “层”设置Y启用
-4. player节点设置Y启用
-5. 设置Player层与“层”的z坐标处同一层
-6. 修改贴图“选择”-“Y排序原点”
-7. 修改player节点下的“Animationbody2D”节点的锚点
-
-### 对话框dialogue
-
-1. 创建一个control节点
-
-2. 创建一个子节点NinePatchRect
-
-3. 创建文本子节点（
-
-    富文本：NinePatchRect/RichTextLabel
-
-    普通文本：NinePatchRect/Lebel
-
-4. 这些方法都是基于，富文本节点，LEbel节点
-
-``` c++
-set_text(); // 设置文本，每次都是新的
-add_text(); // 添加文本
-```
-
-
-
-### 实现黑夜透镜效果
-
-1. 添加CanvasLayer节点：相当于图层，
-
-   Layer属性：改成大的，遮盖全部
-
-   Mouse / Filter属性：阻止点击穿透，建议stop
-
-2. 添加子节点ColorRect节点：改变颜色
-
-3. 可以使用 SceneTree.create_tween() 或 Node.create_tween() 创建 Tween（“即用即弃”）
-
-``` c++
-/* 创建补间动画 tween类 */
-
-```
-
-
-
-### 回合制人员加载
-
-1. 设置Marker2D节点，表贼元素位置
-
-``` c++
-// 得到定位节点
-m1 = get_node<Marker2D>("m1");
-m2 = a->get_node<Marker2D>("m2");
-m3 = a->get_node<Marker2D>("p3");
-// 加载敌人素材
-ResourceLoader *R = new ResourceLoader();
-Ref<PackedScene> wolf = R->load("res://units/enemy_wolf.tscn","PackedScene");
-
-// 初始化，元素初始化
-Node *b = wolf->instantiate();
-Node *c = tree->instantiate();
-// marker2d加载敌人素材
-m1->add_child(b);
-m2->add_child(c);
-```
-
-### 调用子类方法
-
-``` c++
-#incldue "Player"
-_player = get_node<Player>("Player");
-_player->set_movement_limit(_scene_size);
-
-```
 
 ### 平台跳跃移动
 
@@ -2470,29 +2796,9 @@ if input.is_action_just_pressed("ui_accept") and is_on_floor():
 	velocity.y = JUMP_VELOCITY
 ```
 
-### 动画播放实现场景移动
 
-1. 创建场景A（任意）
-2. 创建子节点AnimationPlayer（A节点的子节点）
-3. 创建新动画
-4. 在指定位置创建一个关键帧，在目标位置再创建一个关键帧
-5. 设置播放模式，可以修改播放方式（实现往返播放）
 
-### 自定义继承
 
-1. 注册（`register_types.cpp`）时顺序很重要，父类一定要先注册
-2. 若自定义节点没有出现，可以重启Godot软件
-
-``` c++
-// 父类
-class TFSC : public Node {
-    GDCLASS(TFSC, Node);
-}
-// 子类
-class TMOVESTATE : public TFSC {
-    GDCLASS(TMOVESTATE, TFSC);
-}
-```
 
 
 

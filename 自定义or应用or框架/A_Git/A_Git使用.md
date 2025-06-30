@@ -16,7 +16,7 @@
 | 名称    | 说明                |
 | ------- | ------------------- |
 | origin  | 源,远程服务器，默认 |
-| master  | 主分支              |
+| main    | 主分支              |
 | hotfix  | 修补bug             |
 | release | 发放版本            |
 | develop | 开发版本            |
@@ -32,6 +32,9 @@
 | ^    | 步数，一个^，一步 |
 
 ## 常用命令
+
+- `git add .`：不包括删除文件
+- `git add *`：修改、删除、新建都添加（可能会把不需要的文件添加进来）
 
 <img src="assets/A_Git使用/git操作命令.png"/>
 
@@ -62,6 +65,42 @@
 
 1. 创建项目
 2. ``
+
+## 忽略文件
+
+1. 使用方法：在根目录下创建文件`.gitignore`
+
+基本语法
+
+``` shell
+# 忽略所有 .log 文件
+*.log
+
+# 忽略特定文件
+debug.ini
+# 忽略 /build 目录
+build/
+
+# 忽略 /logs 目录下的所有内容
+logs/*
+
+# 忽略所有 .txt 文件，但不忽略 important.txt
+*.txt
+!important.txt
+
+# 这是注释，不会影响 Git 行为
+*.bak
+```
+
+
+
+- 忽略当前，不能使用.
+
+```shell
+git rm -r --cached .
+git add .
+git commit -m "update .gitignore"  # windows使用的命令时，需要使用双引号
+```
 
 ## 常用功能
 
@@ -149,7 +188,11 @@ HEAD # workspace 与 Repository
 
 ### 五、合并
 
+### 六、恢复
 
+1. 检查删除文件日志：`git log`
+2. 获取删除文件：`git reset <提交HASH> <删除文件>`
+3. 恢复：`git checkout <目录>`
 
 ## 使用SSH Key
 

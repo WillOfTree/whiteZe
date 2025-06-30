@@ -88,15 +88,23 @@
 
 2. 安装CMake：https://cmake.org/download/
 
+   选项`Add CMake to the system PATH for all users`
+
 3. 下载Ninja： https://github.com/ninja-build/ninja/releases 
 
-4. 将Ninja解压到CMake\bin目录下
+   将Ninja解压到CMake\bin目录下
 
-5. 下载Skia库：https://github.com/aseprite/skia/releases 
+4. 下载Skia库：https://github.com/aseprite/skia/releases 
 
-6. 下载Visual Studio Community 2022，安装后选择`使用C++的桌面开发`，并选择`Windows 11 SDK` 
+5. 下载Visual Studio Community 2022，安装后选择`使用C++的桌面开发`，并选择`Windows 11 SDK` 
 
-7. 文件目录
+6. 打开CMD
+
+   ``` shell
+   call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" -arch=x64
+   ```
+
+7. 切换到aseprite目录下文件目录
 
    ``` shell
    aseprite-compile

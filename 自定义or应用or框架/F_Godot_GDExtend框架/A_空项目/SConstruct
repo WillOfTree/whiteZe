@@ -5,6 +5,7 @@ import sys
 # 导入SConstruct环境
 env = SConscript("external/godot-cpp/SConstruct")
 
+
 #------------设置----------------------------------
 
 sources = []      # Cpp文件位置
@@ -14,6 +15,8 @@ CPPPATH_temp = [] # 头文件位置
 libpath = "./demo/bin/{}/lib{}{}".format(env["platform"], env['suffix'], env['SHLIBSUFFIX'])
 
 #------------准备函数-------------------------------
+
+
 
 # 遍历目录和文件
 def recursive_listdir():

@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build Debug Develop",
+            "type": "shell",
+            "command": "scons",
+            "args": [
+                "-j12",
+                "target=template_debug",
+                "debug_symbols=yes"
+            ]
+        },
+       // {
+       //     "label": "Build GDExtension",
+       //     "type": "shell",
+       //     "command": "scons",
+       //     "args": [
+       //         "-j12",
+       //         "target=template_debug",
+       //         "debug_symbols=yes"
+       //     ]
+       //}
+    ]
+}
