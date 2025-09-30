@@ -58,8 +58,8 @@ Android_SDK有2种安装方式
 
 #### Ⅳ、配置Godot设置，打开编辑器
 
-1. 编辑器$\to$导出$\to$Android，Java SDK Path：添加Java_SDK的根目录
-2. 编辑器$\to$导出$\to$Android，Android SDK Path：设置为Android_SDK的根目录
+1. 编辑器$\to$编辑器设置$\to$导出$\to$Android，Java SDK Path：添加Java_SDK的根目录
+2. 编辑器$\to$编辑器设置$\to$导出$\to$Android，Android SDK Path：设置为Android_SDK的根目录
 
 #### Ⅴ、设置环境变量
 
@@ -142,13 +142,13 @@ android.arm32 = "res://bin/android/lib.android.template_release.arm32.so"
 
    > keytool -v -genkey -keystore tree.keystore -alias tree -keyalg RSA -validity 10000 -dname "CN=tree,O=Android,C=CN" 
 
-   ``-alias`：填写用户名（默认：tree ）
+   ``-alias`：填写用户名（**默认：tree** ）
 
    `-validity`：密钥有效期，单位天
 
    `-keystore`：密钥文件文件名，若不使用此项，也会要求输入密码
 
-   `-storepass`：密码（默认：tree0000）
+   `-storepass`：密码（**默认：tree0000**）
 
    `-dname`：cn-开发者名称，O-组织名称，C-国家或组织代码
 
@@ -159,6 +159,8 @@ android.arm32 = "res://bin/android/lib.android.template_release.arm32.so"
    发布：填写tree.keystore的位置
 
    发布密码 / 发布用户：填写生成.keystore文件的密钥
+
+   `当前密钥位置：D:\Program Files (x86)\Godot\tree.keystore`
 
 4. 导出即可
 
@@ -197,52 +199,49 @@ android.arm32 = "res://bin/android/lib.android.template_release.arm32.so"
 
 ### 六、修改Android启动页面
 
-1. 修改位置：C:\Users\binar\AppData\Roaming\Godot\export_templates\4.4.1.stable
+1. 首先应安装导出模板
 
-2. 通过Godot打开目录
+2. 使用Gradle构建
 
-   任务栏$\to$编辑器$\to$管理导出模板$\to$当前版本下的“打开文件夹”
+   删除Godot项目目录下的android目录：`\demo\android`
 
-3. 修改文件：`android_source\res\values\themes.xml`
+   安装Android构建模板：任务栏$\to$项目$\to$安装Android构建模板
 
-   android_source是一个zip的压缩包，需要解压后修改，再重新压缩，替换原文件
+3. 修改文件：`\demo\android\build\res\values\themes.xml` 
+
+4. 额外的使用“压缩原生库”可减小App大小
+
+style name = "GodotAppMainTheme"选项
 
 ``` xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="GodotAppMainTheme" 
-           parent="@android:style/Theme.DeviceDefault.NoActionBar">
-        <!-- 禁用系统状态栏背景绘制（避免与 Godot 界面冲突） -->
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
-        <!-- 禁止通过滑动关闭应用（防止误操作退出） -->
-        <item name="android:windowSwipeToDismiss">false</item>
-    </style>
+<!-- 禁用系统状态栏背景绘制（避免与 Godot 界面冲突） -->
+<item name="android:windowDrawsSystemBarBackgrounds">false</item>
+<!-- 禁止通过滑动关闭应用（防止误操作退出） -->
+<item name="android:windowSwipeToDismiss">false</item>
+```
 
-    <!-- 
-        Android 12+ 专用闪屏主题（适配 SplashScreen API）
-        - 用于控制启动时的系统级闪屏效果
-    -->
-    <style name="GodotAppSplashTheme" parent="Theme.SplashScreen">
-        <!-- 
-            闪屏背景色（必须设置）
-            - 建议使用与 Godot 启动画面相同的颜色
-            - 格式：@color/xxx 或 #AARRGGBB
-        -->
-        <item name="android:windowSplashScreenBackground">#00000000</item>
+style name = "GodotAppSplashTheme" 选项
 
-        <!-- 图标：应设置为@null  -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/icon_foreground</item>
+- @mipmap可以修改res/mipmap目录下的图片
+- @mipmap/icon_background：背景层，提供图标的底色或图案。
+- @mipmap/icon_foreground：是自适应图标的前景层，通常用于启动画面或应用图标。
+- #AARRGGBB：颜色编码，BB为00是透明，FF为不透明（待确定）
 
-        <!-- 默认即可 -->
-        <item name="postSplashScreenTheme">@style/GodotAppMainTheme</item>
+``` xml
+<!-- 闪屏背景色（必须设置）
+  - 可以填写内容：@color/xxx、#AARRGGBB、@mipmap -->
+<item name="android:windowSplashScreenBackground">#000000</item>
 
-        <!-- 
-            （可选）闪屏动画时长（毫秒）
-            - 默认值：1000ms
-            - 示例：<item name="windowSplashScreenAnimationDuration">500</item>
-        -->
-    </style>
-</resources>
+<!-- 图标  
+  - 可以填写内容：@mipmap、@null -->
+<item name="windowSplashScreenAnimatedIcon">@mipmap/icon_foreground</item>
+
+<!-- 默认即可 -->
+<item name="postSplashScreenTheme">@style/GodotAppMainTheme</item>
+
+<!--（可选）闪屏动画时长（毫秒）
+  - 默认值：1000ms -->
+<item name="windowSplashScreenAnimationDuration">500</item>
 ```
 
 

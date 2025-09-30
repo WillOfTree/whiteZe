@@ -4,25 +4,18 @@
 
 ### 一、目录结构
 
-build     编译
-
-cocos     cocos2d-x的库
-
-doc      帮助文档
-
-extensions  扩展的功能（工具）
-
-external   扩展功能
-
-licenses   授权文件
-
-plugin    第三方的社交平台
-
-templates  创建cpp项目模板文件
-
-tests     测试的demo
-
-tools     项目产生攻击等
+``` shell
+build     #编译
+cocos     #cocos2d-x的库
+doc       #帮助文档
+extensions#  扩展的功能（工具）
+external  # 扩展功能
+licenses  # 授权文件
+plugin    #第三方的社交平台
+templates # 创建cpp项目模板文件
+tests     #测试的demo
+tools     #项目产生攻击等
+```
 
 ### 二、常用工具
 

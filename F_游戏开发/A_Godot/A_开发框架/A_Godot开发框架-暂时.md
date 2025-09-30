@@ -33,36 +33,7 @@
 
    应检查节点注册顺序，父类应在子类先注册
 
-## 目录结构
-
-### 一、C++项目目录
-
-``` shell
-# 项目根目录
- ├─demo `Godot项目目录`
- ├─bin `存放编译后的可执行文件（Godot引擎或游戏）`
- ├─external `第三方库`
- |	└─godot-cpp
- ├─include `头文件目录` 
- ├─src `C++代码目录` 
- |	├─FSC # 详细查看：一、状态机结构
- |	|	├─finite_state_machine 
- |	|	├─battery_substate 
- |	|	└─fsc.cpp 
- │  ├─manager_controller # 详细查看：二、管理器节点
- │  ├─pickup_object # 详细查看：可拾取物品目录结构
- |	├─resources_data 
- |	|	├─skill_data # 详细查看：三、skill结构
- |	|	└─role_data  `角色数据文件夹`
- |	|		├─protagonist_data.cpp # 主角资源
- |	|		├─enemy_data.cpp # 敌人资源
- |	|		└─role_data.cpp # 角色资源
- |	├─register_types.cpp # 注册文件
- |	└─main_node.cpp # 主节点
- └─SConstruct  # SCons构建脚本
-```
-
-### 二、Godot目录说明
+## Godot目录说明
 
 ``` shell
 # Godot项目目录
@@ -110,51 +81,25 @@
     └─equipments `装备数据`
 ```
 
-## MainNode场景结构
+## 场景结构
 
-### 一、状态机结构
+### 一、常用结构名称
 
-C++项目
-
-``` shell
-├─FSC `状态机目录`
-	├─finite_state_machine `状态机文件目录`
-	|	├─init_state.cpp
-	|	├─bat_state.cpp
-	|	├─change_scence_state.cpp
-	|	├─open_backpack_state.cpp
-	|	└─ordinary_state.cpp
-	├─battery_substate `战斗子类`
-	|	├─init_substate.cpp 
-	|	├─switch_substate.cpp 
-	|	├─player_substate.cpp 
-	|	├─enemy_substate.cpp 
-	|	├─verification_substate.cpp
-	|	└─over_substate.cpp 
-	└─fsc.cpp #状态机文件
-```
-
-回合制RPG
-
-``` shell
-TFSM # 无限状态机
-├─TInitState # 初始化状态
-├─TOrdinaryState # 一般状态，移动和站立 
-├─TOpenBackpackState # 背包打开，系统打开状态
-├─TChangeScenceState # 切换场景状态
-└─TBatState # 战斗状态
-    ├─InitialSubState # 子战斗状态-初始化
-    ├─SwitchSubState # 子战斗状态-战斗切换
-    ├─PlayerSubState # 子战斗状态-玩家操作状态 
-    ├─EnemySubState # 子战斗状态-敌人战斗状态
-    ├─VerificationSubState # 子战斗状态-验证战斗状态 
-    └─OverSubState # 子战斗状态-战斗结束状态
-```
+- TInitState # 初始化状态
+- TOrdinaryState # 一般状态，移动和站立 
+- TOpenBackpackState # 背包打开，系统打开状态
+- TChangeScenceState # 切换场景状态
+- TBatState # 战斗状态
+  - InitialSubState # 子战斗状态-初始化
+  - SwitchSubState # 子战斗状态-战斗切换
+  - PlayerSubState # 子战斗状态-玩家操作状态 
+  - EnemySubState # 子战斗状态-敌人战斗状态
+  - VerificationSubState # 子战斗状态-验证战斗状态 
+  - OverSubState # 子战斗状态-战斗结束状态
 
 横板过关
 
 ``` shell
-TFSM # 无限状态机
 ├─TInitState # 初始化状态
 ├─TMoveState # 移动状态 
 ├─TIdleState # 站立状态
@@ -162,30 +107,16 @@ TFSM # 无限状态机
 └─TChangeScenceState # 切换场景状态
 ```
 
-### 二、管理器节点
-
-C++项目
-
-``` shell
-├─manager_controller `管理类目录`
-	├─abstract_manager_node.cpp # 抽象管理器基类
-	├─manager_bat.cpp # 战斗管理器
-	├─manager_input.cpp # 输入管理器
-	├─manager_scene.cpp # 场景管理器
-	├─manager_inventory.cpp # 背包管理器
-	└─manager_skill.cpp # 技能管理器
-```
-
-Godot场景
+管理器节点名称
 
 ``` shell
 TControllerNode `TControllerNode`
-├─`%`TSceneManager     # 场景管理器，用于切换场景，加载玩家，加载敌人等等
-├─`%`TInputManager     # 输入管理，将输入信号传送出去，
-├─`%`TMapManager       # 随机地图生成
-├─`%`TInventoryManager # 物品管理
-├─`%`TPlayerManager    # 玩家管理器，技能管理器
-└─`%`SignalManager     # 信号管理器，定义信号，连接信号
+├─TSceneManager     # 场景管理器，用于切换场景，加载玩家，加载敌人等等
+├─TInputManager     # 输入管理，将输入信号传送出去，
+├─TMapManager       # 随机地图生成
+├─TInventoryManager # 物品管理
+├─TPlayerManager    # 玩家管理器，技能管理器
+└─TSignalManager     # 信号管理器，定义信号，连接信号
 ```
 
 ### 三、主场景结构说明
@@ -195,8 +126,6 @@ TControllerNode `TControllerNode`
 
 ``` shell
 main `Node2D` # 主循环
-├─TFSC `TFSC` # 系统节点
-├─TManagermentController `Node` # 管理器控制节点
 ├─PlayerContainer `Node` # 玩家资源节点
 |	├─Protagonist `TPlayerResMount` # 资源节点
 |	└─Supporter `TPlayerResMount` # 配角数据
@@ -204,7 +133,7 @@ main `Node2D` # 主循环
 |	├─InventoryWindow `CanvasLayer` # 装备界面
 |	└─BattleWindow `CanvasLayer` # 战斗界面 
 ├─Camera2D `Camera2D` # 相机节点
-└─World `Node` # 世界节点，用于动态加载
+└─GameWorld `Node` # 世界节点，用于动态加载
 ```
 
 ### 四、world场景结构
@@ -447,65 +376,225 @@ Area2D <脚本> # 挂载脚本
 
 ## 架构
 
-### 一、TMainNode
+### 一、状态机
 
-关于TMainNode循环引用错误：
+1. 状态机的子状态是使用C++方法创建的，没有使用Godot中类，所以要手动管理内存对象
+2. 注册状态子类在TFSCMachine.cpp中
+3. 子状态机如果需要发射信号，调用信号管理器中的发射信号方法
 
-1. 在TMainNode.cpp中引入管理器类
-2. 在使用TMainNode::s_global_manager管理器类时，引入其对应的头文件（在.cpp文件中）
+GDScript调用
 
-TMainNode中定义的静态变量
-
-- `TMainNode::s_global_world `：世界节点
-
-- `TMainNode::s_global_batmanager`：战斗管理器
-
-- `TMainNode::s_global_playermanager`：玩家节点
-
-- `TMainNode::s_global_inventorymanager`：仓库管理器
-
-- `TMainNode::s_global_scenemanager`：场景管理器
-
-- `TMainNode::s_global_inputmanager`：输入输出管理器
-
-- `TMainNode::s_global_inventorywindow`：背包窗口
-
-- `TMainNode::s_global_battlewindow`：战斗窗口
-
-TMainNode可调用方法
-
-- `sys_initialize()`：TMainNode初始化方法
-
-TMainNode的GDScript脚本设置
-
-``` shell
-extends TMainNode
-
-@onready var tfsc = $TFSC # 状态机核心节点引入
-func _ready() -> void:
-	sys_initialize(); # 系统初始化
-	tfsc.fsc_initiazlie(); # 状态机初始化
-	pass # Replace with function body.
-	
-func _process(delta: float) -> void:
-	tfsc.fsc_update(delta) # 状态机每帧运行
-	pass
+``` python
+# 初始化状态机类
+var t = ClassDB.instantiate("TFSCMachine") as TFSCMachine
+# 状态机初始化方法
+t.fsc_initiazlie()
 ```
 
-### 二、TFSC状态机
+### 二、管理器类
 
-提供给GDScript调用的方法
+1. 若需要在GDScript中调用，应创建一个节点，暴露属性，在其他管理器中调用这个节点的方法
 
-1. `fsc_initiazlie()`：状态机初始化方法 
-2. `fsc_update(_delta)`：状态机update方法 
 
-### 三、管理器类
+#### Ⅰ、接口类
 
-- 管理器类要使用TMainNode中设置的s_global_manager方法，需要引入其对应的头文件，为了防止循环引入错误
+- 供控制器调用
 
-Ⅰ、InputManager
+``` c++
+class TControllerInterface : public RefCounted
+{
+    GDCLASS(TControllerInterface, RefCounted); // Godot 必需的宏
+protected:
+    static void _bind_methods(){};
+public:
+    virtual void initialize() = 0; // 初始方法，需要再外部访问
+    virtual ~TControllerInterface() = default; // 默认析构函数
+};
+```
 
-Ⅲ、SceneManager
+#### Ⅱ、TControllerInit
+
+1. TControllerInit重要用于调用已经注册的管理器类的初始化
+
+TController.h
+
+``` c++
+class TControllerInterface; // 类声明
+class TControllerInit : public RefCounted
+{
+    GDCLASS(TControllerInit, RefCounted);
+public:
+    // 注册方法，供regiter_type.cpp中注册使用
+    static void register_controller(TControllerInterface * p);
+
+protected:
+    static void _bind_methods();
+
+private:
+    void initialize(); // 初始化方法，供GDScript调用
+    // 容器，所有的管理器集合
+    static std::vector<TControllerInterface *> controller_set;
+};
+```
+
+TController.cpp
+
+``` c++
+
+std::vector<TControllerInterface *> TControllerInit::controller_set {};
+
+void TControllerInit::_bind_methods() 
+{
+    // 注册方法供GDScript调用
+    ClassDB::bind_method(D_METHOD("initiazlie"), &TControllerInit::initialize);
+}
+// 管理器类初始化
+void TControllerInit::initialize()
+{
+    for (int i=0; i < controller_set.size(); i++)
+    {
+        controller_set[i]->initialize();
+    }
+}
+// 注册方法
+void TControllerInit::register_controller(TControllerInterface * p)
+{
+    controller_set.push_back(p);
+};
+```
+
+#### Ⅲ、管理器的创建
+
+创建创建管理器的.h文件
+
+1. 要继承自接口文件`TControllerInterface`
+2. 必须实现方法：`virtual void initialize() override;`
+3. 创建单例模式
+
+``` c++
+class TGameManager : public TControllerInterface // 继承接口文件
+{
+    GDCLASS(TGameManager, TControllerInterface); 
+public:
+    virtual void initialize() override; // 接口文件必须实现方法
+    static TGameManager * get_singleton(); // 获取单例方法
+
+protected:
+    static void _bind_methods();
+
+private:
+    static TGameManager * singleton; // 单例
+};
+```
+
+实现管理器方法.cpp文件
+
+``` c++
+// 单例对象
+TGameManager * TGameManager::singleton = nullptr;
+// 获取单例
+TGameManager * TGameManager::get_singleton()
+{
+    if (singleton == nullptr)
+    {
+        singleton = memnew(TGameManager);
+    }
+    return singleton;
+};
+// 必须实现方法
+void TGameManager::initialize(){}
+```
+
+#### Ⅳ、GDSciprt调用
+
+``` python
+# 初始化调用
+var f = ClassDB.instantiate("TControllerInit") as TControllerInit
+f.initiazlie()
+
+# 直接调用已经注册的类方法
+# TGameManager在register_type.cpp中注册为单例
+# TGameManager中应使用Class::register_class绑定方法
+TGameManager.test()
+```
+
+### 三、register_type.cpp
+
+#### Ⅰ、注册方法
+
+基本注册：
+
+``` c++
+// 注册接口类TControllerInterface
+ClassDB::register_abstract_class<TControllerInterface>(); 
+// 注册类
+ClassDB::register_class<TGameManager>();
+```
+
+使用TControllerInit控制器与不使用TControllerInit控制器
+
+``` c++
+/* 方式一，使用TControllerInit控制器 */
+// 直接注册给TControllerInit
+TControllerInit::register_controller(TGameManager::get_singleton());
+
+/* 方式二，没有TControllerInit控制器 */
+// 直接调用get_singleton进行初始化
+TGameManager * p_game = TGameManager::get_singleton();
+// 初始化
+p_game->initialize();
+```
+
+#### Ⅱ、GDExtension注册单例
+
+- 可以选择静态单例，在使用过程中比较复杂，使用静态单例简单的多
+
+``` c++
+/* 可选项：若要提供给GDScript调用，则注册为注册单例 */ 
+// 注意要引入头文件
+#include <godot_cpp/classes/engine.hpp>
+Engine::get_singleton()->register_singleton(
+    "TGameManager", 
+    // 如果使用了方式二，就可填写p_game
+    TGameManager::get_singleton()
+);
+```
+
+#### Ⅲ、使用静态单例
+
+- 通过`bind_static_method`绑定方法
+- 单例注册转而在`BOIS.gd`中进行注册
+- 另外，单例不用手动反注册，系统会自动卸载
+
+GDExtension绑定静态方法，静态方法返回当前单例
+
+``` c++
+static void _bind_methods()
+{
+    // 注册静态方法
+    ClassDB::bind_static_method(
+     	// ！TMainNode：类名，同时供GDScript调用
+     	// ！D_METHOD("get_direction")：在GDScript中触发的方法
+     	"TMainNode", D_METHOD("get_singleton"), 
+     	// 实际调用的方法
+    	&TMainNode::get_singleton); 
+    };
+};
+
+// 触发方法
+Vector2 TMainNode::get_singleton() { //... };
+```
+
+GDScript调用方法
+
+``` python
+## 获取TMainNode实例，
+var k = TMainNode.get_singleton()
+## 使用注册单例
+Engine.register_singleton("TMainNode", k)
+```
+
+
 
 ### 四、物品相关
 

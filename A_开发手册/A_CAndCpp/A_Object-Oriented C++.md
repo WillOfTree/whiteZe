@@ -5,7 +5,7 @@
 - 行注释：//
 - 块注释：/**/
 
-### 常用目录结构
+## 常用目录结构
 
 ``` shell
 project 
@@ -22,6 +22,149 @@ project
 ├─Makefile # 项目构建配置文件
 └─README.md # 项目总体说明文件
 ```
+
+## 现代C++
+
+### 一、智能指针
+
+1. `unique_ptr`、`shared_ptr`、`weak_ptr`：自动管理内存，避免内存泄漏。
+
+2. 注意：因为是自动管理内存，不需要手动释放（不用析构函数）
+
+3. 手动放弃所有权需要手动释放
+
+   ``` c++
+   void risky() {
+       auto A = std::make_unique<int>(42);
+       int* raw_ptr = A.release();  // 放弃所有权，需手动管理 ❗
+       delete raw_ptr;  // 必须手动释放，否则内存泄漏！
+   }
+   ```
+
+
+`std::unique_ptr` - 独占所有权
+
+- **优先使用 `unique_ptr`** - 最轻量，无引用计数开销
+
+``` c++
+// 创建 unique_ptr
+std::unique_ptr<MyClass> ptr1 = std::make_unique<MyClass>();
+// 移动语义（所有权转移），不能使用=赋值
+std::unique_ptr<MyClass> ptr2 = std::move(ptr1);
+
+// 双重指针（几乎无用，违背 unique_ptr 设计初衷）
+std::unique_ptr<TStateInterface> * a = std::make_unique<TStateInterface>;
+
+// 创建动态数组
+std::unique_ptr<int[]> arr = std::make_unique<int[]>(10);
+arr[0] = 42;
+arr[1] = 24;
+
+// 或者使用自定义删除器
+auto deleter = [](int* p) {
+    delete[] p;
+};
+std::unique_ptr<int[], decltype(deleter)> arr2(new int[5], deleter);
+```
+
+`std::shared_ptr` - 共享所有权
+
+``` c++
+// 创建 shared_ptr（推荐使用 make_shared）
+std::shared_ptr<Resource> ptr1 = std::make_shared<Resource>();
+// 共享所有权
+std::shared_ptr<Resource> ptr2 = ptr1;
+```
+
+`std::weak_ptr` - 弱引用
+
+- **避免循环引用** - 使用 `weak_ptr` 打破循环
+
+``` c++
+std::shared_ptr<int> shared = std::make_shared<int>(42);
+std::weak_ptr<int> weak = shared;
+
+```
+
+
+
+### 二、范围循环for auto
+
+#### Ⅰ、遍历Vector容器
+
+1. 要使用vector的下标，需要最朴素的for遍历方法
+2. for auto不能获取下标
+
+``` c++
+std::vector<int> i; //定义一个vector容器
+
+// 修改你正在迭代的容器的值，或者你想避免拷贝大的对象
+for(auto &it : num) {
+    cout << it << endl;
+}
+// it 用于捕获vector里面的值
+for(auto it :num) {
+    cout << it << endl;
+}
+```
+
+#### Ⅱ、遍历map容器
+
+``` c++
+map<int, int> num_map;      
+num_map[2] = 4;
+num_map[4] = 5;
+
+for(auto &it : num_map) {       
+    cout << it.first << endl; // 输出key
+    cout << it.second << endl;// 输出value
+}
+```
+
+### 三、移动语义
+
+- 右值引用（`&&`）和 `std::move`：避免不必要的拷贝，提升性能。
+
+```C++
+std::vector<int> v1 = std::move(v2); // 移动而非拷贝
+```
+
+### 四、强类型枚举（`enum class`）
+
+```c++
+enum class Color { Red, Green }; // 作用域限定，避免命名冲突
+
+// 使用作用域解析运算符访问
+Color c = Color::Red;
+```
+
+### 五、自动类型推导
+
+- `auto`：自动推断变量类型。
+- `decltype`：获取表达式的类型。
+
+```c++
+auto x = 42; // int
+decltype(x) y = x; // int
+```
+
+### 六、Lambda 表达式
+
+```c++
+auto add = [](int a, int b) { return a + b; };
+```
+
+### 七、初始化列表
+
+```c++
+std::vector<int> v = {1, 2, 3};
+```
+
+### 八、nullptr
+
+替代 `NULL`，明确表示空指针。
+
+
 
 ## 语法基础
 
@@ -341,40 +484,56 @@ delete [] arr;
 delete arr[2];
 ```
 
-### 七、for auto
+### 七、静态方法
 
-#### Ⅰ、遍历Vector容器
+1. 静态方法只能访问静态变量
+2. **慎用**：过度使用静态方法可能导致代码难以测试或违反面向对象设计原则。
 
-1. 要使用vector的下标，需要最朴素的for遍历方法
-2. for auto不能获取下标
+应用场景1：工具函数/工具类
+
+- 提供与类相关但不需要实例的功能（如数学计算、字符串处理）
+- 不使用类中的变量，方法，必须要的数据可通过参数提供
+
+应用场景2：工厂类
+
+- 返回当前实例
 
 ``` c++
-std::vector<int> i; //定义一个vector容器
-
-// 修改你正在迭代的容器的值，或者你想避免拷贝大的对象
-for(auto &it : num) {
-    cout << it << endl;
-}
-// it 用于捕获vector里面的值
-for(auto it :num) {
-    cout << it << endl;
-}
+class GameObject {
+public:
+    static GameObject* create() {
+        return new GameObject(); // 返回当前实例
+    }
+};
 ```
 
-#### Ⅱ、遍历map容器
+应用场景3：单例模式
+
+- 控制类只能有一个实例，并提供全局访问点。
 
 ``` c++
-map<int, int> num_map;      
-num_map[2] = 4;
-num_map[4] = 5;
-
-for(auto &it : num_map) {       
-    cout << it.first << endl; // 输出key
-    cout << it.second << endl;// 输出value
-}
+class AAA {
+    static AAA * instance; // 静态对象
+public:
+    static AAA * Singleton() {
+        if (!instance) {
+            instance = new AAA();
+        }
+        return instance;
+    }
+};
+AAA * AAA::instance = nullptr;
 ```
 
 ## 函数高级
+
+### 通用准则
+
+1. **对于内置类型**（int, double, bool等）：直接传值
+2. **对于小型自定义类型**：根据需要选择
+3. **对于大型对象**：总是使用 `const &`
+4. **需要修改参数时**：使用 `&`（去掉const）
+5. **需要副本时**：明确使用值传递
 
 ### 一、默认参数
 
@@ -462,85 +621,225 @@ func(v);
 func(10);
 ```
 
-#### 3、引用传值
+### 四、引用传值
 
-引用传值只能传递变量
+避免不必要的拷贝
 
 ``` c++
-// 函数定义
-void func(int &a){
-    count << "func的调用——1"
+// 值传递 - 产生拷贝（性能差）
+void processByValue(std::vector<int> data) {
+    std::cout << "Size: " << data.size() << std::endl;
 }
-// 无法引用，因为相当于int &a=10，非法
-// 引用 只能引用变量
-func(A);
 
-void func(const int &a){
-    count << "const int a"
+// 引用传递 - 无拷贝（性能好）
+void processByReference(const std::vector<int> & data) {
+    std::cout << "Size: " << data.size() << std::endl;
 }
-// 合法，因为const是常量
-func(10);
 ```
 
-引用传值定义调用
+修改外部变量的值
 
 ``` c++
-/* 常量引用 */
-// 类中声明
-void func(int &a);
-void func(int &);
-
-// 函数定义
-void func(int &a){
-    count << "func的调用——1"
+// 通过引用修改原始值
+void increment(int & value) {
+    value++; // 直接修改原始变量
 }
 
-// 使用，使用时不用加&
-func(A);
+// 通过指针修改（C风格，不推荐在现代C++中使用）
+void incrementPtr(int * value) {
+    (*value)++;
+}
 ```
 
-### 四、静态方法
-
-1. 静态方法只能访问静态变量
-2. **慎用**：过度使用静态方法可能导致代码难以测试或违反面向对象设计原则。
-
-应用场景1：工具函数/工具类
-
-- 提供与类相关但不需要实例的功能（如数学计算、字符串处理）
-- 不使用类中的变量，方法，必须要的数据可通过参数提供
-
-应用场景2：工厂类
-
-- 返回当前实例
+返回多个值
 
 ``` c++
-class GameObject {
+// 通过引用返回多个计算结果
+void analyzeVector(
+    const std::vector<int> & vec, 
+    int & minVal) {
+	//...
+}
+```
+
+常量引用`const & `：只读访问
+
+- 大型对象只读访问（最常见）
+- 需要修改原对象
+
+``` c++
+void printInfo(const std::string& prefix) {
+    // 大多数情况下应该这样写
+    // 参数使用常量引用，避免拷贝
+}
+
+void modifyFunction(std::vector<int> & data) {
+   // 需要修改时去掉const
+}
+
+
+void processByValue(std::vector<int> data) {
+    // 值传递，会发生完整拷贝：调用时整个vector被复制一份
+    // 明确表示需要副本，拷贝
+}
+```
+
+现代C++版本
+
+```c++
+// 现代C++中的灵活用法
+void smartFunction(std::vector<int> data) {
+    // 调用者可以选择：
+    // smartFunction(vec);        // 拷贝（如果不介意）
+    // smartFunction(std::move(vec)); // 移动（高效）
+}
+```
+
+### 五、返回值
+
+1. **默认直接返回值** - 最安全清晰
+2. **只有生命周期确定时才返回引用**
+3. **避免输出参数** - 降低可读性
+4. **利用现代C++特性** - optional, tuple, 结构化绑定
+5. **性能关键时测试** - 不要过早优化
+
+#### Ⅰ、普通返回值
+
+- **最安全**：返回的是独立副本
+- ✅ **支持所有类型**：包括局部变量
+- ⚠️ **可能有拷贝开销**：但现代编译器有优化（NRVO/RVO）
+- ✅ **C++17强制优化**：返回局部对象时保证无额外拷贝
+
+适用情况：
+
+``` c++
+// 1. 返回新创建的对象
+std::unique_ptr<MyClass> createObject() {
+    return std::make_unique<MyClass>();
+}
+
+// 2. 返回计算结果（需要副本）
+std::vector<int> processData(const std::vector<int>& input) {
+    std::vector<int> result = input;
+    // 处理result...
+    return result; // NRVO优化可能消除拷贝
+}
+
+// 3. 返回基本类型
+int calculateSum(int a, int b) {
+    return a + b;
+}
+```
+
+#### Ⅱ、返回常量引用 (`const &`)
+
+- ✅ **无拷贝开销**：只返回引用
+- ⚠️ **生命周期风险**：必须保证引用对象存活
+- ✅ **只读安全**：const 保证不会被意外修改
+- ❌ **不能返回局部变量**
+
+``` shell
+需要返回什么？
+├── 单个值 → 直接返回值
+├── 多个值 → std::tuple 或 struct
+├── 需要修改现有对象 → 返回引用 (&)
+├── 只读访问现有对象 → 返回常量引用 (const &)
+└── 需要避免拷贝且调用者提供内存 → 输出参数
+```
+
+适用场景
+
+``` c++
+// 1. 返回类内部数据（getter方法）
+class Config {
+    std::map<std::string, std::string> settings;
 public:
-    static GameObject* create() {
-        return new GameObject(); // 返回当前实例
+    const std::map<std::string, std::string>& getSettings() const {
+        return settings;
     }
 };
+
+// 2. 返回静态或全局数据
+const std::string& getDefaultName() {
+    static const std::string defaultName = "default";
+    return defaultName;
+}
+
+// 3. 返回参数中的引用
+const std::string & findLongest(const std::vector<std::string>& strings) {
+    if (strings.empty()) throw std::runtime_error("Empty");
+    return *std::max_element(strings.begin(), strings.end());
+}
 ```
 
-应用场景3：单例模式
+#### Ⅲ、非常量引用（&）
 
-- 控制类只能有一个实例，并提供全局访问点。
+- ✅ **允许修改原数据**：可以直接赋值
+- ⚠️ **破坏封装性**：暴露内部实现
+- ⚠️ **生命周期风险**：同常量引用
+- 🎯 **用于操作符重载**：如 `operator[]`, `operator<<`
+
+适用场景
 
 ``` c++
-class AAA {
-    static AAA * instance; // 静态对象
+// 1. 操作符重载
+class Matrix {
+    double* data;
 public:
-    static AAA * Singleton() {
-        if (!instance) {
-            instance = new AAA();
-        }
-        return instance;
+    double& operator()(int row, int col) {
+        return data[row * cols + col];
     }
 };
-AAA * AAA::instance = nullptr;
+
+// 2. 链式调用设置器
+class Builder {
+    std::string value;
+public:
+    Builder& setName(const std::string& name) {
+        value = name;
+        return *this; // 返回引用支持链式调用
+    }
+};
+
+// 3. 访问容器元素
+std::vector<int> vec = {1, 2, 3};
+int& first = vec[0]; // 返回引用允许修改
+first = 100; // 修改原vector
 ```
 
+#### Ⅳ、参数带出
 
+- ✅ **可返回多个值**：通过多个输出参数
+- ⚠️ **可读性差**：不如返回值直观
+- ✅ **避免拷贝大对象**：可以重用已分配内存
+- ❌ **现代C++不推荐**：优先使用返回值或tuple
+
+适用场景
+
+``` c++
+// 1. 需要返回多个相关值
+void analyzeString(const std::string& str, 
+                  int& charCount, 
+                  int& wordCount, 
+                  int& lineCount) {
+    // 计算多个统计值
+}
+
+// 2. 需要重用内存避免分配
+void processLargeData(const BigData& input, BigData& output) {
+    output.reuseMemory(); // 重用已分配内存
+    // 处理数据到output
+}
+
+// 3. 需要返回成功/失败状态
+bool loadFromFile(const std::string& filename, 
+                 std::vector<std::string>& lines) {
+    std::ifstream file(filename);
+    if (!file) return false;
+    
+    return true;
+}
+```
 
 
 
