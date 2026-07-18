@@ -137,18 +137,36 @@ func _ready() -> void:
 
 ``` python
 # /* 2种加载方式，2选一 */
-var scene_a_resource = load("res://path_to_your_scene_A.tscn") # 在运行时加载
-var scene_a_resource = preload("res://path_to_your_scene_A.tscn") # 在脚本解析时预加载
+# 在运行时加载，代码执行到这行时加载
+var scene_a_resource = load("res://path_to_your_scene_A.tscn") 
+# 静态加载，当场景加载时，就加载资源
+var scene_a_resource = preload("res://path_to_your_scene_A.tscn")
 
-// 实例化场景
+# 实例化场景
 var scene_a_instance = scene_a_resource.instantiate()
 
 # 添加场景
 add_child(scene_a_instance)
 
-# 卸载
-scene_a_instance.queue_free()
+
 ```
+
+删除场景
+
+``` python
+# 场景指针，可以放到全局变量中
+scene_a_instance.queue_free()
+
+# 若只能获取父类节点，只删除子节点
+ for child in $B.get_children():
+     child.queue_free()
+    
+# 如果知道场景A的节点名
+if $B.has_node("SceneA"):  # 假设场景A的节点名叫"SceneA"
+   $B.get_node("SceneA").queue_free()
+```
+
+
 
 ### 四、禁止关闭
 
@@ -161,5 +179,135 @@ get_tree().set_auto_accept_quit(false)
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		get_tree().quit() # default behavior
+```
+
+### 五、信号
+
+内置信号
+
+``` python
+extends Control
+
+func _ready():
+    # 获取按钮节点（假设场景中有一个名为 Button 的按钮）
+    var button = $Button
+
+    # 连接按钮的 pressed 信号到自定义方法
+    button.pressed.connect(_on_button_pressed)
+
+# 当按钮背按下时调用的方法
+func _on_button_pressed():
+    print("按钮被点击了！")
+```
+
+自定义信号
+
+``` python
+extends Node
+
+# 1. 定义自定义信号
+signal player_scored(points)
+signal game_over
+
+func _ready():
+    # 2. 连接自定义信号到处理方法
+    player_scored.connect(_on_player_scored)
+    game_over.connect(_on_game_over)
+
+# 3. 在某个条件下发射信号
+func add_score(amount):
+    print("获取分数：", amount)
+    player_scored.emit(amount)   # 发射信号并传递参数
+
+func end_game():
+    game_over.emit() # 发射无参数信号
+
+# 4. 处理信号的方法
+func _on_player_scored(points):
+    print("玩家获得了 %d 分" % points)
+
+func _on_game_over():
+    print("游戏结束！")
+
+```
+
+### 六、关于鼠标无法点击按钮
+
+**`CenterContainer`默认会"拦截"鼠标事件**。作为`Control`类节点，它的`mouse_filter`属性默认为`MOUSE_FILTER_STOP`，这意味着：
+
+- 它会接收鼠标事件
+- 事件不会继续向下传递给被它覆盖的节点A 
+
+即使这个容器是透明的、没有背景，它仍然会阻挡事件传递。这就是为什么节点A变得无法点击。
+
+**解决方案**
+
+**方案一：设置Mouse Filter为Ignore（最推荐）**
+
+1. 选中你的`CenterContainer`节点
+2. 在检查器（Inspector）中找到 **"Mouse Filter"** 属性
+3. 将其从默认的 **"Stop"** 改为 **"Ignore"**
+
+或者通过代码设置：
+
+```python
+$CenterContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+```
+
+**方案二：设置Mouse Filter为Pass**
+
+如果你希望`CenterContainer`本身也能接收某些事件（比如鼠标进入/退出的效果），但又不想阻挡下层，可以设置为 **"Pass"** 模式。
+
+gdscript
+
+```
+$CenterContainer.mouse_filter = Control.MOUSE_FILTER_PASS
+```
+
+这种模式下：
+
+- 容器会先接收到事件
+- 事件会继续向下传递给节点A 
+- 如果容器和节点A都想响应同一个点击，两者都会触发
+
+方案三：调整节点层级
+
+如果因为某些原因你不能修改`CenterContainer`的`mouse_filter`，可以考虑调整节点结构：
+
+- 将`CenterContainer`和节点A放在同一层级，而不是覆盖在上面
+- 但根据你的描述（"在A界面上添加centercontainer"），方案一明显更符合你的原始设计意图
+
+验证是否生效
+
+设置完成后，你可以：
+
+1. 运行场景
+2. 点击原本被容器覆盖的区域
+3. 节点A应该能正常响应点击了
+
+原理小贴士
+
+Godot的`mouse_filter`有三种模式：
+
+| 模式             | 行为               | 适用场景                     |
+| :--------------- | :----------------- | :--------------------------- |
+| **STOP**（默认） | 接收事件，停止传递 | 按钮、输入框等交互控件       |
+| **PASS**         | 接收事件，继续传递 | 透明遮罩、需要同时响应的上层 |
+| **IGNORE**       | 完全忽略事件       | 纯装饰性元素、布局容器       |
+
+你现在的需求就是典型的"布局容器应该忽略事件"场景，所以**方案一最合适**。
+
+### 七、实例化场景没有背景
+
+- 需要用药Panel控件设置背景颜色
+- 需要设置场景的顶级父类`custom Minimum Size`属性，不能为空
+- 需要保存场景
+
+### 八、按钮不更新
+
+``` python
+# 更新按钮
+self.button.queue_redraw() 
+await get_tree().process_frame # 等待1帧
 ```
 

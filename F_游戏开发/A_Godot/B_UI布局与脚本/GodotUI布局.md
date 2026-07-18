@@ -71,9 +71,33 @@ PanelContainer
 
 ## 布局说明
 
+注意事项
+
 1. 开发软件时，一般不要使用游戏开发控件，因为contol控件有些参数没有
 
 2. 使用TextureRect替代Sprite2D节点
+
+3. **要使用扩展功能**
+
+   - 需要点击容器的`扩展`按钮
+
+   - 其父类容器的`Container Sizing`下的`Horizontal、Vertical`属性是`填充`
+
+     （需要对应的方向上属性是填充）
+
+
+### 顶级容器
+
+1. 适合做顶级容器的控件有：Control、MariginContainer、PanelContainer
+
+   ！CenterContainer容器更适合父类的下级节点，就是当下节点只有剧中一个属性，其他样式与CenterContainer平行
+
+2. CenterContainer做顶级容器时，子容器不能覆盖整个屏幕，会集中在项目中间一点，做弹出框等没有问题
+
+3. Control做**子场景**父类时，应该设置
+   - `Custom Minimum`：但当自己作为子场景添加到其他场景中，若不设置，可能会出现背景不显示等问题，建议提前设置（其子节点Panel节点，也可自行设置`Cusom Minimum`，同样可以解决问题）
+   - 锚点可设为：任意（可选左上，右下等），**父节点的锚点选择与子节点能否使用完整矩形锚点没有直接关系**
+   - `Transform/Size`：父类设置了这项，子场景就可以使用**锚点-整个场景** ，并充满容器
 
 MarginContainer与容器Container使用
 
@@ -115,6 +139,10 @@ PanelContainer
 	├─Button # 随意布局
 	├─Button # 随意布局
 ```
+
+### 左右剧中布局
+
+需要使用control节点做中间节点
 
 ## 节点属性说明
 
@@ -655,6 +683,8 @@ m_animationState->travel("run");
 | **`file_mode`**         | 文件选择模式（单个文件、多个文件、目录等） | `FileDialog.FILE_MODE_OPEN_FILE`                             |
 
 GDScript使用
+
+- 
 
 ``` python
 func _ready():

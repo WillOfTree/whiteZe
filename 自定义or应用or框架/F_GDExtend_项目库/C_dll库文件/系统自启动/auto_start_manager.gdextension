@@ -1,0 +1,16 @@
+[configuration]
+
+entry_symbol = "system_auto_startup_entrysymbol"
+compatibility_minimum = "4.1"
+; 是否允许热重载
+reloadable = true
+
+
+[libraries]
+
+; windows库
+windows.debug.x86_64 = "res://bin/windows/auto_start_manager.windows.template_debug.x86_64.dll"
+
+; 安卓库
+;android.x86_64 = "res://bin/android/lib.android.template_debug.x86_64.so"
+;android.arm64 = "res://bin/android/lib.android.template_release.arm64.so"

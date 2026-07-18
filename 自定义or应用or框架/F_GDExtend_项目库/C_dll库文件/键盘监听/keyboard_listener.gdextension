@@ -1,0 +1,17 @@
+[configuration]
+
+entry_symbol = "t_keyboard_listener"
+compatibility_minimum = "4.1"
+; 是否允许热重载
+reloadable = true
+
+
+[libraries]
+
+; windows库
+windows.debug.x86_64 = "res://bin/windows/keyboard_listener.windows.template_debug.x86_64.dll"
+
+; 安卓库
+;android.x86_64 = "res://bin/android/lib.android.template_debug.x86_64.so"
+;android.arm64 = "res://bin/android/lib.android.template_release.arm64.so"
+

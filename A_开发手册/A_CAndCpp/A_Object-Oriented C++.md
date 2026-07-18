@@ -1,857 +1,12 @@
-# C++ 使用手册
+# Object Oriented C++（面向对象的C++）
 
-## 概述：
-
-- 行注释：//
-- 块注释：/**/
-
-## 常用目录结构
-
-``` shell
-project 
-├─bin # 编译后的可执行文件
-├─build # 存放.O 或.dep文件
-|	├─debug
-|	└─release
-├─doc # 项目文档
-├─include # 所有头文件
-├─src # 源文件
-├─lib # 静态库或动态库
-├─external # 第三方库
-├─tests # 测试代码
-├─Makefile # 项目构建配置文件
-└─README.md # 项目总体说明文件
-```
-
-## 现代C++
-
-### 一、智能指针
-
-1. `unique_ptr`、`shared_ptr`、`weak_ptr`：自动管理内存，避免内存泄漏。
-
-2. 注意：因为是自动管理内存，不需要手动释放（不用析构函数）
-
-3. 手动放弃所有权需要手动释放
-
-   ``` c++
-   void risky() {
-       auto A = std::make_unique<int>(42);
-       int* raw_ptr = A.release();  // 放弃所有权，需手动管理 ❗
-       delete raw_ptr;  // 必须手动释放，否则内存泄漏！
-   }
-   ```
-
-
-`std::unique_ptr` - 独占所有权
-
-- **优先使用 `unique_ptr`** - 最轻量，无引用计数开销
-
-``` c++
-// 创建 unique_ptr
-std::unique_ptr<MyClass> ptr1 = std::make_unique<MyClass>();
-// 移动语义（所有权转移），不能使用=赋值
-std::unique_ptr<MyClass> ptr2 = std::move(ptr1);
-
-// 双重指针（几乎无用，违背 unique_ptr 设计初衷）
-std::unique_ptr<TStateInterface> * a = std::make_unique<TStateInterface>;
-
-// 创建动态数组
-std::unique_ptr<int[]> arr = std::make_unique<int[]>(10);
-arr[0] = 42;
-arr[1] = 24;
-
-// 或者使用自定义删除器
-auto deleter = [](int* p) {
-    delete[] p;
-};
-std::unique_ptr<int[], decltype(deleter)> arr2(new int[5], deleter);
-```
-
-`std::shared_ptr` - 共享所有权
-
-``` c++
-// 创建 shared_ptr（推荐使用 make_shared）
-std::shared_ptr<Resource> ptr1 = std::make_shared<Resource>();
-// 共享所有权
-std::shared_ptr<Resource> ptr2 = ptr1;
-```
-
-`std::weak_ptr` - 弱引用
-
-- **避免循环引用** - 使用 `weak_ptr` 打破循环
-
-``` c++
-std::shared_ptr<int> shared = std::make_shared<int>(42);
-std::weak_ptr<int> weak = shared;
-
-```
-
-
-
-### 二、范围循环for auto
-
-#### Ⅰ、遍历Vector容器
-
-1. 要使用vector的下标，需要最朴素的for遍历方法
-2. for auto不能获取下标
-
-``` c++
-std::vector<int> i; //定义一个vector容器
-
-// 修改你正在迭代的容器的值，或者你想避免拷贝大的对象
-for(auto &it : num) {
-    cout << it << endl;
-}
-// it 用于捕获vector里面的值
-for(auto it :num) {
-    cout << it << endl;
-}
-```
-
-#### Ⅱ、遍历map容器
-
-``` c++
-map<int, int> num_map;      
-num_map[2] = 4;
-num_map[4] = 5;
-
-for(auto &it : num_map) {       
-    cout << it.first << endl; // 输出key
-    cout << it.second << endl;// 输出value
-}
-```
-
-### 三、移动语义
-
-- 右值引用（`&&`）和 `std::move`：避免不必要的拷贝，提升性能。
-
-```C++
-std::vector<int> v1 = std::move(v2); // 移动而非拷贝
-```
-
-### 四、强类型枚举（`enum class`）
-
-```c++
-enum class Color { Red, Green }; // 作用域限定，避免命名冲突
-
-// 使用作用域解析运算符访问
-Color c = Color::Red;
-```
-
-### 五、自动类型推导
-
-- `auto`：自动推断变量类型。
-- `decltype`：获取表达式的类型。
-
-```c++
-auto x = 42; // int
-decltype(x) y = x; // int
-```
-
-### 六、Lambda 表达式
-
-```c++
-auto add = [](int a, int b) { return a + b; };
-```
-
-### 七、初始化列表
-
-```c++
-std::vector<int> v = {1, 2, 3};
-```
-
-### 八、nullptr
-
-替代 `NULL`，明确表示空指针。
-
-
-
-## 语法基础
-
-### 一、内存模型
-
-1. 代码区：存放函数的二进制代码，由操作系统管理
-2. 全局区：存放全局变量和静态变量以及常量
-   - 全局变量、静态变量、常量区、字符串常量、const定义的常量
-3. 栈区：由编译器自动分配释放，川航函数参数、局部变量
-4. 堆区：程序员控制，程序结束自动释放
-   - 使用new运算符
-
-### 二、引用（&）
-
-#### 1、引用的基本用法
-
-- 理解：给变量起别名，他们都指向同一块内存，本质上使用的是指针。
-
-- 语法：数据类型 &别名 = 变量名| 数组名 |函数名
-
-  `int &a = b`：定义一个引用变量
-
-``` c++
-int a = 100;
-int &b = a; // 相当于 int *b = &a;
-b = 20;// 修改b，a的值也修改，他们是同一块内存
-
-/* 错误引用 */ 
-// 引用必须是一个合法的空间
-int &b = 100;
-
-/* 数组引用 */
-int a[10] = {0};
-int (&arr)[10] = a; //给数组起别名,arr指向a的空间
-
-/* 函数引用 */
-int &cc = func(); //引用类型的函数
-```
-
-#### 2、引用的注意事项
-
-- 引用必须初始化
-
-  ``` c++
-  int &a; //错误，没有初始化
-  int &a = b; // 正确
-  ```
-
-- 引用初始化后不可修改
-
-  ``` c++
-  int b = 200;
-  int &c = b;
-  &c = 300; //错误，引用已经指向了b
-  c = 300;  //这是赋值操作，不是引用，正确
-  ```
-
-- 并没有引用变量（与指针不同），当去掉&符号，就是普通变量（而指针，只要声明了指针变量，他就一直是指针变量，不论带不带*）
-
-#### 3、引用做函数参数
-
-- 本质还是指针传值，但比指针传值简单
-
-``` c++
-/* 声明 */ 
-void swap(int &a, int &b);
-void func(int (&arr)[], Player &p1, Player *p2);
-
-/* 定义 */
-// 定义引用传值，注意这里的&
-void swap(int &a, int &b)
-{
-	// 引用传值，操作与普通变量操作相同
-	int temp = a;
-	a = b;
-	b = tmp;
-}
-// 其他的引用方式
-void func(int (&arr)[], Player &p1, Player *p2){
-    // 数组
-    arr[2] = 30;
-    // 引用-结构体
-    p1.name = 2;
-    // 正常传递结构体指针
-    // 既然都传递指针了，也就没有必要使用引用传递结构体
-    p2->name = 3;
-}
-
-int main(){
-    /* 普通调用 */
-    // 引用传递，这里放的是值
-    // 这样就与其他高级语言一样简单
-    int a=200;
-	int c=100;
-	swap(a, b);
-    
-    // 数组和结构引用
-    int arr[10] = {1,2,3,4};
-	// 结构体
-    Player p1;
-    Player *p2 = new Player;  // Player类型的结构体
-	func(arr, p1, p2);
-}
-```
-
-#### 4、引用做函数的返回值
-
-- 不要返回局部变量的引用，因为这个引用会销毁
-- 函数的调用可以做左值
-
-``` c++
-/* 局部变量不要返回 */ 
-int & test(){
-    int a = 10;
-    return a;
-}
-int &ref = test();
-cout << ref << endl; //打印错误，第一次可能成功
-
-/* 函数的引用可以做为 */
-int & test(){
-    // 全局区，程序结束后释放
-    static int a = 10;
-    return a;
-}
-int &ref = test();
-cout << ref << endl; //打印10，因为他是static变量
-// 这里test返回一个引用，相当于&ref = 1000
-test() = 1000;
-cout << ref << endl; // 打印1000
-```
-
-#### 5、常量引用
-
-- **避免不必要的拷贝**：常用于函数参数，避免大对象拷贝
-- **只读访问**：通过常量引用不能修改所引用的对象
-- 若想把函数中的变量数值带出，必须使用* 或&，不论变量是什么类型（int，double等都需要）
-
-``` c++
-const int & ref = 10; // 可以赋值任何值
-ref = 20;// 错误，ref不能修改
-
-void test(const int &val)
-{
-    val = 100; //错误不能修改
-}
-```
-
-### 三、HelloWorld
-
-- <> ：系统头文件
-- "" ：自定义头文件，当前文件所在的目录
-- .h：是c语言的库，c++的库是不带.h
-
-``` c++
-// 标准输入输出流
-#include <iostream> 
-// 使用命名空间，可以省略std::的书写
-// 不建议大面积使用，只在局部使用
-useing namespace std;
-// 因为iostream中有引入string库，所以可以不引用string而使用string定义变量
-// 但要是使用string,应写上#include <string>
-#include <string>
-
-int main(int argc, const char * argv[]){
-    // 标准的命名空间std
-    // cout标准输出
-    // << 左运算符，拼接基础类型，字符串
-    // endl换行
-	std::cout << “hello world” << std::endl;
-	system(“pause”);//阻塞
-
-	return EXIT_SUCCESS; // 返回正常退出
-}
-```
-
-### 四、作用域
-
-#### Ⅰ、:: 运算符
-
-- 作用域运算符
-- 子类调用父类方法的运算符
-
-```c++
-// 作用域运算符
-// 全局atc ::atc 
-int atc=100;
-void function()
-{
-	cout << ::atc <<endl //使用全局atc
-	std::cout //std作用域下的cout方法
-}
-```
-
-#### Ⅱ、namespace关键字
-
-- 使用命名空间，可以省略std::的书写
-- 不建议大面积使用，只在局部使用
-
-```c++
-//命名空间必须定义在全局作用下
-//命名空间可以嵌套命名空间
-//命名空间可以放函数，变量，结构体类
-//命名空间是开放的，可以随时添加进原来的命名空间，**同一个命名空间名会合并**
-namespace LOL  // 声明一个命名空间
-{
-	void goattc();//函数
-	int a;//变量
-	struct Person{};//结构体
-class B{};//类
-namespace D{};//命名空间LOL::D::
-}
-
-//无名称的命名空间
-namespace
-{
-int a; //相当于static int a;
-}
-```
-
-#### Ⅲ、using关键字
-
-``` c++
-//using编译指令
-using namespace name 
-//use声明，在函数内使用会有二义性，声明原则比编译指令高，
-using name 
-```
-
-### 五、标准输入输出
-
-#### Ⅰ、键盘输出cout
-
-``` c++
-// 跳过回车，空格
-// 默认按十进制输出
-cout << 0b00001010 << endl; //输出10
-cout << 0123 <<endl; //输出83
-cout << 0xab << endl; //输出171
-
-// 输出8进制
-cout << bitset<8>(0b00001010) << endl; // 输出00001010
-cout << oct << 0123<< endl; // 0123
-cout << hex << 0xab << endl; //输出ab
-//刷新缓冲区linux有用
-cout.flush()
-//放入缓冲区
-cout.put(‘a’).put() 
-// 
-cout.write()
-cout.width(20)
-cout.fill(“*”)
-//卸载10进制显示
-cout.unsetf(ios::dec)
-//十进制显示
-cout.setf(ios::dec)
-```
-
-#### Ⅱ、键盘输入cin
-
-``` c++
-// cin 输入设备，默认为键盘
-char data;
-// cin会根据输入的类型自动判断输入类型
-cin >> data; //将输入值放入data变量
-// 输入多个变量
-cin >> num >> data
-//获取一个字符，接收换行\n
-char c = cin.get() 
-//将字符放到buf变量中，获取1024个字符,读取字符串不会拿走\n需要在读取一次
-cin.get(buf, 1024)
-//读取换行符，并把换行扔掉
-cin.getline(buf, 1024)
-//忽略一个字符
-cin.ignore()
-//忽略了n个字符
-cin.ignore(n)
-//查看，然后再放入缓存区，用cin.get()可获取
-cin.peek()
-//将字符串返回缓冲区
-char c = cin.get();
-cin.putback(c); 
-```
-
-### 六、New运算符
-
-#### Ⅰ、创建空间
-
-- 返回的是该类型的**指针**
-
-``` c++
-// 创建10个int类型的空间
-int *p = new int(10);
-    
-// 开辟数组,10个连续空间的数组
-int *arr = new int[10];
-    
-// 函数
-int * func(){}
-int *p = func()
-```
-
-#### Ⅱ、释放空间
-
-```c++
-/* 普通变量 */ 
-int *p = new int(10)
-// 删除
-delete p;
-
-/* 释放数组 */ 
-// 新建数组
-int *p = new int[10];
-// 释放整个数组
-delete [] arr;
-// 释放数组中的一个值
-delete arr[2];
-```
-
-### 七、静态方法
-
-1. 静态方法只能访问静态变量
-2. **慎用**：过度使用静态方法可能导致代码难以测试或违反面向对象设计原则。
-
-应用场景1：工具函数/工具类
-
-- 提供与类相关但不需要实例的功能（如数学计算、字符串处理）
-- 不使用类中的变量，方法，必须要的数据可通过参数提供
-
-应用场景2：工厂类
-
-- 返回当前实例
-
-``` c++
-class GameObject {
-public:
-    static GameObject* create() {
-        return new GameObject(); // 返回当前实例
-    }
-};
-```
-
-应用场景3：单例模式
-
-- 控制类只能有一个实例，并提供全局访问点。
-
-``` c++
-class AAA {
-    static AAA * instance; // 静态对象
-public:
-    static AAA * Singleton() {
-        if (!instance) {
-            instance = new AAA();
-        }
-        return instance;
-    }
-};
-AAA * AAA::instance = nullptr;
-```
-
-## 函数高级
-
-### 通用准则
-
-1. **对于内置类型**（int, double, bool等）：直接传值
-2. **对于小型自定义类型**：根据需要选择
-3. **对于大型对象**：总是使用 `const &`
-4. **需要修改参数时**：使用 `&`（去掉const）
-5. **需要副本时**：明确使用值传递
-
-### 一、默认参数
-
-- 如果有一个值有默认参数，从这个位置开始，到最后面都必须有默认参数
-- 定义和声明，只能有1个默认参数。
-
-``` c++
-// 声明
-int func(int a = 1111);
-// 从b开始到最后都必须有默认参数
-int func(int a, int b =1, int c=2);
-
-// 定义
-int func(int a = 1111){
-    return a;
-}
-
-/* 定义-实现 */
-// 声明中含有默认参数
-int func(int a=1);
-int func(int a){
-    return 1;
-}
-// 定义中含有默认参数
-int func(int a);
-int func(int a=1){
-    return 1;
-}
-```
-
-### 二、占位参数
-
-``` c++
-// 第二个参数是占位参数
-void func(int a, int){
-    return 1;
-}
-func(1,2)
-    
-// 占位参数的默认值
-void func(int = 10){
-    return 1;
-}
-func()
-```
-
-### 三、函数重载
-
-函数名相同，但参数不同，从而根据参数选择不同的函数
-
-- 参数不同包括，个数、类型、顺序、引用类型
-- 函数的返回值，不能变成重载方式
-- 重载，不加默认参数
-
-#### 1、正常调用
-
-``` c++
-void func(int a){
-    count << "func的调用——1"
-}
-void func(){
-    count << "func的调用——2"
-}
-
-// 输出func的调用——1
-func(1);
-// 输出func的调用——2
-func();
-```
-
-#### 2、常量
-
-``` c++
-/* 常量 */
-void func(int a){
-    count << "func的调用——1"
-}
-void func(const int a){
-    count << "const int a"
-}
-int v = 10;
-// 输出func的调用——1
-func(v);
-// 输出 const int a
-func(10);
-```
-
-### 四、引用传值
-
-避免不必要的拷贝
-
-``` c++
-// 值传递 - 产生拷贝（性能差）
-void processByValue(std::vector<int> data) {
-    std::cout << "Size: " << data.size() << std::endl;
-}
-
-// 引用传递 - 无拷贝（性能好）
-void processByReference(const std::vector<int> & data) {
-    std::cout << "Size: " << data.size() << std::endl;
-}
-```
-
-修改外部变量的值
-
-``` c++
-// 通过引用修改原始值
-void increment(int & value) {
-    value++; // 直接修改原始变量
-}
-
-// 通过指针修改（C风格，不推荐在现代C++中使用）
-void incrementPtr(int * value) {
-    (*value)++;
-}
-```
-
-返回多个值
-
-``` c++
-// 通过引用返回多个计算结果
-void analyzeVector(
-    const std::vector<int> & vec, 
-    int & minVal) {
-	//...
-}
-```
-
-常量引用`const & `：只读访问
-
-- 大型对象只读访问（最常见）
-- 需要修改原对象
-
-``` c++
-void printInfo(const std::string& prefix) {
-    // 大多数情况下应该这样写
-    // 参数使用常量引用，避免拷贝
-}
-
-void modifyFunction(std::vector<int> & data) {
-   // 需要修改时去掉const
-}
-
-
-void processByValue(std::vector<int> data) {
-    // 值传递，会发生完整拷贝：调用时整个vector被复制一份
-    // 明确表示需要副本，拷贝
-}
-```
-
-现代C++版本
-
-```c++
-// 现代C++中的灵活用法
-void smartFunction(std::vector<int> data) {
-    // 调用者可以选择：
-    // smartFunction(vec);        // 拷贝（如果不介意）
-    // smartFunction(std::move(vec)); // 移动（高效）
-}
-```
-
-### 五、返回值
-
-1. **默认直接返回值** - 最安全清晰
-2. **只有生命周期确定时才返回引用**
-3. **避免输出参数** - 降低可读性
-4. **利用现代C++特性** - optional, tuple, 结构化绑定
-5. **性能关键时测试** - 不要过早优化
-
-#### Ⅰ、普通返回值
-
-- **最安全**：返回的是独立副本
-- ✅ **支持所有类型**：包括局部变量
-- ⚠️ **可能有拷贝开销**：但现代编译器有优化（NRVO/RVO）
-- ✅ **C++17强制优化**：返回局部对象时保证无额外拷贝
-
-适用情况：
-
-``` c++
-// 1. 返回新创建的对象
-std::unique_ptr<MyClass> createObject() {
-    return std::make_unique<MyClass>();
-}
-
-// 2. 返回计算结果（需要副本）
-std::vector<int> processData(const std::vector<int>& input) {
-    std::vector<int> result = input;
-    // 处理result...
-    return result; // NRVO优化可能消除拷贝
-}
-
-// 3. 返回基本类型
-int calculateSum(int a, int b) {
-    return a + b;
-}
-```
-
-#### Ⅱ、返回常量引用 (`const &`)
-
-- ✅ **无拷贝开销**：只返回引用
-- ⚠️ **生命周期风险**：必须保证引用对象存活
-- ✅ **只读安全**：const 保证不会被意外修改
-- ❌ **不能返回局部变量**
-
-``` shell
-需要返回什么？
-├── 单个值 → 直接返回值
-├── 多个值 → std::tuple 或 struct
-├── 需要修改现有对象 → 返回引用 (&)
-├── 只读访问现有对象 → 返回常量引用 (const &)
-└── 需要避免拷贝且调用者提供内存 → 输出参数
-```
-
-适用场景
-
-``` c++
-// 1. 返回类内部数据（getter方法）
-class Config {
-    std::map<std::string, std::string> settings;
-public:
-    const std::map<std::string, std::string>& getSettings() const {
-        return settings;
-    }
-};
-
-// 2. 返回静态或全局数据
-const std::string& getDefaultName() {
-    static const std::string defaultName = "default";
-    return defaultName;
-}
-
-// 3. 返回参数中的引用
-const std::string & findLongest(const std::vector<std::string>& strings) {
-    if (strings.empty()) throw std::runtime_error("Empty");
-    return *std::max_element(strings.begin(), strings.end());
-}
-```
-
-#### Ⅲ、非常量引用（&）
-
-- ✅ **允许修改原数据**：可以直接赋值
-- ⚠️ **破坏封装性**：暴露内部实现
-- ⚠️ **生命周期风险**：同常量引用
-- 🎯 **用于操作符重载**：如 `operator[]`, `operator<<`
-
-适用场景
-
-``` c++
-// 1. 操作符重载
-class Matrix {
-    double* data;
-public:
-    double& operator()(int row, int col) {
-        return data[row * cols + col];
-    }
-};
-
-// 2. 链式调用设置器
-class Builder {
-    std::string value;
-public:
-    Builder& setName(const std::string& name) {
-        value = name;
-        return *this; // 返回引用支持链式调用
-    }
-};
-
-// 3. 访问容器元素
-std::vector<int> vec = {1, 2, 3};
-int& first = vec[0]; // 返回引用允许修改
-first = 100; // 修改原vector
-```
-
-#### Ⅳ、参数带出
-
-- ✅ **可返回多个值**：通过多个输出参数
-- ⚠️ **可读性差**：不如返回值直观
-- ✅ **避免拷贝大对象**：可以重用已分配内存
-- ❌ **现代C++不推荐**：优先使用返回值或tuple
-
-适用场景
-
-``` c++
-// 1. 需要返回多个相关值
-void analyzeString(const std::string& str, 
-                  int& charCount, 
-                  int& wordCount, 
-                  int& lineCount) {
-    // 计算多个统计值
-}
-
-// 2. 需要重用内存避免分配
-void processLargeData(const BigData& input, BigData& output) {
-    output.reuseMemory(); // 重用已分配内存
-    // 处理数据到output
-}
-
-// 3. 需要返回成功/失败状态
-bool loadFromFile(const std::string& filename, 
-                 std::vector<std::string>& lines) {
-    std::ifstream file(filename);
-    if (!file) return false;
-    
-    return true;
-}
-```
-
-
-
-## 类和对象
-
-### 一、类的调用方法集合
+## 类的调用方法集合
 
 1.  **应当使用带括号的构造方式**（`AA *a = new AA();`）
 
-2. 有构造函数的类，不论有没有括号，都用构造函数进行初始化；
+2. 有构造函数的类：不论有没有括号，都用构造函数进行初始化；
 
-3. 没有构造函数的类
+3. 没有构造函数的类：
 
     不加括号的new只分配内存空间，不进行内存的初始化`AA *a = new AA;`;
 
@@ -863,12 +18,13 @@ bool loadFromFile(const std::string& filename,
 // WorkManager自定义类
 class WorkManager{ ... };
 
-// 方法一
+// 方法一，拷贝构造
 WorkManager worker = WorkManager();
-// 方法二
+// 方法二，默认构造，没有参数
 WorkManager worker;
 
-worker.print_title(); //调用
+//调用
+worker.print_title();
 ```
 
 指针方法调用（堆中创建）
@@ -877,32 +33,123 @@ worker.print_title(); //调用
 // WorkManager自定义类
 class WorkManager{ ... }
 
-WorkManager *worker = new WorkManager();
+WorkManager * worker = new WorkManager();
 worker->print_title();
 ```
 
-### 二、对象特性
+## 构造函数
 
-#### 1、构造函数
+### 一、默认/参数构造
 
-``` c
+``` c++
 class NPC 
 {
-    // 构造方法,与类名相同,自动调用
-    // 构造函数可以有参数，可以重载
-	NPC()；  
-}
-
-/* 单文件 */
-class NPC 
-{
-	NPC(){
-        count<< "构造函数调用"；
-    }  
+    //! 无参构造方法,与类名相同,自动调用
+	NPC();
+    //! 有参构造方法
+    NPC(int a);
 }
 ```
 
-#### 2、析构函数
+调用方法：
+
+``` c++
+// 默认构造函数
+NPC p1; 
+// 有参数构造函数
+NPC p2(10); 
+```
+
+### 二、拷贝构造
+
+- 拷贝构造创建的对象与原对象是值相同，但内存位置不同的关系
+
+``` c++
+class NPC 
+{
+    // 拷贝构造，固定写法，需要类名、&、const
+	NPC(const NPC &n);
+    // 拷贝赋值运算符
+    NPC & operator=(const MyClass& other);
+}
+```
+
+调用拷贝构造：
+
+``` c++
+NPC p; // 普通
+
+NPC p2 = p; // 拷贝构造，调用的是拷贝运算符
+NPC p3(p2); // 拷贝构造
+
+MyClass base;
+MyClass arr[3] = {base, base, base};  // 拷贝构造函数调用3次
+
+// 在函数调用时直接传递对象，都是调用拷贝构造
+void processObject(MyClass obj) { ... }
+
+// 值返回时也是拷贝构造（没有RVO优化的时候）
+MyClass createObject() 
+{
+    MyClass obj;
+    return obj;  // 可能调用拷贝构造函数
+}
+```
+
+### 三、移动构造
+
+- 移动构造使用右值引用和移动语义（即指向内存中已经存在的对象）
+
+``` c++
+class A
+{
+    // 移动构造
+    A(A && obj);
+}
+```
+
+### 四、现代C++建议
+
+决策流程：
+
+```text
+是否需要自定义析构函数？
+    ├── 否 → 使用默认的所有函数
+    └── 是 → 
+          ├── 是否需要深拷贝？
+          │     ├── 否 → 可能不需要拷贝函数
+          │     └── 是 → 需要同时定义拷贝构造和拷贝赋值
+          │
+          └── 是否禁止拷贝？
+                ├── 否 → 考虑移动语义
+                └── 是 → 删除拷贝构造和拷贝赋值
+```
+
+所以函数举例：
+
+```c++
+class ModernClass {
+public:
+    // 1. 析构函数
+    ~ModernClass();
+    
+    // 2. 拷贝构造函数
+    ModernClass(const ModernClass&);
+
+    // 3. 拷贝赋值运算符
+    ModernClass& operator=(const ModernClass&);
+
+    // 4. 移动构造函数 (C++11)
+    ModernClass(ModernClass&&);
+
+    // 5. 移动赋值运算符 (C++11)
+    ModernClass& operator=(ModernClass&&);
+}
+```
+## 析构函数
+
+- 构造流程：先构造A的对象，再构造B的对象
+- 析构流程：先析构B的对象，再构造A的对象
 
 ``` c++
 class NPC 
@@ -912,78 +159,10 @@ class NPC
 }
 ```
 
-#### 3、构造函数的分类
+## 深拷贝和浅拷贝
 
-- 按参数分为：有参数构造和无参数构造
-- 按类型分为：普通构造和拷贝构造
-
-#### 4、有参构造函数
-
-定义：
-
-``` c++
-/* 有参数构造函数 */
-class NPC 
-{
-	NPC(int a);
-}
-```
-
-调用方法：
-
-``` c++
-/* 括号法 */
-//默认构造函数, 不要加小括号
-NPC p1; 
-// 有参数构造函数
-NPC p2(10); 
-
-/* 显示法 */
-// 有参数构造
-NPC p4 = NPC(10);
-
-/* 隐试转换法 */
-// 相当于 NPC p6 = NPC(10)
-NPC p6 = 10
-```
-
-#### 5、拷贝构造函数
-
-定义：
-
-``` c++
-/* 拷贝构造函数 */
-class NPC 
-{
-    // 固定写法
-    // 拷贝构造函数，需要把类传入
-	NPC(const NPC &n);
-}
-```
-
-调用：
-
-``` c++
-NPC p2;
-
-/* 括号法 */
-NPC p3(p2);
-
-/* 显示法 */
-// 不要使用拷贝函数初始化匿名对象
-// 例：NPC(p5) 
-// NPC(p5) 等价于 NPC p5,这时p5与13行对象名相同
-NPC p5 = NPC(p2);
-
-/* 隐试转换法 */
-NPC p7 = p2;
-```
-
-#### 6、深拷贝和浅拷贝
-
-浅拷贝：并没有正在的拷贝，而是用指针指向了同一块空间，是由于析构（释放）内存时，浅拷贝在第一次就把资源释放，第二次释放就出错了
-
-深拷贝：在堆中重新申请空间
+- 浅拷贝：并没有正在的拷贝，而是用指针指向了同一块空间，是由于析构（释放）内存时，浅拷贝在第一次就把资源释放，第二次释放就出错了
+- 深拷贝：在堆中重新申请空间
 
 ``` c++
 NPC(const NPC & N){
@@ -997,227 +176,197 @@ NPC(const NPC & N){
 }
 ```
 
-#### 7、拷贝构造函数使用时机
+## 初始化列表
 
-1. 用已经创建好得对象初始化新类(Person p2(p1))
-2. 值传递，将类作为参数（值传递，都会调用拷贝构造）
-3. 以值得方式返回局部对象（会占用更多内存）
-4. relese与debug模式运行结果不同
-
-#### 8、初始化列表
-
-- 给类的属性赋值的操作
-
-①、传统操作
+使用参数构造函数时，可以使用初始化列表定性成员变量的初始化
 
 ``` c++
-class Person{
-	//Person中定义属性
-    // 建议使用_标注类属性
-	int m_A; // int _m_A;
-    int m_B;
-    
-	Person(int a, int b){
-        m_A = a;
-        m_B = b;
-    }
-}
-```
-
-②、使用初始化列表
-
-``` c++
-class Person {
-	//Person中定义属性
-	int m_A; 
-    int m_B;
-    /* 方法一 */
-    //直接将m_A赋值为10，m_B=20
-    Person():m_A(10), m_B(20) {
-        ... 
-    } 
-    
-    /* 方法二 */
-    // 将变量a的值赋值给m_A，将变量b的值赋值给m_B
-    Person(int a, int b): m_A(a), m_B(b) { 
-        ... 
-    }
-}
-```
-
-#### 9、类对象作为类成员
-
-##### 不使用类声明指针
-
-构造流程：以下例子，先构造A的对象，再构造B的对象
-
-析构流程：以下例子，先析构B的对象，再构造A的对象
-
-``` c++
-/* 多个类赋值例子 */ 
-class A {
-    string name;
-    A(string b_na){
-    	name = b_na
-    }
-}
-// 在B中定义一个属性，这个属性是自定义的一个类
-class B {
-    A b_name;
-    int b_b;
-    // 构造函数中赋值
-    // 注意这里的b_name(n)等价于
-    // A b_name = n;
-    B(int a, string n):b_b(a), b_name(n){
-		... 
-    }
-}
-
-// 调用
-B p(1, 'name')
-```
-
-##### 前置声明（类指针）
-
-常见错误：
-
-- `class “xxxx“ does not name a type` 
-- `declare class does not name a type` 
-
-产生原因：在一个源文件中，要声明或定义一个类的指针时，必须在使用前声明或定义该类
-
-``` c++
-/**---------------错误范例--*/
-/*== 文件：A.h == */
-class ABCDE {...}
-/*== 文件B.h ==*/
-class B
-{	
-    // 不可运行，没有在本类中声明ABCDE
-    ABCDE *a; 
-}
-/**---------------错误范例--*/
-
-/**---------------正确范例--*/
-/*== 文件：A.h == */
-class ABCDE {...}
-/*== 文件：B.h ==*/
-class ABCDE; //
-class B
-{	
-    // 正确，已经在本类中声明ABCDE
-    ABCDE *a; 
-}
-/**---------------错误范例--*/
-```
-
-#### 10、静态成员变量
-
-- 所有静态成员共享同一份数据
-
-    ``` c++
-    class B{...}
-    class A{
-    public:
-        static int AA;
-    }
-    int A::AA = 10;
-    // 所有静态成员共享同一份数据
-    B b;
-    cout << b::AA// 与classA中的AA是一个,也是10
-    ```
-
-- 静态变量在编译的时候就已经创建，且值为0
-
-- **必须类内声明，并在类外初始化**，使用前必须初始化
-
-- **静态数据成员不属于某个对象，在为对象分配空间中不包括静态成员所占空间**
-
-- 可以在程序的任意位置访问，赋值
-
-``` c++
-/* --------------文件：A.h */
-class A {
+class Point
+{
+    int x;
 public:
-    // 声明
+    Point(int i): x(i){}
+}
+```
+
+常量成员变量必须使用初始化列表进行初始化
+
+``` c++
+class TestA
+{
+    const int t;
+public:
+    TestA(int b): t(b){}
+}
+```
+
+引用成员变量必须使用初始化列表进行初始化
+
+``` c++
+class TestB
+{
+    int &t;
+public:
+    TestB(int b): t(b){}
+}
+```
+
+参数化的基类必须使用初始哈列表进行初始化
+
+``` c++
+class A // 基类
+{
+    A(int a){};
+}; 
+
+class B: public A
+{
+    B(int x): A(x){}; // 初始化基类的参数
+}
+```
+
+## 静态相关内容
+
+### 一、静态成员变量
+
+1. 所有静态成员共享同一份数据
+2. 静态变量在编译的时候就已经创建，且值为0
+3. **必须类内声明，并在类外初始化**，使用前必须初始化
+4. **静态数据成员不属于某个对象，在为对象分配空间中不包括静态成员所占空间**
+5. 可以在程序的任意位置访问，赋值
+
+定义方法：
+
+``` c++
+class A 
+{
+public:
+    // 类内只能声明，类外初始化
 	static int m_age; 
     static int *b; 
 }
-/* --------------文件：A.h */
 
-/*---------------文件：A.cpp */
-// 类内声明，类外初始化加定义
+/* 类外初始化加定义 */
 // 且不用加static
 int A::m_age = 100;
-// 指针的定义方法
 int * A::b = 200;
+```
 
+使用方法
+
+``` c++
 // 方法二，直接通过类名访问（常用）
 A::m_age = 300;
 
-// 方法一，通过对象访问（普通方法）
-// 先初始化类，再调用类
-A value；
+// 方法一，通过对象访问（与普通类使用方法一样普通方法）
+A value;
 value.m_age = 200;
 ```
 
-#### 12、静态方法
+### 二、静态方法
 
-1. 静态方法只能操作静态变量、其他静态方法
+1. 静态方法只能操作**静态变量、其他静态方法**
 2. 静态方法没有 this 指针
 3. 类中普通方法可用调用静态方法
-4. 静态方法也是全局可用，内存中只有一份
+4. 静态方法也是**全局可用，内存中只有一份**
+
+定义方法：
 
 ``` c++
-/* --------------文件A.h */
-class A {
+class A 
+{
 public:
     // 静态成员函数只能访问静态成员变量
 	static void func(); 
 }
-/* --------------文件A.h */
-/* --------------文件A.cpp */
-// 定义静态成员函数
-#include "A.h"
+
 void A::func()
 {
     // 其中不能使用非静态成员变量
 }
-/* --------------文件A.cpp */
+```
 
+使用方法：
+
+``` c++
 // 调用一，通过对象
 A a;
 a.func();
-// 调用二，通过类名
+
+// 调用二，通过类名(常用)
 A::func();
 ```
 
-#### 13、静态与非静态互相调用
+### 三、静态与非静态方法调用
 
-方法一：
+- 非静态方法调用静态方法（查看**静态成员变量、静态方法**）
+- 静态方法不能直接调用非静态方法
 
-1. 这种方法，调用的时候必须传入 `A a = new A()` 中的A
+#### Ⅰ、静态工厂方法
 
 ``` c++
-/* A.h */  
-// 通过传递类的地址调用非静态
-class A {
-public:
-    static void test(A *a);
-private:
-    int m_a；
-};
-/* A.cpp */
-void A::test(A *a) {
-    a->m_a += 1;
+class User
+{
+    // 非静态方法
+    void displayInfo() const {  }
+    
+    // 静态工厂方法 - 创建对象并返回
+    static User createUser(const std::string& name) {
+        User newUser(name);          // 创建新对象
+        newUser.displayInfo();       // 通过对象调用非静态方法
+        return newUser;
+    }
 }
+
+// 调用方法
+User alice = User::createUser("Alice");
+```
+
+#### Ⅱ、对象指针调用
+
+``` c++
+class A
+{
+    // 非静态方法
+    void displayInfo() const {  }
+    
+    // 静态方法通过对象指针调用非静态方法
+    static void processUser(User * user) {
+        user->displayInfo();     // 通过指针调用
+    }
+}
+
+// 通过指针调用
+User bob("Bob"); // 创建对象，bob
+User::processUser(& bob); // 传递指针
+```
+
+#### Ⅲ、对象引用调用
+
+``` c++
+class User
+{
+    // 非静态方法
+    void displayInfo() const {  }
+    
+    // 静态方法通过对象引用调用非静态方法
+    static void updateUser(User& user, const std::string& newName) {
+        user.displayInfo();          // 通过引用调用
+        user.name = newName;         // 修改对象
+    }
+}
+
+// 通过引用调用
+User charlie("Charlie");
+User::updateUser(charlie, "Charles"); // 使用引用，直接传递对象即可
 ```
 
 静态成员函数可以访问静态成员，在类是单例类的情况下，可以在创建的时候把this指针赋值给那个静态成员，然后在静态成员函数内部访问this指向的静态成员：
 
 ``` c++
 /* A.h */
-class A {
+class A 
+{
 public:
     A();
     static void test() 
@@ -1226,178 +375,73 @@ private:
     static A *m_gA;
     int m_a
 }
+
 /* A.cpp */
-// 静态变量必须声明,不然不可使用
-A * A::m_gA = NULL;
+A * A::m_gA = NULL; // 静态变量初始化
 
 A::A(){
-    A::m_gA = this;
+    A::m_gA = this; // 在类使用时就将this保存起来
 }
+
 void A::test(){
 	A::m_gA.m_a += 1;
 }
 ```
 
-#### 14、this指针
+## 友元函数
 
-1. this指针指向被调用的成员函数（谁调用，就指向谁）
-2. this指针用途：
-    - 当形参和成员变量同名时，可用this区分
-    - 在类的非静态成员函数中返回对象本身，可使用`return *this`
+- 友元函数是在类中声明的一个非成员函数，但它可以访问该类的私有(private)和保护(protected)成员。
 
-①、解决名称冲突
+全局函数做友元
 
 ``` c++
-class Person {
-	int age;
-    Person(int age){
-        // 属性名与方法名重名
-        this->age = age
-    }
-}
-// this指针指向的时p1
-Person p1(18);
-```
-
-②、返回类本身（可进行链式编程）
-
-```c++
-class Person
+class Buliding 
 {
-public:
-    int age;
-    // 若返回值(Person func(int a))，就不会进行累加操作
-    Person & func(int a){
-        this->age +=a;
-        return * this
-    }
-}
-
-Person p1;
-p1.func(10).func(20).func(30);
-```
-
-#### 15、空指针
-
-``` c++
-class Person
-{
-public:
-    int age;
-    // 若返回值(Person func(int a))，就不会进行累加操作
-    void func(){
-        cout << "this this kong";
-    }
-    void func2(){
-        // 因为默认成员属性前面有this->
-        // 当空指针类的时候，就变成NULL->age
-        cout << age;
-    }
-}
-
-Person *p1 = NULL;
-p1.func(); // 没错
-p1.func2();// 报错
-```
-
-#### 16、const修饰
-
-①、常函数
-
-- 限制修改类属性的值
-
-``` c++
-class Person{
-    // 加了mutable，就可以修改
-    // 灿han'shu
-	mutable int B;
-	int a;
-    //常函数，不允许修改类的成员属性
-	void showInfo() const {
-        // 错误，不能修改
-		this->a = 100;
-        // 正确，mutable是可以修改的
-        this->B = 100;
-	}
-}
-```
-
-②、常对象
-
-- 常对象可以调用常函数，不能调用普通方法
-
-``` c++
-class Person{
-	mutable int B;
-	int a;
-    //常函数，不允许修改类的成员属性
-	void showInfo() const {
-        // 错误，不能修改
-		this->a = 100;
-        // 正确，mutable是可以修改的
-        this->B = 100;
-	}
-    // 普通方法
-    void func(){...}
-}
-
-const Person p2; 
-p2.a = 100; // 错误，不能修改
-p2.B = 100; //正确，mutable修饰，可以修改
-cout << p2.name // 可以读
-    
-const Person p3;
-p3.func(); // 错误，不能调用
-p3.showInfo();// 正确，可以调用常函数
-```
-
-#### 17、类中枚举
-
-- 类中枚举是定义在静态区
-
-``` c++
-class A {
-    public:
-    	enum type{one,two,tree};
-}
-type i;// 定义一个类枚举
-type i = A::one;//给枚举类i赋值A::one
-```
-
-### 三、友元函数
-
-可以访问指定类中的私有方法、属性
-
-①、全局函数做友元
-
-``` c++
-// 定义
-class Buliding {
-    // 告诉编译器，允许goodGay() 函数访问私有属性
+    // 声明友元函数
 	friend void goodGay(Buliding &bul);
+private:
+    double width;
 }
 
-//全局友元函数
-// void goodGay(buliding * bul)
-void goodGay(buliding &bul）{
-	//这里可以调用Buliding访问私有方法属性
+// 定义友元函数 - 不是Box的成员函数
+void goodGay(Buliding & bul)
+{
+	b.width = 2000;
 }
+
+// 调用
+Buliding b;
+goodGay(b);// 调用友元函数
 ```
 
-②、类做友元
+类做友元
 
 ``` c++
-// 定义
-class Buliding{
-    // 告诉编译器，允许goodGy 类访问私有属性
-	friend class goodGy；//类做友元
+class Buliding
+{
+    // 声明友元类是GoodGay,
+	friend class goodGy;
+private:
+    double width;
 }
-class GoodGay {
-    void visite(){  }
+
+// 可修改Buliding私有方法的类
+class GoodGay 
+{
+    void visite(Buliding & b)
+    {
+    	b.width = 1000;
+    }
 }
+
+// 调用
+Buliding b;
+
+GoodGay g;
+g.visite(b); // 友元类可以修改private属性
 ```
 
-③、成员函数做友元
+成员函数做友元
 
 ``` c++
 // 定义
@@ -1410,13 +454,13 @@ class GoodGay {
 }
 ```
 
-### 四、运算符重载
+## 运算符重载
 
 对已有的运算符进行重新定义，赋予另外一种功能
 
-#### 1、加法重载
+### 一、加法重载
 
-①、通过成员函数重载
+通过成员函数重载
 
 ``` c++
 class Person {
@@ -1440,7 +484,7 @@ p2.b = 20;
 Person p3 = p1+p2;
 ```
 
-②、通过全局函数重载
+通过全局函数重载
 
 ``` c++
 class Person{
@@ -1463,7 +507,7 @@ p2.b = 20;
 Person p3 = p1+p2;
 ```
 
-#### 2、左移运算符
+### 二、左移运算符
 
 只通过全局函数重载
 
@@ -1488,18 +532,155 @@ ostream operator<< (ostream &cout, Person p){
 cout <<p <<p << endl;
 ```
 
-#### 3、递增运算符重载
+### 三、递增运算符重载
+
+### 四、赋值运算符重载
+
+### 五、关系运算符重载
+
+### 六、函数运算符重载
+
+## 其他内容
+
+### 一、类对象作为类成员
 
 ``` c++
+class A {
+    string name;
+    A(string b_na){
+    	name = b_na
+    }
+}
+
+class B {
+    A _name; // A类对象
+    int _b;
+    
+    // 使用初始化列表赋值
+    B(int a, string n):_b(a), _name(n)
+    {
+		//... 
+    }
+}
+
+// 调用
+B p(1, 'name')
 ```
 
-#### 4、赋值运算符重载
+### 二、前置声明
 
-#### 5、关系运算符重载
+常见错误：
 
-#### 6、函数运算符重载
+- `class “xxxx“ does not name a type` 
+- `declare class does not name a type` 
 
-## C++三大特性
+产生原因：在一个源文件中，要声明或定义一个类的指针时，必须在使用前声明或定义该类
+
+``` c++
+/* 文件：A.h */
+class ABCDE {...}
+
+/* 文件：B.h */
+class ABCDE; // 前置声明
+class B
+{	
+    ABCDE *a; 
+}
+```
+
+### 三、this指针
+
+1. this指针指向被调用的成员函数（谁调用，就指向谁）
+2. this指针用途：
+   - 当形参和成员变量同名时，可用this区分
+   - 在类的非静态成员函数中返回对象本身，可使用`return *this`
+
+解决名称冲突
+
+``` c++
+class Person {
+	int age;
+    Person(int age){
+        // 属性名与方法名重名
+        this->age = age
+    }
+}
+// this指针指向的时p1
+Person p1(18);
+```
+
+返回类本身（可进行链式编程）
+
+```c++
+class Person
+{
+public:
+    int age;
+    // 若返回值(Person func(int a))，就不会进行累加操作
+    Person & func(int a){
+        this->age +=a;
+        return * this
+    }
+}
+
+Person p1;
+p1.func(10).func(20).func(30);
+```
+
+### 四、空指针
+
+``` c++
+class Person
+{
+public:
+    int age;
+    // 若返回值(Person func(int a))，就不会进行累加操作
+    void func(){
+        cout << "this this kong";
+    }
+    void func2(){
+        // 因为默认成员属性前面有this->
+        // 当空指针类的时候，就变成NULL->age
+        cout << age;
+    }
+}
+
+Person *p1 = NULL;
+p1.func(); // 没错
+p1.func2();// 报错
+```
+
+### 标识符
+
+- override、final
+
+`= default`标识符
+
+- 将该函数声明为显式默认函数，这使得编译器为显式默认函数生成默认实现，比手动编程的函数实现更有效
+- 不是任何函数都可以使用`= default`的，必须是特殊的成员函数（默认构造、拷贝构造、析构函数等）
+
+``` c++
+class A
+{
+    A () = default;
+}
+```
+
+`= delete`标识符
+
+- 禁用该成员函数，信用的成员函数为显示删除
+- 基本所有的函数都可以显示删除
+
+``` c++
+class A
+{
+    A () = delete;
+}
+```
+
+
+
+## OOP三大特性
 
 ### 一、封装
 
@@ -2139,213 +1320,3 @@ class B:public A{
     virtual void fun() override; //正确
 }
 ```
-
-## 文件操作
-
-文件类型分为两种
-
-- 文本文件：文件以ASCII码形式存放在计算机中
-- 二进制文件：文件以文本的二进制形式存储在计算机中
-
-文件操作三大类
-
-- ofstream：写操作
-- ifstream：读操作
-- fstream：读写操作
-
-### 一、文本文件
-
-文件操作方式：
-
-- ios::in：  读文件的方式打开
-- ios::out： 写文件的方式打开
-- ios::ate： 初始位置：文件尾
-- ios::app： 追加方式写
-- ios::trunc： 如果文件存在，先删除在创建
-- ios::binary： 二进制方式
-- 多方式打开：ios:out | ios::trunc 使用2种方式
-
-#### 1、写操作
-
-``` c++
-/* 导入头文件 */ 
-#include<fstream>
-
-/*  创建流对象 */
-ofstream ofs;
-/* 打开文件 */ 
-ofs.open(“路径”, ios::in);
-/* 写数据 */ 
-ofs<< “想要向文本输入的” << endl;
-/* 关闭 */ 
-ofs.close();
-    
-/* 判断打开时候成功 */
-// 成功返回1,失败返回0
-ofs.is_open();
-```
-
-#### 2、读文件
-
-``` c++
-/* 导入头文件 */ 
-#include<fstream>
-
-/* 创建流对象 */
-ifstream ifs;
-/* 打开文件 */ 
-ifs.open(“路径”, ios::out);
-/* 读数据、方式一 */ 
-char buf[1024] = {0};
-// 读的数据放到buf中
-while(ifs >> buf){
-    //读取完成后，输出
-	couf<< buf <<endl; 
-}
-/* 读数据、方式二 */ 
-char buf[1024] = {0};
-while( ifs.getline(buf, sizof(buf)) ){
-	couf<< buf <<endl; //读取完成后，输出
-}
-/* 读数据、方式三 */ 
-string buf;
-while( getline(ifs, buf) ){
-	couf<< buf <<endl; //读取完成后，输出
-}
-
-/* 关闭 */ 
-ofs.close();
-
-/* 判断打开时候成功 */
-// 成功返回1,失败返回0
-ofs.is_open();
-
-/* 获取数据，放到buf中，每次读取sizfo(buf)个大小 */
-ifs.getline(buf, sizeof(buf))
-/* 每次获取1个字符 */
-char c = ifs.get();
-/**/
-ifs.eof()
-```
-
-### 二、进制文件
-
-文件类型特定为：ios::binary
-
-二进制写文件不建议使用string类型，会有不可预料的错误
-
-#### 1、写文件
-
-``` c++
-/* 导入头文件 */ 
-#include<fstream>
-
-/* 创建流对象 */
-ofstream ofs;
-/* 打开文件 */ 
-ofs.open(“路径”, ios::out | ios::binary);
-/* 写数据 */
-Person p = {'张三', 18}；
-// 将p类型强转换为char指针类型
-ofs.write((const char *)&p, sizeof(Person))
-/* 关闭 */ 
-ofs.close();
-```
-
-#### 2、读文件
-
-``` c++
-/* 导入头文件 */ 
-#include<fstream>
-
-/* 创建流对象 */
-ifstream ifs;
-/* 打开文件 */ 
-ifs.open(“路径”, ios::in| ios::binary);
-/* 读数据*/ 
-if (!ifs.is_open()){
-    cout<< "打开失败"
-        return;
-}
-// 用于存放数据
-Person p;
-// 读取的数据放到p中，大小是sizeof(Person)
-ifs.read( (char *)&p, sizeof(Person))
-
-/* 关闭 */ 
-ofs.close();
-```
-
-## 异常
-
-### 一、基本语法
-
-``` c++
-try{} catch(int) {}//捕获int类型异常
-
-try{} catch(){} catch(){} //捕获多个异常
-
-try{} catch(...){} //捕获其他类型异常
-
- 
-
-throw 1//抛出异常，可被catch抓到
-
-throw 3.14//抛出double异常
-
- 自定义异常类
-
-class my Exception
-
-{
-
-public:
-
-void myException();
-
-}
-
- 
-
-throw MyException(); //抛出异常类
-
-catch(MyException e)
-```
-
-### 二、栈解旋
-
-从try开始，到throw抛出异常之前，所有栈上的对象都会被释放
-
-### 三、异常接口声明
-
-void func() throw() //不能抛出任何异常
-
-void func() throw(int) //抛出int类型异常,当前函数只能抛出int错误
-
-{
-
-throw 1;
-
-}
-
-### 四、异常生命周期
-
-throw new MyException();
-
-catch(MyException *e)
-
-{
-
-delete e;
-
-}
-
-### 五、异常多态
-
-### 六、标准异常库
-
-\#include<stdexcept>
-
-throw out_of_range(“年龄越界”); //越界异常
-
-e.what() //异常信息

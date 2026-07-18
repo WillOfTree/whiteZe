@@ -190,6 +190,32 @@ SceneTransition # 战斗场景canvasLayer
 	└─ AnimationPlayer `` # 
 ```
 
+## 自动加载
+
+### 一、基础使用方式
+
+- 自动加载脚本只做逻辑，不做节点引用
+- 
+
+``` python
+# ✅ 存储数据，不要直接引用场景节点
+var player_health: int = 100
+var current_level: int = 1
+var inventory: Array = []
+
+# ✅ 定义全局信号
+signal game_over
+signal score_updated(new_score: int)
+
+# ✅ 纯逻辑函数
+func calculate_damage(attack: int, defense: int) -> int:
+    return max(0, attack - defense)
+```
+
+### 二、全局节点获取方法
+
+- 通过注册节点，获取global_node_manager获取节点
+
 ## 实体结构
 
 ### 一、Player结构
