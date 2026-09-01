@@ -473,6 +473,8 @@ using name
 
 ### 一、传统enum的问题
 
+- 
+
 ``` c++
 // 传统枚举的问题
 enum Color { Red, Green, Blue };
@@ -485,46 +487,111 @@ int i = Red; // 隐式转换为 int - 可能不是我们想要的
 Color c2 = 1; // 隐式从 int 转换 - 危险！
 ```
 
-### 二、强类型枚举的语法和基本用法
+### 二、强类型枚举基本用法
 
-```c++
-// 定义方法
-enum class EnumName {
-    enumerator1,
-    enumerator2,
+在类中定义：
+
+- 该枚举只在这个类内部或作为该类接口的一部分使用。
+
+``` c++
+class Player {
+public:
+    enum class State { kIdle, kRun, kJump };
+    // 枚举在类内部，表明它是 Player 的附属品
 };
 
-// 或者使用 struct（效果完全相同）
-enum struct EnumName {
-    enumerator1,
-    enumerator2,
-};
+// 在类中使用
+void Player::set_state(State new_state) {
+    State current = State::IDLE;  // 可以省略类名
+}
+
+// 类外使用，不能省略Player类名
+// 类名::枚举名 s = 类名::枚举名::枚举值
+Player::State s = Player::State::kIdle
 ```
 
-基本示例
+在独立的头文件中定义：
 
-```c++
-#include <iostream>
+``` c++
+// game_enums.hpp
+#pragma once
 
-// 定义强类型枚举，比传统枚举多了class关键字
-enum class Color { Red, Green, Blue };
-enum class TrafficLight { Red, Yellow, Green }; 
+enum class GamePhase { kMenu, kPlay, kPaused };
+enum class Difficulty { kEasy, kNormal, kHard };
 
-int main() {
-    // 必须使用作用域初始化变量
-    Color c = Color::Red;    
-    TrafficLight t = TrafficLight::Red; 
+// 使用-任意位置
+GamePhase phase = GamePhase::MENU;
+Difficulty diff = Difficulty::EASY;
+```
+
+### 三、简化写法
+
+起别名方式
+
+``` c++
+// 在 .cpp 文件顶部
+// 声明使用了Player类中的State枚举值
+using State = Player::State;
+// 声明使用了GamePhase的枚举值，需要引入game_enums.h头文件
+using Phase = GamePhase;
+
+// 之后就可以
+State s = State::IDLE;
+Phase p = Phase::MENU;
+```
+
+使用`using enum`关键字
+
+-  若使用了`using enum`，同时出现了另外一个相同的枚举变量，编译器会出错，这时需要显示指定枚举值
+- 当使用了`using enum`，就不能使用其前缀，只能使用枚举值
+- 为了防止不可预测的错误，禁止再类的`.h`文件中使用`using enum`，应在具体使用的位置添加`using enum`
+
+``` c++
+void handle_state(Player::State s) {
+    using enum Player::State;   // 只在这个函数里生效
+    switch (s) {
+        case IDLE: break; // 有效，直接使用枚举值
+        case State::RUN: break; // 错误，不能加载前缀
+        case Player::State::RUN: break; // 错误，不能加载前缀
+    }
     
-    // 错误使用方法
-    int i = Color::Red; // 不能隐式转换为 int
-    Color c2 = 1;       // 不能从 int 隐式转换
-    
-    // 显示转换
-    Color c3 = static_cast<int>(i); 
-    
-    return 0;
+    // 当使用using enum后，定义类型还是要完整的
+    // 省略的只有使用 枚举值 的时候
+    Player::State a = kIdle;
 }
 ```
+
+单独引入一个枚举值
+
+``` c++
+void func() {
+    using Player::State::IDLE;   // 只引入 IDLE
+    Player::State s = IDLE;      // ✅ 可以用
+    // Player::State s2 = RUN;   // ❌ RUN 没引入
+}
+```
+
+### 四、关于枚举类型冲突
+
+``` c++
+enum class A { CC, DD };
+enum class B { EE, CC };
+
+void func() {
+    // 方法一：显式指定（最安全）
+    A a = A::CC;
+    B b = B::CC;
+    
+    // 方法二：在最小作用域内 using enum
+    {
+        using enum A;
+        A a2 = CC;   // ✅ 只在这个块里有效
+    }
+    // 离开块后，CC 又变回“未定义”，不会和 B 冲突
+}
+```
+
+
 
 ### 三、强类型枚举的高级特性
 

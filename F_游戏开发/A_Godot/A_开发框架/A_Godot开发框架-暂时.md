@@ -21,18 +21,6 @@
   3. GDExtension与GDScript之间的调用，需要返回值
   4. 在高频调用的方法中（例如_process方法中）
 
-## 常见错误
-
-1. 资源挂载节点，不显示资源位置
-
-   应检查`D_METHOD`的方法与`PropertyInfo`方法是否一致
-
-   应检查`add_property`后的字符是不是当前类名
-
-2. 不显示自定义节点
-
-   应检查节点注册顺序，父类应在子类先注册
-
 ## Godot目录说明
 
 ``` shell
@@ -81,84 +69,82 @@
     └─equipments `装备数据`
 ```
 
+## Layer / Mask 方案
+
+- 当前物体属于哪一层：`CollisionObject2D / Collision / Layer`
+
+- 碰撞掩码：`CollisionObject2D / Collision / Mask` 
+
+- 例子：
+
+  Play（Mask是2，3）：Play只能检测Layer是2或3的物体
+
+  Play（Layer是1）：Play是属于1层
+
+通用的Layer设计
+
+| Layer       | 类别      | 说明               |
+| :---------- | :-------- | :----------------- |
+| **Layer 1** | 玩家      | 玩家角色           |
+| **Layer 2** | 敌人      | 敌人/NPC           |
+| **Layer 3** | 墙壁/地形 | 静态障碍物         |
+| **Layer 4** | 物品      | 可拾取物品         |
+| **Layer 5** | 触发区域  | 传送门、对话触发区 |
+
+通用设计
+
+| 节点类型              | Collision Layer | Collision Mask | 说明                         |
+| :-------------------- | :-------------- | :------------- | :--------------------------- |
+| **玩家**              | `1`             | `2, 3, 4, 5`   | 碰敌人、墙壁、物品、触发区域 |
+| **敌人**              | `2`             | `1, 3`         | 碰玩家、墙壁                 |
+| **墙壁**              | `3`             | `(空)`         | 作为障碍物，不主动检测别人   |
+| **物品 (Area2D)**     | `4`             | `1`            | 只检测玩家                   |
+| **触发区域 (Area2D)** | `5`             | `1`            | 只检测玩家                   |
+
 ## 场景结构
 
-### 一、常用结构名称
+### MainLoop
 
-- TInitState # 初始化状态
-- TOrdinaryState # 一般状态，移动和站立 
-- TOpenBackpackState # 背包打开，系统打开状态
-- TChangeScenceState # 切换场景状态
-- TBatState # 战斗状态
-  - InitialSubState # 子战斗状态-初始化
-  - SwitchSubState # 子战斗状态-战斗切换
-  - PlayerSubState # 子战斗状态-玩家操作状态 
-  - EnemySubState # 子战斗状态-敌人战斗状态
-  - VerificationSubState # 子战斗状态-验证战斗状态 
-  - OverSubState # 子战斗状态-战斗结束状态
+- **场景容器模式**，切换场景，直接删除world下的节点
 
-横板过关
-
-``` shell
-├─TInitState # 初始化状态
-├─TMoveState # 移动状态 
-├─TIdleState # 站立状态
-├─TJumpState # 跳跃状态
-└─TChangeScenceState # 切换场景状态
+``` c++
+MainLoop # 游戏主场景
+├─ PlayerContainer (Node)  # 玩家模型容器
+├─ ConfigLoader (Node)  # 配置加载节点
+├─ UI (CanvasLayer)  # 🆕 UI 层（独立于世界）
+└─ World 
 ```
 
-管理器节点名称
+### world场景结构
+
+- `set_global_position`是相对于游戏世界远点（0.0）的偏移位置
+- `set_position`是相对于父节点的相对位置
+- 传送节点要使用`set_global_position`、`get_global_position`获取绝对位置
+- 只有创建复杂物体，比如武器，背包，才使用`set_position`与`get_position`;
 
 ``` shell
-TControllerNode `TControllerNode`
-├─TSceneManager     # 场景管理器，用于切换场景，加载玩家，加载敌人等等
-├─TInputManager     # 输入管理，将输入信号传送出去，
-├─TMapManager       # 随机地图生成
-├─TInventoryManager # 物品管理
-├─TPlayerManager    # 玩家管理器，技能管理器
-└─TSignalManager     # 信号管理器，定义信号，连接信号
-```
-
-### 三、主场景结构说明
-
-1. 在GDExtension中，使用静态方法存储了当前节点的指针
-1. 在Godot编辑器中，使用全局脚本，添加对应位置
-
-``` shell
-main `Node2D` # 主循环
-├─PlayerContainer `Node` # 玩家资源节点
-|	├─Protagonist `TPlayerResMount` # 资源节点
-|	└─Supporter `TPlayerResMount` # 配角数据
-├─Windows `Node` # 一些常用窗口
-|	├─InventoryWindow `CanvasLayer` # 装备界面
-|	└─BattleWindow `CanvasLayer` # 战斗界面 
-├─Camera2D `Camera2D` # 相机节点
-└─GameWorld `Node` # 世界节点，用于动态加载
-```
-
-### 四、world场景结构
-
-- TEnemyContainer：当前场景所有敌人模型容器，保存了当前场景所有可遇见的敌人
-
-``` shell
-World # 场景
-├─ FunctionNode # 功能节点
-|	└─OtherFunctionNode # 其他功能节点
-├─ BG # 背景
-|	├─Sprite2D # 背景图片
-|	└─Sprite2D # 背景图片
-├─ PickableObjectContainer # 场景中可拾取物品，PickupObject对象
+SceneNode # 场景
+├── WorldEnvironment (WorldEnvironment)  # 环境（天空、光照）
+├── TileMap (TileMapLayer)  # 地图层
+├── EnemiesContainer (Node) # 🆕 敌人容器
+│     ├── Enemy_01
+│     └── Enemy_02
+├─ PickupsContainer # 场景中可拾取物品，PickupObject对象
 |	├─Weapon # 可拾取的物品
 |	├─Item # 可拾取的药品
 |	└─Equipment # 可拾取装备
-├─ Interaction # 交互节点
-├─ Teleporter # 传送
-|	├─AimPosition_1 `Marker2D` # 目标传送位置
-|	└─TriggerArea_1 `Area2D` # 传送碰撞区域、传送触发区域
-├─ EnemyPosition # 敌人位置marker2d位置
-|	├─Marker2D
-|	└─Marker2D
-└─ TEnemyContainer[C++] 
+|
+├── Markers (Node)  # 🆕 标记点容器（纯位置参考）
+│   ├── AimTeleportPoints (Node) # 目标传送点
+│   │   ├── Teleport_Aim_01 (Marker2D)
+│   │   └── Teleport_Aim_02 (Marker2D)
+│   └── EnemyPositions (Node) # 敌人站位
+│       ├── Pos_01 (Marker2D)
+│       └── Pos_02 (Marker2D)
+└─ Triggers (Node)  # 🆕 触发器容器
+     ├── TeleportTrigger_01 (Area2D)  # 传送触发区域
+     └── TeleportTrigger_02 (Area2D)
+
 ```
 
 ### 五、战斗场景
@@ -181,42 +167,7 @@ BattleWindow # 战斗场景canvasLayer
 			└─`%`GridContainer # 其子节点用于添加技能按钮
 ```
 
-### 六、过度场景
 
-``` shell
-SceneTransition # 战斗场景canvasLayer
-└─ Control # 
-	├─ ColorRect `` # 
-	└─ AnimationPlayer `` # 
-```
-
-## 自动加载
-
-### 一、基础使用方式
-
-- 自动加载脚本只做逻辑，不做节点引用
-- 
-
-``` python
-# ✅ 存储数据，不要直接引用场景节点
-var player_health: int = 100
-var current_level: int = 1
-var inventory: Array = []
-
-# ✅ 定义全局信号
-signal game_over
-signal score_updated(new_score: int)
-
-# ✅ 纯逻辑函数
-func calculate_damage(attack: int, defense: int) -> int:
-    return max(0, attack - defense)
-```
-
-### 二、全局节点获取方法
-
-- 通过注册节点，获取global_node_manager获取节点
-
-## 实体结构
 
 ### 一、Player结构
 
@@ -267,9 +218,6 @@ characterBody2D # 敌人
 |	├─Body`Sprite2D` # 身体
 |	├─ChooseIcon`AnimatedSprite2D` # 选中标识
 |	└─Shadow`Sprite2D` # 影子
-├─ AreaBox`Node2D` # 回合制不需要
-|	├─ HurtBox `Area2D` # 伤害区域，回合制不需要
-|	└─ HitBox `Area2D` # 攻击区域，回合制不需要
 ├─ AnimationPlayer # 动画 
 ├─ AudioStreamPlayer2D # 音效
 ├─ AIScriptNode<脚本> `Node` # AI脚本挂载节点-调用组件方法
@@ -346,6 +294,15 @@ mark2d
 
 - 应设置传送区域图块颜色，方便区分传送区域
 
+2个信号：
+
+- `area_entered`：当另一个 `Area2D` 进入当前 `Area2D` 时触发
+- `body_entered`：**当另一个 `PhysicsBody`（如 `CharacterBody2D`、`RigidBody2D`）进入 `Area2D` 时触发。**多使用玩家走进传送门、敌人撞到墙壁、角色踩到陷阱
+
+
+
+
+
 Area2D脚本
 
 - Area2D触发body_entered信号，触发`_player_entered`方法
@@ -369,28 +326,6 @@ func _player_entered(_p: Node2D)->void:
     TScenceManager.changer_scence(AimScence, target_transition_area)
     pass
 
-# 转换传送区域方向
-func _update_area():
-    var new_rect: Vector2 = Vector2(32, 32)
-    var new_position: Vector2 = Vector2.ZERO
-    if side == SIDE.TOP:
-        new_rect.x *= size
-        new_position.y -=16
-    elif side == SIDE.BOTTOM:
-        new_rect.x *= size
-        new_position.y += 16
-    elif side == SIDE.LEFT:
-        new_rect.y *= size
-        new_position.x -= 16
-    else side == SIDE.RIGHT:
-        new_rext.y *= size
-        new_position.x += 16
-    # 防止未找到CollisionShape2D，出现错误
-	if collision_shape == null:
-        collision_shape = get_node("CollisionShape2D")
-    # 设置
-    collision_shape.shape.size = new_rect
-    collision_shape.position = new_position
 ```
 
 场景结构
@@ -400,225 +335,19 @@ Area2D <脚本> # 挂载脚本
 └─ CollisionShape2D `` 
 ```
 
-## 架构
+## dll使用方法
 
-### 一、状态机
+### 一、方法说明
 
-1. 状态机的子状态是使用C++方法创建的，没有使用Godot中类，所以要手动管理内存对象
-2. 注册状态子类在TFSCMachine.cpp中
-3. 子状态机如果需要发射信号，调用信号管理器中的发射信号方法
+- 
 
-GDScript调用
-
-``` python
-# 初始化状态机类
-var t = ClassDB.instantiate("TFSCMachine") as TFSCMachine
-# 状态机初始化方法
-t.fsc_initiazlie()
+``` shell
+TFiniteStateMachine.fsc_initiazlie();
+TGameDirector.set_run_data(TGameDirector.EnterScene, "s00");
+TGameDirector.set_run_data(TGameDirector.AimLocation, "B");
 ```
 
-### 二、管理器类
-
-1. 若需要在GDScript中调用，应创建一个节点，暴露属性，在其他管理器中调用这个节点的方法
-
-
-#### Ⅰ、接口类
-
-- 供控制器调用
-
-``` c++
-class TControllerInterface : public RefCounted
-{
-    GDCLASS(TControllerInterface, RefCounted); // Godot 必需的宏
-protected:
-    static void _bind_methods(){};
-public:
-    virtual void initialize() = 0; // 初始方法，需要再外部访问
-    virtual ~TControllerInterface() = default; // 默认析构函数
-};
-```
-
-#### Ⅱ、TControllerInit
-
-1. TControllerInit重要用于调用已经注册的管理器类的初始化
-
-TController.h
-
-``` c++
-class TControllerInterface; // 类声明
-class TControllerInit : public RefCounted
-{
-    GDCLASS(TControllerInit, RefCounted);
-public:
-    // 注册方法，供regiter_type.cpp中注册使用
-    static void register_controller(TControllerInterface * p);
-
-protected:
-    static void _bind_methods();
-
-private:
-    void initialize(); // 初始化方法，供GDScript调用
-    // 容器，所有的管理器集合
-    static std::vector<TControllerInterface *> controller_set;
-};
-```
-
-TController.cpp
-
-``` c++
-
-std::vector<TControllerInterface *> TControllerInit::controller_set {};
-
-void TControllerInit::_bind_methods() 
-{
-    // 注册方法供GDScript调用
-    ClassDB::bind_method(D_METHOD("initiazlie"), &TControllerInit::initialize);
-}
-// 管理器类初始化
-void TControllerInit::initialize()
-{
-    for (int i=0; i < controller_set.size(); i++)
-    {
-        controller_set[i]->initialize();
-    }
-}
-// 注册方法
-void TControllerInit::register_controller(TControllerInterface * p)
-{
-    controller_set.push_back(p);
-};
-```
-
-#### Ⅲ、管理器的创建
-
-创建创建管理器的.h文件
-
-1. 要继承自接口文件`TControllerInterface`
-2. 必须实现方法：`virtual void initialize() override;`
-3. 创建单例模式
-
-``` c++
-class TGameManager : public TControllerInterface // 继承接口文件
-{
-    GDCLASS(TGameManager, TControllerInterface); 
-public:
-    virtual void initialize() override; // 接口文件必须实现方法
-    static TGameManager * get_singleton(); // 获取单例方法
-
-protected:
-    static void _bind_methods();
-
-private:
-    static TGameManager * singleton; // 单例
-};
-```
-
-实现管理器方法.cpp文件
-
-``` c++
-// 单例对象
-TGameManager * TGameManager::singleton = nullptr;
-// 获取单例
-TGameManager * TGameManager::get_singleton()
-{
-    if (singleton == nullptr)
-    {
-        singleton = memnew(TGameManager);
-    }
-    return singleton;
-};
-// 必须实现方法
-void TGameManager::initialize(){}
-```
-
-#### Ⅳ、GDSciprt调用
-
-``` python
-# 初始化调用
-var f = ClassDB.instantiate("TControllerInit") as TControllerInit
-f.initiazlie()
-
-# 直接调用已经注册的类方法
-# TGameManager在register_type.cpp中注册为单例
-# TGameManager中应使用Class::register_class绑定方法
-TGameManager.test()
-```
-
-### 三、register_type.cpp
-
-#### Ⅰ、注册方法
-
-基本注册：
-
-``` c++
-// 注册接口类TControllerInterface
-ClassDB::register_abstract_class<TControllerInterface>(); 
-// 注册类
-ClassDB::register_class<TGameManager>();
-```
-
-使用TControllerInit控制器与不使用TControllerInit控制器
-
-``` c++
-/* 方式一，使用TControllerInit控制器 */
-// 直接注册给TControllerInit
-TControllerInit::register_controller(TGameManager::get_singleton());
-
-/* 方式二，没有TControllerInit控制器 */
-// 直接调用get_singleton进行初始化
-TGameManager * p_game = TGameManager::get_singleton();
-// 初始化
-p_game->initialize();
-```
-
-#### Ⅱ、GDExtension注册单例
-
-- 可以选择静态单例，在使用过程中比较复杂，使用静态单例简单的多
-
-``` c++
-/* 可选项：若要提供给GDScript调用，则注册为注册单例 */ 
-// 注意要引入头文件
-#include <godot_cpp/classes/engine.hpp>
-Engine::get_singleton()->register_singleton(
-    "TGameManager", 
-    // 如果使用了方式二，就可填写p_game
-    TGameManager::get_singleton()
-);
-```
-
-#### Ⅲ、使用静态单例
-
-- 通过`bind_static_method`绑定方法
-- 单例注册转而在`BOIS.gd`中进行注册
-- 另外，单例不用手动反注册，系统会自动卸载
-
-GDExtension绑定静态方法，静态方法返回当前单例
-
-``` c++
-static void _bind_methods()
-{
-    // 注册静态方法
-    ClassDB::bind_static_method(
-     	// ！TMainNode：类名，同时供GDScript调用
-     	// ！D_METHOD("get_direction")：在GDScript中触发的方法
-     	"TMainNode", D_METHOD("get_singleton"), 
-     	// 实际调用的方法
-    	&TMainNode::get_singleton); 
-    };
-};
-
-// 触发方法
-Vector2 TMainNode::get_singleton() { //... };
-```
-
-GDScript调用方法
-
-``` python
-## 获取TMainNode实例，
-var k = TMainNode.get_singleton()
-## 使用注册单例
-Engine.register_singleton("TMainNode", k)
-```
+### 二、组件
 
 
 
@@ -898,17 +627,17 @@ camera.force_update_scroll();
 camera.limit_left = int() // 设置相机大小
 ```
 
-### 四、玩家重叠问题
+### 四、分层/Y排序
 
-启用Y排序
+需要修改场景根节点的`Y 排序`
 
-1. 根节点（游戏场景）设置`Y Sort Enabled`启用
-2. Tilemap设置Y启用
-3. Tilemap -> “层”设置Y启用
-4. player节点设置Y启用
-5. 设置Player层与“层”的z坐标处同一层
-6. 修改贴图“选择”-“Y排序原点”
-7. 修改player节点下的“Animationbody2D”节点的锚点
+1. 图层排序：`CanvasItem / Ordering / Z Index` 
+
+   `Z Index` 值越大，图层越在上面
+
+3. 启用Y排序：`CanvasItem / Ordering / Y Sort Enabled`  
+
+
 
 ### 五、遇敌脚本
 
@@ -939,13 +668,6 @@ PanelContainer
 	└─ MarginContainer # 边距
 		└─Label / RichTextLabel # 文本标签，显示说话文字
 ```
-
-### layer physics
-
-1. Layer：block_movement 阻挡移动
-2. Layer：
-
-### 
 
 ### 碰撞检测
 
